@@ -1,10 +1,17 @@
-import { PlusIcon, TrashIcon } from "@primer/octicons-react";
-import { Box, FormControl, IconButton } from "@primer/react";
+import { MentionIcon, PlusIcon, TrashIcon } from "@primer/octicons-react";
+import { Box, FormControl, IconButton, Select } from "@primer/react";
 import { Form, Formik } from "formik";
 import { last } from "rambda";
 import { object, string } from "yup";
+import { MoxieSelect } from "~/components/MoxieSelect";
 import { MoxieTextInput } from "~/components/MoxieTextInput";
-import { createEmail, deleteEmail, reloadAccount, useAccount } from "~/lib/api";
+import {
+    createEmail,
+    deleteEmail,
+    reloadAccount,
+    useAccount,
+    useDomains,
+} from "~/lib/api";
 
 export function Emails({ username }: { username: string }) {
     const account = useAccount(username);
@@ -35,35 +42,37 @@ function EmailItem({
     showCreate?: boolean;
     showDelete?: boolean;
 }) {
-    const account = useAccount(username);
+    const domains = useDomains();
 
     return (
         <Formik
-            initialValues={{ action: "", address }}
-            onSubmit={async ({ action, address }, actions) => {
+            initialValues={{
+                action: "",
+                localpart: address ? address.split("@")[0] : "",
+                domain: address ? address.split("@")[1] : domains[0].ASCII,
+            }}
+            onSubmit={async ({ action, localpart, domain }, actions) => {
                 try {
                     if (action === "create") {
-                        const modifiedAddress = address.includes("@")
-                            ? address
-                            : `${address}@${account.Domain}`;
-                        await createEmail(username, modifiedAddress);
+                        await createEmail(username, `${localpart}@${domain}`);
                         actions.resetForm();
                         reloadAccount(username);
                     }
                     if (action === "delete") {
-                        await deleteEmail(address);
+                        await deleteEmail(`${localpart}@${domain}`);
                         reloadAccount(username);
                     }
                 } catch (e) {
                     actions.setErrors({
-                        address: "x",
+                        localpart: "x",
                     });
                     actions.setStatus(last((e as Error).message.split(":")));
                 }
             }}
             validationSchema={object({
                 action: string(),
-                address: string().required(),
+                localpart: string().required(),
+                domain: string().required(),
             })}
         >
             {({ setFieldValue, submitForm, dirty, status }) => (
@@ -74,11 +83,26 @@ function EmailItem({
                         </FormControl.Label>
                         <div className="flex items-center gap-2 w-full">
                             <MoxieTextInput
-                                name="address"
-                                placeholder="Address"
+                                name="localpart"
+                                placeholder="Local part"
                                 disabled={!showCreate}
-                                className="flex-grow"
+                                block
                             />
+                            <MentionIcon size={12} />
+                            <MoxieSelect
+                                block
+                                name="domain"
+                                disabled={!showCreate}
+                            >
+                                {domains?.map((domain) => (
+                                    <Select.Option
+                                        key={domain.ASCII}
+                                        value={domain.ASCII}
+                                    >
+                                        {domain.ASCII}
+                                    </Select.Option>
+                                ))}
+                            </MoxieSelect>
                             <div className="flex gap-1">
                                 {showCreate && (
                                     <IconButton
@@ -90,7 +114,7 @@ function EmailItem({
                                         }}
                                     />
                                 )}
-                                {showDelete && !dirty && (
+                                {showDelete && (
                                     <IconButton
                                         icon={TrashIcon}
                                         aria-label="Delete"
