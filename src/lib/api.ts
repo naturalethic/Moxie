@@ -3,7 +3,6 @@ import { Account, Domain, WebServerConfig, store } from "./store";
 
 export const middleware: Middleware = (useSWRNext) => {
     return (key, fetcher, config) => {
-        console.log("MIDDLEWARE", key);
         const swr = useSWRNext(key, fetcher, config);
         const [resource, params] = key as [string, unknown[]];
         if (swr.data) {
@@ -67,6 +66,10 @@ export function reloadAccounts() {
 
 export async function createAccount(username: string, address: string) {
     await api("AccountAdd", [username, address]);
+}
+
+export async function deleteAccount(username: string) {
+    await api("AccountRemove", [username]);
 }
 
 export function useAccount(username: string) {
