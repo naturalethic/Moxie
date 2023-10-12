@@ -9,20 +9,18 @@ import {
 import { Form, Formik } from "formik";
 import { last } from "rambda";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { object, string } from "yup";
 import { MoxieSelect } from "~/components/MoxieSelect";
 import { MoxieTextInput } from "~/components/MoxieTextInput";
 import { createDomain, reloadDomains, useAccounts } from "~/lib/api";
 
-export function Component() {
-    const { name } = useParams();
+export function Domain({ name }: { name?: string }) {
     const [selectedItem, setSelectedItem] = useState("addresses");
     return (
         <PageLayout padding="none" columnGap="none" rowGap="none">
             <PageLayout.Pane position="start" width="small" divider="line">
                 <NavList>
-                    {name === "new" ? (
+                    {!name ? (
                         <NavList.Item aria-current={true}>
                             New domain details
                         </NavList.Item>
@@ -52,7 +50,6 @@ export function Component() {
 
 export function NewDomain() {
     const accounts = useAccounts();
-    const nav = useNavigate();
 
     return (
         <Formik
@@ -62,7 +59,6 @@ export function NewDomain() {
                 try {
                     await createDomain(name, username);
                     reloadDomains();
-                    nav(`/domains/${name}`);
                 } catch (e) {
                     actions.setErrors({
                         name: "x",

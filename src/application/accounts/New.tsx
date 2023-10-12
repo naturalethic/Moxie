@@ -3,7 +3,6 @@ import { Box, Button, CheckboxGroup, FormControl } from "@primer/react";
 import { ErrorMessage, Form, Formik } from "formik";
 import { last } from "rambda";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { array, object, string } from "yup";
 import { MoxieCheckbox } from "~/components/MoxieCheckbox";
 import { MoxieTextInput } from "~/components/MoxieTextInput";
@@ -15,7 +14,6 @@ import {
 } from "~/lib/api";
 
 export function New() {
-    const nav = useNavigate();
     const domains = useDomains();
     const [previousUsernameValue, setPreviousUsernameValue] = useState("");
 
@@ -40,7 +38,6 @@ export function New() {
                         } catch {}
                     }
                     reloadAccounts();
-                    nav(`/accounts/${username}`);
                 } catch (e) {
                     actions.setErrors({
                         username: "x",

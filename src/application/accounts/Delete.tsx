@@ -1,14 +1,11 @@
 import { Box, Button } from "@primer/react";
 import { Form, Formik } from "formik";
 import { last } from "rambda";
-import { useNavigate } from "react-router-dom";
 import { object, string } from "yup";
 import { MoxieTextInputControl } from "~/components/MoxieTextInputControl";
 import { deleteAccount, reloadAccounts } from "~/lib/api";
 
 export function Delete({ username }: { username: string }) {
-    const nav = useNavigate();
-
     return (
         <Formik
             initialValues={{
@@ -18,7 +15,6 @@ export function Delete({ username }: { username: string }) {
                 try {
                     await deleteAccount(confirm);
                     reloadAccounts();
-                    nav("/accounts");
                 } catch (e) {
                     actions.setErrors({
                         confirm: "x",

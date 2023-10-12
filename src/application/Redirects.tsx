@@ -14,15 +14,12 @@ import {
     reloadWebServerConfig,
     saveRedirect,
     useWebServerConfig,
-} from "../lib/api";
+} from "~/lib/api";
 
-export function Component() {
+export function Redirects() {
     const webServerConfig = useWebServerConfig();
 
     return (
-        // <PageLayout>
-        //     <PageLayout.Header>Redirects</PageLayout.Header>
-        //     <PageLayout.Content>
         <Box className="flex flex-col gap-2 pt-2">
             <RedirectItem showCreate />
             {webServerConfig?.WebDNSDomainRedirects?.map(([from, to]) => (
@@ -34,8 +31,6 @@ export function Component() {
                 />
             ))}
         </Box>
-        //     </PageLayout.Content>
-        // </PageLayout>
     );
 }
 
