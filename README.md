@@ -4,7 +4,7 @@ An experimental UI for administration of [mox](https://github.com/mjl-/mox).
 
 ### ** Warning **
 
-This is a proptype for exploration, do not use it against a production mox server.
+This is a prototype for exploration, do not use it against a production mox server.
 
 ### Development
 
