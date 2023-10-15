@@ -88,6 +88,14 @@ export async function createDomain(domain: string, username: string) {
     await api("DomainAdd", [domain, username, ""]);
 }
 
+export function useDomainLocalparts(domain: string) {
+    return useApi<Record<string, string>>("DomainLocalparts", [domain]);
+}
+
+export function reloadDomainLocalparts(domain: string) {
+    reload("DomainLocalparts", [domain]);
+}
+
 export function useWebServerConfig() {
     return useApi<WebServerConfig>("WebserverConfig");
 }

@@ -2,6 +2,7 @@ import { PlusCircleIcon } from "@primer/octicons-react";
 import { MoxieNavLayout } from "~/components/MoxieNavLayout";
 import { useAccounts } from "~/lib/api";
 import { Account } from "./Account";
+import { New } from "./New";
 
 export function Accounts() {
     const accounts = useAccounts();
@@ -13,7 +14,7 @@ export function Accounts() {
                 label="Add new account"
                 leadingVisual={PlusCircleIcon}
             >
-                <Account />
+                <New />
             </MoxieNavLayout.Item>
             {accounts.map((username) => (
                 <MoxieNavLayout.Item

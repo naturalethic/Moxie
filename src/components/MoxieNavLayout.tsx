@@ -24,8 +24,7 @@ function MoxieNavLayoutImpl({
     });
 
     const [selectedItem, setSelectedItem] = useState(
-        items.find((item) => item.type === MoxieNavLayout.Item)?.props.key ??
-            "",
+        items.find((item) => item.type === MoxieNavLayout.Item)?.props.id ?? "",
     );
 
     return (
@@ -36,9 +35,9 @@ function MoxieNavLayoutImpl({
                         item.type === MoxieNavLayout.Item ? (
                             <NavList.Item
                                 key={item.props.id}
-                                aria-current={item.props.label === selectedItem}
+                                aria-current={item.props.id === selectedItem}
                                 onClick={() => {
-                                    setSelectedItem(item.props.label);
+                                    setSelectedItem(item.props.id);
                                 }}
                             >
                                 {item.props.label}
@@ -57,7 +56,7 @@ function MoxieNavLayoutImpl({
             <PageLayout.Content padding="none" sx={{ paddingLeft: 2 }}>
                 <Suspense>
                     {
-                        items.find((item) => item.props.label === selectedItem)
+                        items.find((item) => item.props.id === selectedItem)
                             ?.props.children
                     }
                 </Suspense>

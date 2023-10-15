@@ -1,107 +1,147 @@
+import { PlusIcon, TrashIcon } from "@primer/octicons-react";
+import { Box } from "@primer/react";
+import { DataTable } from "@primer/react/drafts";
+import { Field, FieldProps, Form, Formik } from "formik";
+import { useEffect, useState } from "react";
+import { MoxieNavLayout } from "~/components/MoxieNavLayout";
 import {
-    Box,
-    Button,
-    FormControl,
-    NavList,
-    PageLayout,
-    Select,
-} from "@primer/react";
-import { Form, Formik } from "formik";
-import { last } from "rambda";
-import { useState } from "react";
-import { object, string } from "yup";
-import { MoxieSelect } from "~/components/MoxieSelect";
-import { MoxieTextInput } from "~/components/MoxieTextInput";
-import { createDomain, reloadDomains, useAccounts } from "~/lib/api";
+    createEmail,
+    deleteEmail,
+    reloadDomainLocalparts,
+    useAccounts,
+    useDomainLocalparts,
+} from "~/lib/api";
 
-export function Domain({ name }: { name?: string }) {
-    const [selectedItem, setSelectedItem] = useState("addresses");
-    return (
-        <PageLayout padding="none" columnGap="none" rowGap="none">
-            <PageLayout.Pane position="start" width="small" divider="line">
-                <NavList>
-                    {!name ? (
-                        <NavList.Item aria-current={true}>
-                            New domain details
-                        </NavList.Item>
-                    ) : (
-                        <NavList.Item
-                            aria-current={selectedItem === "addresses"}
-                            onClick={() => setSelectedItem("addresses")}
-                        >
-                            Addresses
-                        </NavList.Item>
-                    )}
-                </NavList>
-            </PageLayout.Pane>
-            <PageLayout.Content
-                padding="none"
-                sx={{ paddingLeft: 2, paddingTop: 2 }}
-            >
-                {name === "new" ? (
-                    <NewDomain />
-                ) : (
-                    selectedItem === "addresses" && <div>Addressess</div>
-                )}
-            </PageLayout.Content>
-        </PageLayout>
-    );
-}
+type Address = {
+    id: string;
+    localpart: string;
+    account: string;
+};
 
-export function NewDomain() {
+export function Domain({ name }: { name: string }) {
+    const localparts = useDomainLocalparts(name);
     const accounts = useAccounts();
 
+    const [data, setData] = useState<Address[]>([]);
+    useEffect(() => {
+        setData([
+            { id: Math.random().toString(), localpart: "", account: "" },
+            ...Object.entries(localparts ?? {}).map(([localpart, account]) => {
+                return { id: localpart, localpart, account };
+            }),
+        ]);
+    }, [localparts]);
+
     return (
-        <Formik
-            initialValues={{ name: "", username: accounts[0] }}
-            onSubmit={async ({ name, username }, actions) => {
-                console.log(name, username);
-                try {
-                    await createDomain(name, username);
-                    reloadDomains();
-                } catch (e) {
-                    actions.setErrors({
-                        name: "x",
-                    });
-                    actions.setStatus(last((e as Error).message.split(":")));
-                }
-            }}
-            validationSchema={object({
-                name: string().required(),
-                username: string().required(),
-            })}
-        >
-            {({ dirty, status }) => (
-                <Form>
-                    <Box className="space-y-2">
-                        <FormControl>
-                            <FormControl.Label>Domain name</FormControl.Label>
-                            <MoxieTextInput name="name" block />
-                            {dirty && status && (
-                                <FormControl.Validation variant="error">
-                                    {status}
-                                </FormControl.Validation>
-                            )}
-                        </FormControl>
-                        <FormControl>
-                            <FormControl.Label>
-                                Postmaster / Reporting account
-                            </FormControl.Label>
-                            <MoxieSelect block name="username">
-                                {accounts?.map((account) => (
-                                    <Select.Option
-                                        key={account}
-                                        value={account}
-                                    >
-                                        {account}
-                                    </Select.Option>
-                                ))}
-                            </MoxieSelect>
-                        </FormControl>
-                        <Button type="submit">Add new domain</Button>
-                    </Box>
-                </Form>
-            )}
-        </Formik>
+        <MoxieNavLayout>
+            <MoxieNavLayout.Item id="addresses" label="Addresses">
+                <Formik
+                    initialValues={{ localpart: "", username: accounts[0] }}
+                    onSubmit={async ({ localpart, username }, actions) => {
+                        if (!localpart) {
+                            return;
+                        }
+                        await createEmail(
+                            username,
+                            `${localpart === "*" ? "" : localpart}@${name}`,
+                        );
+                        actions.resetForm();
+                        reloadDomainLocalparts(name);
+                    }}
+                >
+                    <Form>
+                        <DataTable
+                            columns={[
+                                {
+                                    id: "id",
+                                    header: "Localpart",
+                                    renderCell: (data) => {
+                                        return data.account ? (
+                                            <Box>
+                                                {data.account && !data.localpart
+                                                    ? "*"
+                                                    : data.localpart}
+                                            </Box>
+                                        ) : (
+                                            <Field name="localpart">
+                                                {({
+                                                    field,
+                                                }: FieldProps<string>) => (
+                                                    <input
+                                                        {...field}
+                                                        className="border-b"
+                                                    />
+                                                )}
+                                            </Field>
+                                        );
+                                    },
+                                },
+                                {
+                                    id: "account",
+                                    header: "Account",
+                                    renderCell: (data) => {
+                                        return data.account ? (
+                                            <Box className="pl-1">
+                                                {data.account}
+                                            </Box>
+                                        ) : (
+                                            <Field name="username">
+                                                {({
+                                                    field,
+                                                }: FieldProps<string>) => (
+                                                    <select {...field}>
+                                                        {accounts.map(
+                                                            (username) => (
+                                                                <option
+                                                                    key={
+                                                                        username
+                                                                    }
+                                                                >
+                                                                    {username}
+                                                                </option>
+                                                            ),
+                                                        )}
+                                                    </select>
+                                                )}
+                                            </Field>
+                                        );
+                                    },
+                                },
+                                {
+                                    id: "actions",
+                                    header: "",
+                                    align: "end",
+                                    renderCell: (data) => {
+                                        return data.account ? (
+                                            <button
+                                                className="cursor-pointer"
+                                                onClick={async () => {
+                                                    await deleteEmail(
+                                                        `${data.localpart}@${name}`,
+                                                    );
+                                                    reloadDomainLocalparts(
+                                                        name,
+                                                    );
+                                                }}
+                                            >
+                                                <TrashIcon />
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="submit"
+                                                className="cursor-pointer"
+                                            >
+                                                <PlusIcon />
+                                            </button>
+                                        );
+                                    },
+                                },
+                            ]}
+                            data={data}
+                        />
+                    </Form>
+                </Formik>
+            </MoxieNavLayout.Item>
+        </MoxieNavLayout>
     );
 }

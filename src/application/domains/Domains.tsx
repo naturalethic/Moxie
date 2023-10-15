@@ -2,6 +2,7 @@ import { PlusCircleIcon } from "@primer/octicons-react";
 import { MoxieNavLayout } from "~/components/MoxieNavLayout";
 import { useDomains } from "~/lib/api";
 import { Domain } from "./Domain";
+import { New } from "./New";
 
 export function Domains() {
     const domains = useDomains();
@@ -13,7 +14,7 @@ export function Domains() {
                 label="Add new domain"
                 leadingVisual={PlusCircleIcon}
             >
-                <Domain />
+                <New />
             </MoxieNavLayout.Item>
             <MoxieNavLayout.Divider />
             {domains?.map((domain) => (

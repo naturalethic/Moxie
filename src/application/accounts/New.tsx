@@ -38,6 +38,7 @@ export function New() {
                         } catch {}
                     }
                     reloadAccounts();
+                    actions.resetForm();
                 } catch (e) {
                     actions.setErrors({
                         username: "x",
