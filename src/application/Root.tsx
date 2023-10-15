@@ -9,7 +9,7 @@ export function Root() {
     const snap = useSnap();
 
     return (
-        <Box>
+        <Box className="flex flex-col h-screen">
             <Header className="flex justify-between">
                 <Text fontSize={5}>Moxie</Text>
                 <Box className="flex gap-2">
@@ -24,7 +24,7 @@ export function Root() {
                     />
                 </Box>
             </Header>
-            <Box className="m-3">
+            <Box className="m-3 flex-grow overflow-auto">
                 <MoxieNavLayout>
                     <MoxieNavLayout.Item id="accounts" label="Account">
                         <Accounts />
