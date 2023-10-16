@@ -17,6 +17,8 @@ export function MoxieAssociative({
     tip,
     keyLabel,
     valueLabel,
+    keyPlaceholder,
+    valuePlaceholder,
 }: {
     name: string;
     items: Record<string, string>;
@@ -24,6 +26,8 @@ export function MoxieAssociative({
     tip?: string;
     keyLabel: string;
     valueLabel: string;
+    keyPlaceholder: string;
+    valuePlaceholder: string;
 }) {
     let data: Row[] = [];
     function deriveData() {
@@ -63,7 +67,7 @@ export function MoxieAssociative({
         }
     }
     return (
-        <Box className="flex flex-col gap-2 pt-2">
+        <Box className="flex flex-col gap-2">
             <Box className="flex gap-2 items-center">
                 {label}
                 {tip && (
@@ -84,6 +88,7 @@ export function MoxieAssociative({
                                 <input
                                     ref={newKey}
                                     className="border-b"
+                                    placeholder={keyPlaceholder}
                                     onKeyDown={(event) => {
                                         if (event.key === "Enter") {
                                             event.preventDefault();
@@ -108,6 +113,7 @@ export function MoxieAssociative({
                                 <input
                                     ref={newValue}
                                     className="border-b"
+                                    placeholder={valuePlaceholder}
                                     onKeyDown={(event) => {
                                         if (event.key === "Enter") {
                                             event.preventDefault();
