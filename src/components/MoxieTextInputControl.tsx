@@ -1,13 +1,31 @@
-import { FormControl, TextInput, TextInputProps } from "@primer/react";
+import { QuestionIcon } from "@primer/octicons-react";
+import {
+    Box,
+    FormControl,
+    TextInput,
+    TextInputProps,
+    Tooltip,
+} from "@primer/react";
 import { ErrorMessage, Field, FieldProps } from "formik";
 
 export function MoxieTextInputControl(
-    props: TextInputProps & { name: string; label?: string },
+    props: TextInputProps & { name: string; label?: string; tip?: string },
 ) {
-    const { name, label } = props;
+    const { name, label, tip } = props;
     return (
         <FormControl>
-            {label && <FormControl.Label>{label}</FormControl.Label>}
+            {label && (
+                <FormControl.Label>
+                    <Box className="flex gap-2 items-center">
+                        {label}
+                        {tip && (
+                            <Tooltip text={tip} direction="s">
+                                <QuestionIcon size={16} />
+                            </Tooltip>
+                        )}
+                    </Box>
+                </FormControl.Label>
+            )}
             <Field name={name}>
                 {({ field, meta }: FieldProps<string>) => (
                     <TextInput

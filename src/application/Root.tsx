@@ -1,9 +1,9 @@
 import { Box, Header, Text, TextInput } from "@primer/react";
 import { MoxieNavLayout } from "~/components/MoxieNavLayout";
 import { useSnap } from "../lib/store";
-import { Redirects } from "./Redirects";
 import { Accounts } from "./accounts/Accounts";
 import { Domains } from "./domains/Domains";
+import { Web } from "./web/Web";
 
 export function Root() {
     const snap = useSnap();
@@ -32,8 +32,8 @@ export function Root() {
                     <MoxieNavLayout.Item id="domains" label="Domains">
                         <Domains />
                     </MoxieNavLayout.Item>
-                    <MoxieNavLayout.Item id="redirects" label="Redirects">
-                        <Redirects />
+                    <MoxieNavLayout.Item id="web" label="Web">
+                        <Web />
                     </MoxieNavLayout.Item>
                 </MoxieNavLayout>
             </Box>

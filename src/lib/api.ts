@@ -1,5 +1,5 @@
 import useSWR, { Middleware, mutate } from "swr";
-import { Account, Domain, WebServerConfig, store } from "./store";
+import { Account, Domain, WebHandler, WebServerConfig, store } from "./store";
 
 export const middleware: Middleware = (useSWRNext) => {
     return (key, fetcher, config) => {
@@ -47,8 +47,12 @@ export async function api(resource: string, params: unknown[] = []) {
     return body.result;
 }
 
-export function reload(resource: string, params: unknown[] = []) {
-    mutate([resource, params]);
+export function reload(
+    resource: string,
+    params: unknown[] = [],
+    data?: unknown,
+) {
+    mutate([resource, params], data);
 }
 
 export function useApi<T = unknown>(resource: string, params: unknown[] = []) {
@@ -129,6 +133,28 @@ export async function saveRedirect(redirect: { from: string; to?: string }) {
         },
     ];
     await api("WebserverConfigSave", params);
+}
+
+export async function saveHandler(handler: WebHandler) {
+    if (store.webServerConfig) {
+        const params = [
+            store.webServerConfig,
+            {
+                WebDomainRedirects: generateWebDomainRedirects(),
+                WebHandlers: JSON.parse(
+                    JSON.stringify(store.webServerConfig.WebHandlers),
+                ),
+            },
+        ];
+        if (handler.Name) {
+            // XXX: This presumes the Name field is always the index.  In current mox app, it can be the log name.
+            params[1].WebHandlers[Number(handler.Name)] = handler;
+        } else {
+            params[1].WebHandlers.push(handler);
+        }
+        const result = await api("WebserverConfigSave", params);
+        reload("WebserverConfig", [], result);
+    }
 }
 
 export async function createEmail(username: string, address: string) {

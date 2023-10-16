@@ -16,11 +16,11 @@ export type WebHandler = {
     PathRegexp: string;
     DontRedirectPlainHTTP: boolean;
     Compress: boolean;
-    WebStatic: WebStatic;
-    WebRedirect: WebRedirect;
-    WebForward: WebForward;
-    Name: string;
-    DNSDomain: Domain;
+    WebStatic: WebStatic | null;
+    WebRedirect: WebRedirect | null;
+    WebForward: WebForward | null;
+    Name?: string;
+    DNSDomain?: Domain;
 };
 
 export type WebForward = {
