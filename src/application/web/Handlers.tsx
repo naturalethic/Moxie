@@ -20,8 +20,8 @@ export function Handlers() {
             {webServerConfig.WebHandlers.map((handler) => (
                 <MoxieNavLayout.Item
                     key={handler.Name}
-                    id={handler.Name}
-                    label={handler.Name}
+                    id={handler.Name!}
+                    label={`${handler.Domain}:${handler.PathRegexp}`}
                 >
                     {handler.Name}
                     {/* <Domain name={domain.ASCII} /> */}
