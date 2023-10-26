@@ -26,10 +26,10 @@ export const Emails: Component<{ domain: string }> = (props) => {
     }
 
     async function handleChange(localpart: string, username: string) {
-        console.log(localpart, username);
+        await deleteEmail(`${localpart}@${props.domain}`);
+        await createEmail(username, `${localpart}@${props.domain}`);
+        reloadDomainLocalparts(props.domain);
         toast("success", "Email updated");
-        // await createEmail(username, `${localpart}@${props.domain}`);
-        // reloadDomainLocalparts(props.domain);
     }
     return (
         <div>
