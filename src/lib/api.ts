@@ -113,6 +113,19 @@ export function useDomains() {
     return apiResource<Domain[]>("Domains", [], [])[0];
 }
 
+export function reloadDomains() {
+    const [, { refetch }] = apiResource<Domain[]>("Domains", [], []);
+    refetch();
+}
+
+export async function createDomain(domain: string, username: string) {
+    return await safeApi("DomainAdd", [domain, username, ""]);
+}
+
+export async function deleteDomain(domain: string) {
+    return await safeApi("DomainRemove", [domain]);
+}
+
 export function useWebServerConfig() {
     return apiResource<WebServerConfig>("WebserverConfig")[0];
 }

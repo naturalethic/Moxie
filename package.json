@@ -6,11 +6,11 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build && uglifyjs dist/index.js -b --in-situ && biome check --apply-unsafe --max-diagnostics=0 dist/index.js",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "analyze": "vite-bundle-visualizer"
     },
     "dependencies": {
         "@biomejs/biome": "^1.3.1",
-        "@zxcvbn-ts/core": "^3.0.4",
         "autoprefixer": "^10.4.16",
         "solid-js": "^1.8.3",
         "tailwindcss": "^3.3.3",
@@ -18,6 +18,7 @@
         "uglify-js": "^3.17.4",
         "valibot": "^0.19.0",
         "vite": "^4.4.5",
+        "vite-bundle-visualizer": "^0.10.0",
         "vite-plugin-doctest": "^0.1.1",
         "vite-plugin-solid": "^2.7.2",
         "vite-tsconfig-paths": "^4.2.1",

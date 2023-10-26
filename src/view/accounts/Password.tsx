@@ -1,8 +1,6 @@
-import { zxcvbn } from "@zxcvbn-ts/core";
-import { Component, createSignal } from "solid-js";
+import { Component } from "solid-js";
 import { minLength, object, string } from "valibot";
 import { Box } from "~/kit/Box";
-import { Defcon } from "~/kit/Defcon";
 import { createForm } from "~/kit/Form";
 import { TextInput } from "~/kit/TextInput";
 import { setPassword } from "~/lib/api";
@@ -23,16 +21,6 @@ export const Password: Component<{ username: string }> = (props) => {
         },
     );
 
-    const [complexity, setComplexity] = createSignal(0);
-
-    function checkComplexity(value: string) {
-        if (value.length === 0) {
-            setComplexity(0);
-            return;
-        }
-        setComplexity(zxcvbn(value).score + 1);
-    }
-
     return (
         <Form>
             <Box variant="attention">
@@ -44,12 +32,7 @@ export const Password: Component<{ username: string }> = (props) => {
                 a random, unguessable password, preferrably at least 12
                 characters.
             </Box>
-            <TextInput
-                name="password"
-                label="Password"
-                onChange={checkComplexity}
-            />
-            <Defcon complexity={complexity()} />
+            <TextInput name="password" label="Password" />
             <button>Update password</button>
         </Form>
     );

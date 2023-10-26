@@ -1,6 +1,7 @@
 import { Box } from "~/kit/Box";
 import { Browser } from "../kit/Browser";
 import { Accounts } from "./accounts/Accounts";
+import { Domains } from "./domains/Domains";
 import { Web } from "./web/Web";
 
 export default function () {
@@ -14,7 +15,7 @@ export default function () {
                     },
                     {
                         label: "Domains",
-                        view: <div>Domains</div>,
+                        view: <Domains />,
                     },
                     {
                         label: "Web",

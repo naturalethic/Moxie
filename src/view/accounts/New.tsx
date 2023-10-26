@@ -1,4 +1,4 @@
-import { Component, Show } from "solid-js";
+import { Component, Show, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { minLength, object, string } from "valibot";
 import { Box } from "~/kit/Box";
@@ -9,6 +9,8 @@ import { createAccount, reloadAccounts, useDomains } from "~/lib/api";
 
 export const New: Component = () => {
     const domains = useDomains();
+
+    let usernameInput!: HTMLInputElement;
 
     const { form, setForm, Form, setError } = createForm(
         object({
@@ -25,11 +27,18 @@ export const New: Component = () => {
                 if (error) {
                     setError("username", error.split(":")[1]);
                 } else {
+                    // XXX: calling this causes this component to be re-created
                     reloadAccounts();
                 }
             }
         },
     );
+
+    onMount(() => {
+        // XXX: Since the component is re-created as mentioned above, need to
+        //      call focus here.
+        usernameInput.focus();
+    });
 
     const [state, setState] = createStore({
         username: "",
@@ -47,9 +56,9 @@ export const New: Component = () => {
         <Form>
             <TextInput
                 name="username"
-                type="text"
                 label="Username"
                 onChange={handleUsernameChange}
+                ref={usernameInput}
             />
             <TextInput name="localpart" type="text" label="Localpart" />
             <Select
