@@ -54,7 +54,7 @@ export const Associative: Component<{
         <div class="flex flex-col gap-1">
             <Box
                 class={cls("grid grid-cols-2 gap-1", {
-                    "p-2 mb-2": props.submitLabel,
+                    "p-2 mb-1": props.submitLabel,
                 })}
                 shaded={!!props.submitLabel}
             >

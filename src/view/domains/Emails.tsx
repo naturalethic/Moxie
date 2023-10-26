@@ -29,15 +29,15 @@ export const Emails: Component<{ domain: string }> = (props) => {
         await deleteEmail(`${localpart}@${props.domain}`);
         await createEmail(username, `${localpart}@${props.domain}`);
         reloadDomainLocalparts(props.domain);
-        toast("success", "Email updated");
+        toast("success", "Domain account updated");
     }
     return (
         <div>
             <Associative
-                keyPlaceholder="Localpart"
+                keyPlaceholder="localpart"
                 valueOptions={accounts.latest}
                 items={localparts.latest}
-                submitLabel="Add email"
+                submitLabel="Add email address"
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}
                 onChange={handleChange}
