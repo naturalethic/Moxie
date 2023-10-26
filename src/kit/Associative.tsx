@@ -13,6 +13,7 @@ export const Associative: Component<{
     submitLabel?: string;
     onSubmit?: (key: string, value: string) => void;
     onDelete?: (key: string) => void;
+    onChange?: (key: string, value: string) => void;
 }> = (props) => {
     const [items, setItems] = createSignal(structuredClone(props.items));
     createEffect(() => {
@@ -107,6 +108,9 @@ export const Associative: Component<{
                                     options={props.valueOptions}
                                     size="small"
                                     value={value}
+                                    onChange={(value: string) =>
+                                        props.onChange?.(key, value)
+                                    }
                                 />
                             </Show>
                         </>

@@ -11,6 +11,7 @@ export const Select: Component<{
     error?: string;
     value?: string;
     size?: "small" | "normal";
+    onChange?: (value: string) => void;
 }> = (props) => {
     const [, selectProps] = splitProps(props, [
         "label",
@@ -25,6 +26,7 @@ export const Select: Component<{
         if (props.name && setForm) {
             setForm(props.name.split("."), select.value);
         }
+        props.onChange?.(select.value);
     }
 
     createEffect(() => {

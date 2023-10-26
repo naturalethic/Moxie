@@ -6,7 +6,8 @@ export const Box: ParentComponent<{
     class?: string;
     border?: boolean;
     shaded?: boolean;
-    variant?: "attention" | "danger";
+    variant?: "danger" | "attention" | "success";
+    onClick?: () => void;
 }> = (props) => {
     return (
         <div
@@ -16,15 +17,21 @@ export const Box: ParentComponent<{
                 "box-variant": props.variant,
                 [`box-${props.variant}`]: props.variant,
             })}
+            onClick={props.onClick}
         >
+            <Show when={props.variant === "danger"}>
+                <div class="icon-container">
+                    <Icon name="alert-triangle" />
+                </div>
+            </Show>
             <Show when={props.variant === "attention"}>
                 <div class="icon-container">
                     <Icon name="info-square" />
                 </div>
             </Show>
-            <Show when={props.variant === "danger"}>
+            <Show when={props.variant === "success"}>
                 <div class="icon-container">
-                    <Icon name="alert-triangle" />
+                    <Icon name="circle-check" />
                 </div>
             </Show>
             <Show when={props.variant}>

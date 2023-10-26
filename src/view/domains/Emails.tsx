@@ -1,5 +1,6 @@
 import { Component } from "solid-js";
 import { Associative } from "~/kit/Associative";
+import { useToast } from "~/kit/Toast";
 import {
     createEmail,
     deleteEmail,
@@ -12,6 +13,8 @@ export const Emails: Component<{ domain: string }> = (props) => {
     const localparts = useDomainLocalparts(props.domain);
     const accounts = useAccounts();
 
+    const toast = useToast();
+
     async function handleSubmit(localpart: string, username: string) {
         await createEmail(username, `${localpart}@${props.domain}`);
         reloadDomainLocalparts(props.domain);
@@ -22,6 +25,12 @@ export const Emails: Component<{ domain: string }> = (props) => {
         reloadDomainLocalparts(props.domain);
     }
 
+    async function handleChange(localpart: string, username: string) {
+        console.log(localpart, username);
+        toast("success", "Email updated");
+        // await createEmail(username, `${localpart}@${props.domain}`);
+        // reloadDomainLocalparts(props.domain);
+    }
     return (
         <div>
             <Associative
@@ -31,6 +40,7 @@ export const Emails: Component<{ domain: string }> = (props) => {
                 submitLabel="Add email"
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}
+                onChange={handleChange}
             />
         </div>
     );
