@@ -120,6 +120,10 @@ export function reloadDomains() {
     reload("Domains");
 }
 
+export function useDomainRecords(domain: string) {
+    return apiResource<string[]>("DomainRecords", [domain], [])[0];
+}
+
 export async function createDomain(domain: string, username: string) {
     return await safeApi("DomainAdd", [domain, username, ""]);
 }
