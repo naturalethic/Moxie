@@ -71,13 +71,17 @@ function apiResource<T>(
 
 const resourceCache: Record<string, unknown> = {};
 
+function reload(resource: string, params: unknown[] = []) {
+    const [, { refetch }] = apiResource(resource, params);
+    refetch();
+}
+
 export function useAccounts() {
     return apiResource<string[]>("Accounts", [], [])[0];
 }
 
 export function reloadAccounts() {
-    const [, { refetch }] = apiResource<string[]>("Accounts", [], []);
-    refetch();
+    reload("Accounts");
 }
 
 export function useAccount(username: string) {
@@ -85,8 +89,7 @@ export function useAccount(username: string) {
 }
 
 export function reloadAccount(username: string) {
-    const [, { refetch }] = apiResource<Account>("Account", [username]);
-    refetch();
+    reload("Account", [username]);
 }
 
 export async function createAccount(username: string, address: string) {
@@ -114,8 +117,7 @@ export function useDomains() {
 }
 
 export function reloadDomains() {
-    const [, { refetch }] = apiResource<Domain[]>("Domains", [], []);
-    refetch();
+    reload("Domains");
 }
 
 export async function createDomain(domain: string, username: string) {
@@ -124,6 +126,18 @@ export async function createDomain(domain: string, username: string) {
 
 export async function deleteDomain(domain: string) {
     return await safeApi("DomainRemove", [domain]);
+}
+
+export function useDomainLocalparts(domain: string) {
+    return apiResource<Record<string, string>>(
+        "DomainLocalparts",
+        [domain],
+        {},
+    )[0];
+}
+
+export function reloadDomainLocalparts(domain: string) {
+    reload("DomainLocalparts", [domain]);
 }
 
 export function useWebServerConfig() {

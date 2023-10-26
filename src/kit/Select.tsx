@@ -1,19 +1,22 @@
 import { Component, For, createEffect, splitProps, useContext } from "solid-js";
+import { cls } from "~/lib/util";
 import { FormContext } from "./Form";
 import { Label } from "./Label";
 import { Option, optionLabel, optionValue } from "./Option";
 
 export const Select: Component<{
-    name: string;
-    label: string;
+    name?: string;
+    label?: string;
     options?: Option[];
     error?: string;
-    defaultValue?: string;
+    value?: string;
+    size?: "small" | "normal";
 }> = (props) => {
     const [, selectProps] = splitProps(props, [
         "label",
         "error",
-        "defaultValue",
+        "value",
+        "size",
     ]);
     const { form, setForm } = useContext(FormContext);
 
@@ -39,14 +42,21 @@ export const Select: Component<{
 
     return (
         <Label label={props.label} error={props.error}>
-            <select {...selectProps} onChange={handleChange}>
+            <select
+                {...selectProps}
+                onChange={handleChange}
+                class={cls({
+                    "text-sm": !props.size || props.size === "normal",
+                    "text-xs": props.size === "small",
+                })}
+            >
                 <For each={props.options}>
                     {(option) => (
                         <option
                             value={optionValue(option)}
                             selected={
                                 optionValue(option) ===
-                                (props.defaultValue ??
+                                (props.value ??
                                     (props.name &&
                                         (form?.[props.name] as string)))
                             }

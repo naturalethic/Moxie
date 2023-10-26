@@ -8,18 +8,19 @@ export const Domain: Component<{ domain: string }> = (props) => {
     return (
         <div>
             <Browser
+                cacheKey="Domain"
                 items={[
                     {
                         label: "Emails",
-                        view: <Emails domain={props.domain} />,
+                        view: () => <Emails domain={props.domain} />,
                     },
                     {
                         label: "DNS Records",
-                        view: <Records domain={props.domain} />,
+                        view: () => <Records domain={props.domain} />,
                     },
                     {
                         label: "Delete",
-                        view: <Delete domain={props.domain} />,
+                        view: () => <Delete domain={props.domain} />,
                     },
                 ]}
             />

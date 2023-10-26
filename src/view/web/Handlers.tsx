@@ -8,17 +8,18 @@ export const Handlers: Component = () => {
     return (
         <div>
             <Browser
+                cacheKey="Handlers"
                 items={[
                     {
                         label: "Add new web handler",
-                        view: <New />,
+                        view: () => <New />,
                         divider: true,
                         icon: "circle-plus",
                     },
                     ...(webServerConfig.latest?.WebHandlers ?? []).map(
                         (handler) => ({
                             label: `${handler.Domain}:${handler.PathRegexp}`,
-                            view: <div>{handler.Name}</div>,
+                            view: () => <div>{handler.Name}</div>,
                         }),
                     ),
                 ]}

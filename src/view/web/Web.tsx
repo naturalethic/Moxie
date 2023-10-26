@@ -6,9 +6,10 @@ export const Web: Component = () => {
     return (
         <div>
             <Browser
+                cacheKey="Web"
                 items={[
-                    { label: "Handlers", view: <Handlers /> },
-                    { label: "Redirects", view: <div>Redirects</div> },
+                    { label: "Handlers", view: () => <Handlers /> },
+                    { label: "Redirects", view: () => <div>Redirects</div> },
                 ]}
             />
         </div>

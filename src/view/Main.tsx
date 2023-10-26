@@ -8,18 +8,19 @@ export default function () {
     return (
         <Box class="m-2 p-2" border>
             <Browser
+                cacheKey="Main"
                 items={[
                     {
                         label: "Accounts",
-                        view: <Accounts />,
+                        view: () => <Accounts />,
                     },
                     {
                         label: "Domains",
-                        view: <Domains />,
+                        view: () => <Domains />,
                     },
                     {
                         label: "Web",
-                        view: <Web />,
+                        view: () => <Web />,
                     },
                 ]}
             />

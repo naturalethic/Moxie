@@ -8,18 +8,19 @@ export const Account: Component<{ username: string }> = (props) => {
     return (
         <div>
             <Browser
+                cacheKey="Account"
                 items={[
                     {
                         label: "Emails",
-                        view: <Emails username={props.username} />,
+                        view: () => <Emails username={props.username} />,
                     },
                     {
                         label: "Password",
-                        view: <Password username={props.username} />,
+                        view: () => <Password username={props.username} />,
                     },
                     {
                         label: "Delete",
-                        view: <Delete username={props.username} />,
+                        view: () => <Delete username={props.username} />,
                     },
                 ]}
             />

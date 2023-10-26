@@ -5,16 +5,21 @@ import { Icon } from "./Icon";
 
 type BrowserItem = {
     label: string;
-    view: JSX.Element;
+    view: () => JSX.Element;
     divider?: boolean;
     icon?: string;
 };
 
-export const Browser: Component<{ items: BrowserItem[] }> = (props) => {
+export const Browser: Component<{ items: BrowserItem[]; cacheKey?: string }> = (
+    props,
+) => {
+    const cacheKey = props.cacheKey && `browser:${props.cacheKey}`;
     const [state, setState] = createStore<{
         selectedItem: number;
     }>({
-        selectedItem: 0,
+        selectedItem: cacheKey
+            ? Number(localStorage.getItem(cacheKey) ?? 0)
+            : 0,
     });
 
     return (
@@ -33,6 +38,11 @@ export const Browser: Component<{ items: BrowserItem[] }> = (props) => {
                                 )}
                                 onClick={() => {
                                     setState("selectedItem", index);
+                                    cacheKey &&
+                                        localStorage.setItem(
+                                            cacheKey,
+                                            String(index()),
+                                        );
                                 }}
                             >
                                 <Show when={item.icon}>
@@ -51,7 +61,7 @@ export const Browser: Component<{ items: BrowserItem[] }> = (props) => {
                 <For each={props.items}>
                     {(item, index) => (
                         <Show when={index() === state.selectedItem}>
-                            {item.view}
+                            {item.view()}
                         </Show>
                     )}
                 </For>
