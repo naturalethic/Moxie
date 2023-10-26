@@ -105,6 +105,10 @@ export async function deleteEmail(address: string) {
     return await safeApi("AddressRemove", [address]);
 }
 
+export async function setPassword(username: string, password: string) {
+    return await safeApi("SetPassword", [username, password]);
+}
+
 export function useDomains() {
     return apiResource<Domain[]>("Domains", [], [])[0];
 }

@@ -2,6 +2,7 @@ import { Component } from "solid-js";
 import { Browser } from "../../kit/Browser";
 import { Delete } from "./Delete";
 import { Emails } from "./Emails";
+import { Password } from "./Password";
 
 export const Account: Component<{ username: string }> = (props) => {
     return (
@@ -14,7 +15,7 @@ export const Account: Component<{ username: string }> = (props) => {
                     },
                     {
                         label: "Password",
-                        view: <div>Password</div>,
+                        view: <Password username={props.username} />,
                     },
                     {
                         label: "Delete",

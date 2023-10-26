@@ -23,46 +23,18 @@ type CreateForm<S extends BaseSchema> = {
     form: Input<S>;
     setForm: SetStoreFunction<Partial<Input<S>>>;
     Form: Form;
+    resetForm: () => void;
     error: FormError;
     setError: SetStoreFunction<FormError>;
     message: Accessor<string>;
     setMessage: Setter<string>;
 };
 
-/**
- * Creates a form based on the provided schema and optional onSubmit callback.
- *
- * @param {S} schema - The schema to create the form from.
- * @param {(result: SafeParseResult<S>) => void} onSubmit - An optional callback function to be called when the form is submitted.
- * @return {Object} An object containing the form state and helper functions.
- *   - form: The current form state.
- *   - setForm: A function to update the form state.
- *   - Form: A React component to render the form.
- *   - error: The current form error state.
- *   - setError: A function to update the form error state.
- *   - message: The current message state.
- *   - setMessage: A function to update the message state.
- */
 export function createForm<S extends BaseSchema = BaseSchema,>(
     schema: S,
     onSubmit?: (result: SafeParseResult<S>) => void,
 ): CreateForm<S>;
 
-/**
- * Creates a form with the given schema, data, and onSubmit callback.
- *
- * @param {S} schema - The schema for the form.
- * @param {Partial<Input<S>>} [data] - Optional initial data for the form.
- * @param {(result: SafeParseResult<S>) => void} [onSubmit] - Optional callback function called when the form is submitted.
- * @return {Object} An object containing the form state and helper functions.
- *   - form: The current form state.
- *   - setForm: A function to update the form state.
- *   - Form: A React component to render the form.
- *   - error: The current form error state.
- *   - setError: A function to update the form error state.
- *   - message: The current message state.
- *   - setMessage: A function to update the message state.
- */
 export function createForm<S extends BaseSchema = BaseSchema,>(
     schema: S,
     data?: Partial<Input<S>>,
@@ -79,9 +51,15 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
         maybeOnSubmit ??
         (dataOrOnSubmit as (result: SafeParseResult<S>) => void);
 
-    const [form, setForm] = createStore<Partial<Input<S>>>(data ?? {});
+    const [form, setForm] = createStore<Partial<Input<S>>>(
+        data ? structuredClone(data) : {},
+    );
     const [error, setError] = createStore<FormError>({});
     const [message, setMessage] = createSignal("");
+
+    function resetForm() {
+        setForm(data ? structuredClone(data) : {});
+    }
 
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
@@ -112,5 +90,14 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
             </FormContext.Provider>
         );
     };
-    return { form, setForm, Form, error, setError, message, setMessage };
+    return {
+        form,
+        setForm,
+        resetForm,
+        Form,
+        error,
+        setError,
+        message,
+        setMessage,
+    };
 }

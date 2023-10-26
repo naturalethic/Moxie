@@ -23,6 +23,14 @@
     --color-danger-emphasis: #cf222e;
     --color-danger-muted: rgba(255, 129, 130, 0.4);
     --color-danger-subtle: #ffebe9;
+    --color-success: #1a7f37;
+    --color-success-emphasis: #1f883d;
+    --color-success-muted: rgba(74, 194, 107, 0.4);
+    --color-success-subtle: #dafbe1;
+    --color-severe: #bc4c00;
+    --color-severe-emphasis: #bc4c00;
+    --color-severe-muted: rgba(251, 143, 68, 0.4);
+    --color-severe-subtle: #fff1e5;
 }
 
 .border-danger {
@@ -281,5 +289,58 @@ form {
         border: 5px solid black;
         border-color: transparent transparent black transparent;
         display: none;
+    }
+}
+
+.defcon {
+    @apply flex gap-1 w-full;
+
+    & div {
+        @apply h-2 rounded-full;
+    }
+
+    & .defcon-1 {
+        width: 5%;
+        background-color: var(--color-danger-subtle);
+
+        &.active {
+            background-color: var(--color-danger-emphasis);
+        }
+    }
+
+    & .defcon-2 {
+        width: 10%;
+        background-color: var(--color-severe-subtle);
+
+        &.active {
+            background-color: var(--color-severe-emphasis);
+        }
+    }
+
+    & .defcon-3 {
+        width: 15%;
+        background-color: var(--color-attention-subtle);
+
+        &.active {
+            background-color: var(--color-attention-emphasis);
+        }
+    }
+
+    & .defcon-4 {
+        width: 26%;
+        background-color: var(--color-accent-subtle);
+
+        &.active {
+            background-color: var(--color-accent-emphasis);
+        }
+    }
+
+    & .defcon-5 {
+        width: 44%;
+        background-color: var(--color-success-subtle);
+
+        &.active {
+            background-color: var(--color-success-emphasis);
+        }
     }
 }
