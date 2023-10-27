@@ -1,4 +1,5 @@
 import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { unwrap } from "solid-js/store";
 import { cls } from "~/lib/util";
 import { Box } from "./Box";
 import { Option } from "./Option";
@@ -15,7 +16,9 @@ export const Associative: Component<{
     onDelete?: (key: string) => void;
     onChange?: (key: string, value: string) => void;
 }> = (props) => {
-    const [items, setItems] = createSignal(structuredClone(props.items ?? {}));
+    const [items, setItems] = createSignal(
+        structuredClone(unwrap(props.items) ?? {}),
+    );
     createEffect(() => {
         if (!props.items) return;
         setItems(structuredClone(props.items ?? {}));

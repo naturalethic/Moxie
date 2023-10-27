@@ -51,7 +51,7 @@ export const New: Component = () => {
             console.log(success);
         },
     );
-    console.log("New", form().details.headers);
+
     return (
         <Form>
             <Box class="py-4 px-4 space-y-4 max-w-md" shaded>
@@ -86,7 +86,7 @@ export const New: Component = () => {
             </Box>
             <Segmented
                 name="type"
-                defaultValue={form().type}
+                defaultValue={form.type}
                 onChange={(type) => setForm("type", type)}
                 options={[
                     { value: "static", label: "Static" },
@@ -95,7 +95,7 @@ export const New: Component = () => {
                 ]}
             />
             <Box class="border py-4 px-4 space-y-2 rounded max-w-md bg-subtle">
-                <Show when={form().type === "static"}>
+                <Show when={form.type === "static"}>
                     <TextInput
                         name="details.strip"
                         label="Strip prefix"
@@ -123,15 +123,15 @@ export const New: Component = () => {
                         // name="details.headers"
                         // keyLabel="Header"
                         // valueLabel="Value"
-                        keyPlaceholder="X-Moxie"
+                        keyPlaceholder="X-Mox"
                         valuePlaceholder="Value"
-                        items={form().details.headers}
+                        items={form.details.headers}
                     />
                 </Show>
-                <Show when={form().type === "forward"}>
+                <Show when={form.type === "forward"}>
                     <div>Forward</div>
                 </Show>
-                <Show when={form().type === "redirect"}>
+                <Show when={form.type === "redirect"}>
                     <div>Redirect</div>
                 </Show>
             </Box>

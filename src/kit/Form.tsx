@@ -5,31 +5,27 @@ import {
     createContext,
     createSignal,
 } from "solid-js";
+import { SetStoreFunction, createStore } from "solid-js/store";
 import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
-import { setPath } from "~/lib/util";
 
 type Form = ParentComponent<{ class?: string }>;
 type FormData = Record<string, unknown>;
 type FormError = Record<string, string | undefined>;
 
 export const FormContext = createContext<{
-    form?: Accessor<FormData>;
-    // setForm?: Setter<FormData>;
-    setForm?: (path: string | string[], value: unknown) => void;
-    error?: Accessor<FormError>;
-    // setError?: Setter<FormError>;
-    setError?: (path: string | string[], value: string | undefined) => void;
+    form?: FormData;
+    setForm?: SetStoreFunction<FormData>;
+    error?: FormError;
+    setError?: SetStoreFunction<FormError>;
 }>({});
 
 type CreateForm<S extends BaseSchema> = {
-    form: Accessor<Input<S>>;
-    // setForm: Setter<Partial<Input<S>>>;
-    setForm: (path: string | string[], value: unknown) => void;
+    form: Input<S>;
+    setForm: SetStoreFunction<Partial<Input<S>>>;
     Form: Form;
     resetForm: () => void;
-    error: Accessor<FormError>;
-    // setError: Setter<FormError>;
-    setError: (path: string | string[], value: string | undefined) => void;
+    error: FormError;
+    setError: SetStoreFunction<FormError>;
     message: Accessor<string>;
     setMessage: Setter<string>;
 };
@@ -45,9 +41,6 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
     onSubmit?: (result: SafeParseResult<S>) => void,
 ): CreateForm<S>;
 
-// XXX: In order to keep bundle size down, we're using signals instead of stores
-//      for the deep form state.  Thus, we are comparing the whole form state for
-//      every field update.  This is not efficient, but should be ok for smallish forms.
 export function createForm<S extends BaseSchema = BaseSchema,>(
     schema: S,
     dataOrOnSubmit?: Partial<Input<S>> | ((result: SafeParseResult<S>) => void),
@@ -58,36 +51,14 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
         maybeOnSubmit ??
         (dataOrOnSubmit as (result: SafeParseResult<S>) => void);
 
-    const [form, setFormSignal] = createSignal<Partial<Input<S>>>(
+    const [form, setForm] = createStore<Partial<Input<S>>>(
         structuredClone(data ?? {}),
-        {
-            equals(prev, next) {
-                // XXX: This is obviously not the most efficient
-                return JSON.stringify(prev) === JSON.stringify(next);
-            },
-        },
     );
-    const [error, setErrorSignal] = createSignal<FormError>(
-        {},
-        {
-            equals(prev, next) {
-                // XXX: This is obviously not the most efficient
-                return JSON.stringify(prev) === JSON.stringify(next);
-            },
-        },
-    );
+    const [error, setError] = createStore<FormError>({});
     const [message, setMessage] = createSignal("");
 
-    function setForm(path: string | string[], value: unknown) {
-        setFormSignal((form) => setPath(form, path, value));
-    }
-
-    function setError(path: string | string[], value: string | undefined) {
-        setErrorSignal((error) => setPath(error, path, value));
-    }
-
     function resetForm() {
-        setFormSignal(structuredClone(data ?? {}));
+        setForm(structuredClone(data ?? {}));
     }
 
     const Form: Form = (props) => {
