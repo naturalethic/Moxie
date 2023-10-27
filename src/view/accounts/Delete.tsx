@@ -6,7 +6,7 @@ import { TextInput } from "~/kit/TextInput";
 import { deleteAccount, reloadAccounts } from "~/lib/api";
 
 export const Delete: Component<{ username: string }> = (props) => {
-    const { form, Form, setError } = createForm(
+    const form = createForm(
         object({
             username: string([
                 custom((value) => value === props.username, "incorrect"),
@@ -14,9 +14,9 @@ export const Delete: Component<{ username: string }> = (props) => {
         }),
         async ({ success }) => {
             if (success) {
-                const { error } = await deleteAccount(form.username);
+                const { error } = await deleteAccount(form.value.username);
                 if (error) {
-                    setError("username", error.split(":")[1]);
+                    form.error.username = error.split(":")[1];
                 } else {
                     reloadAccounts();
                 }
@@ -25,13 +25,13 @@ export const Delete: Component<{ username: string }> = (props) => {
     );
 
     return (
-        <Form>
+        <form.Form>
             <TextInput name="username" label="Confirm username" />
             <Box variant="danger">
                 To delete this account type the exact username '
                 <span class="font-semibold">{props.username}</span>' above.
             </Box>
             <button>Delete this account</button>
-        </Form>
+        </form.Form>
     );
 };

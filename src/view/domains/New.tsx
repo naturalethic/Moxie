@@ -10,7 +10,7 @@ export const New: Component = () => {
 
     let domainInput!: HTMLInputElement;
 
-    const { form, Form, setError } = createForm(
+    const form = createForm(
         object({
             domain: string([minLength(1, "required")]),
             username: string(),
@@ -18,11 +18,11 @@ export const New: Component = () => {
         async ({ success }) => {
             if (success) {
                 const { error } = await createDomain(
-                    form.domain,
-                    form.username,
+                    form.value.domain,
+                    form.value.username,
                 );
                 if (error) {
-                    setError("username", error.split(":")[1]);
+                    form.error.username = error.split(":")[1];
                 } else {
                     // XXX: calling this causes this component to be re-created
                     reloadDomains();
@@ -38,7 +38,7 @@ export const New: Component = () => {
     });
 
     return (
-        <Form>
+        <form.Form>
             <TextInput name="domain" label="Domain name" ref={domainInput} />
             <Select
                 name="username"
@@ -46,6 +46,6 @@ export const New: Component = () => {
                 options={accounts.latest}
             />
             <button>Add new domain</button>
-        </Form>
+        </form.Form>
     );
 };

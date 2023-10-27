@@ -17,7 +17,7 @@ export const Emails: Component<{ username: string }> = (props) => {
     const domains = useDomains();
     const account = useAccount(props.username);
 
-    const { form, Form, message, setMessage } = createForm(
+    const form = createForm(
         object({
             localpart: string(),
             domain: string(),
@@ -25,10 +25,10 @@ export const Emails: Component<{ username: string }> = (props) => {
         async () => {
             const { error } = await createEmail(
                 props.username,
-                `${form.localpart}@${form.domain}`,
+                `${form.value.localpart}@${form.value.domain}`,
             );
             if (error) {
-                setMessage(error.split(":")[1]);
+                form.message = error.split(":")[1];
             } else {
                 reloadAccount(props.username);
             }
@@ -42,7 +42,7 @@ export const Emails: Component<{ username: string }> = (props) => {
 
     return (
         <Box class="space-y-2">
-            <Form>
+            <form.Form>
                 <Box shaded class="flex flex-col p-2 space-y-1">
                     <div class="flex gap-1">
                         <TextInput
@@ -56,12 +56,12 @@ export const Emails: Component<{ username: string }> = (props) => {
                             options={domains.latest.map((d) => d.ASCII)}
                         />
                     </div>
-                    <Show when={message()}>
-                        <Box variant="danger">{message()}</Box>
+                    <Show when={form.message}>
+                        <Box variant="danger">{form.message}</Box>
                     </Show>
                     <button class="text-xs">Add email address</button>
                 </Box>
-            </Form>
+            </form.Form>
             <List
                 size="small"
                 items={Object.keys(account.latest?.Destinations ?? {})}

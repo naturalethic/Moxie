@@ -6,23 +6,26 @@ import { TextInput } from "~/kit/TextInput";
 import { setPassword } from "~/lib/api";
 
 export const Password: Component<{ username: string }> = (props) => {
-    const { form, Form, resetForm, setError } = createForm(
+    const form = createForm(
         object({
             password: string([minLength(8, "8 chars minimum")]),
         }),
         { password: "" },
         async () => {
-            const { error } = await setPassword(props.username, form.password);
+            const { error } = await setPassword(
+                props.username,
+                form.value.password,
+            );
             if (error) {
-                setError("password", error.split(":")[1]);
+                form.error.password = error.split(":")[1];
             } else {
-                resetForm();
+                form.reset();
             }
         },
     );
 
     return (
-        <Form>
+        <form.Form>
             <Box variant="attention">
                 Bots will try to bruteforce your password. Connections with
                 failed authentication attempts will be rate limited but
@@ -34,6 +37,6 @@ export const Password: Component<{ username: string }> = (props) => {
             </Box>
             <TextInput name="password" label="Password" />
             <button>Update password</button>
-        </Form>
+        </form.Form>
     );
 };

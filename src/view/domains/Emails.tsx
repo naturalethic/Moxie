@@ -31,6 +31,7 @@ export const Emails: Component<{ domain: string }> = (props) => {
         reloadDomainLocalparts(props.domain);
         toast("success", "Domain account updated");
     }
+
     return (
         <div>
             <Associative

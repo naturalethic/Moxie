@@ -11,7 +11,7 @@ export const New: Component = () => {
 
     let usernameInput!: HTMLInputElement;
 
-    const { form, setForm, Form, setError } = createForm(
+    const form = createForm(
         object({
             username: string([minLength(1, "required")]),
             localpart: string([minLength(1, "required")]),
@@ -20,11 +20,11 @@ export const New: Component = () => {
         async ({ success }) => {
             if (success) {
                 const { error } = await createAccount(
-                    form.username,
-                    `${form.localpart}@${form.domain}`,
+                    form.value.username,
+                    `${form.value.localpart}@${form.value.domain}`,
                 );
                 if (error) {
-                    setError("username", error.split(":")[1]);
+                    form.error.username = error.split(":")[1];
                 } else {
                     // XXX: calling this causes this component to be re-created
                     reloadAccounts();
@@ -42,15 +42,15 @@ export const New: Component = () => {
     const [username, setUsername] = createSignal<string>("");
 
     function handleUsernameChange(value: string) {
-        if (username() === form.localpart) {
-            setForm("localpart", value);
-            setError("localpart", undefined);
+        if (username() === form.value.localpart) {
+            form.value.localpart = value;
+            form.error.localpart = undefined;
         }
         setUsername(value);
     }
 
     return (
-        <Form>
+        <form.Form>
             <TextInput
                 name="username"
                 label="Username"
@@ -63,18 +63,19 @@ export const New: Component = () => {
                 label="Domain"
                 options={domains.latest.map((d) => d.ASCII)}
             />
-            <Show when={form.username && form.localpart}>
+            <Show when={form.value.username && form.value.localpart}>
                 <Box variant="attention">
                     The user&nbsp;
-                    <span class="font-semibold">{form.username}</span> <br />
+                    <span class="font-semibold">{form.value.username}</span>{" "}
+                    <br />
                     will be assigned the address
                     <br />
                     <span class="font-semibold">
-                        {form.localpart}@{form.domain}
+                        {form.value.localpart}@{form.value.domain}
                     </span>
                 </Box>
             </Show>
             <button>Add new account</button>
-        </Form>
+        </form.Form>
     );
 };

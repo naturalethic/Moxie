@@ -6,7 +6,7 @@ import { TextInput } from "~/kit/TextInput";
 import { deleteDomain, reloadDomains } from "~/lib/api";
 
 export const Delete: Component<{ domain: string }> = (props) => {
-    const { form, Form, setError } = createForm(
+    const form = createForm(
         object({
             domain: string([
                 custom((value) => value === props.domain, "incorrect"),
@@ -14,9 +14,9 @@ export const Delete: Component<{ domain: string }> = (props) => {
         }),
         async ({ success }) => {
             if (success) {
-                const { error } = await deleteDomain(form.domain);
+                const { error } = await deleteDomain(form.value.domain);
                 if (error) {
-                    setError("domain", error.split(":")[1]);
+                    form.error.domain = error.split(":")[1];
                 } else {
                     reloadDomains();
                 }
@@ -25,13 +25,13 @@ export const Delete: Component<{ domain: string }> = (props) => {
     );
 
     return (
-        <Form>
+        <form.Form>
             <TextInput name="domain" label="Confirm domain" />
             <Box variant="danger">
                 To delete this domain type the exact name '
                 <span class="font-semibold">{props.domain}</span>' above.
             </Box>
             <button>Delete this domain</button>
-        </Form>
+        </form.Form>
     );
 };
