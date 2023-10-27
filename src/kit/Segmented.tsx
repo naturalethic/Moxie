@@ -4,14 +4,14 @@ import { Option, optionLabel, optionValue } from "./Option";
 
 type SegementedProps<T extends string> = {
     name: string;
-    defaultValue?: string;
+    value?: string;
     options: Option<T>[];
     onChange?: (value: T) => void;
 };
 
 export const Segmented = <T extends string,>(props: SegementedProps<T>) => {
     const [value, setValue] = createSignal<string>(
-        optionValue(props.options[0]),
+        optionValue(props.value ?? props.options[0]),
     );
     function handleClick(option: Option<T>) {
         setValue(optionValue(option) as string);

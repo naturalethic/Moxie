@@ -1,16 +1,29 @@
-import { Component, Show } from "solid-js";
-import { boolean, object, record, string } from "valibot";
+import { Component, Show, createSignal } from "solid-js";
+import { boolean, object, optional, record, string } from "valibot";
 import { Associative } from "~/kit/Associative";
 import { Box } from "~/kit/Box";
 import { Checkbox } from "~/kit/Checkbox";
 import { createForm } from "~/kit/Form";
+import { Label } from "~/kit/Label";
 import { Segmented } from "~/kit/Segmented";
 import { Select } from "~/kit/Select";
 import { TextInput } from "~/kit/TextInput";
 import { useDomains } from "~/lib/api";
 
+type HandlerType = "static" | "forward" | "redirect";
+
+const StaticSchema = object({
+    strip: string(),
+    root: string(),
+    list: boolean(),
+    continue: boolean(),
+    headers: record(string()),
+});
+
 export const New: Component = () => {
     const domains = useDomains();
+
+    const [type, setType] = createSignal<HandlerType>("static");
 
     const { form, setForm, Form } = createForm(
         object({
@@ -19,14 +32,7 @@ export const New: Component = () => {
             path: string(),
             secure: boolean(),
             compress: boolean(),
-            type: string(),
-            details: object({
-                strip: string(),
-                root: string(),
-                list: boolean(),
-                continue: boolean(),
-                headers: record(string()),
-            }),
+            static: optional(StaticSchema),
         }),
         {
             log: "",
@@ -34,18 +40,6 @@ export const New: Component = () => {
             path: "",
             secure: true,
             compress: false,
-            type: "static",
-            details: {
-                strip: "",
-                root: "",
-                list: true,
-                continue: false,
-                headers: {
-                    "Cache-Control": "no-cache, no-store, must-revalidate",
-                    Pragma: "no-cache",
-                    Expires: "0",
-                },
-            },
         },
         ({ success }) => {
             console.log(success);
@@ -86,56 +80,83 @@ export const New: Component = () => {
             </Box>
             <Segmented
                 name="type"
-                defaultValue={form.type}
-                onChange={(type) => setForm("type", type)}
+                value={type()}
+                onChange={(type) => setType(type)}
                 options={[
                     { value: "static", label: "Static" },
                     { value: "forward", label: "Forward" },
                     { value: "redirect", label: "Redirect" },
                 ]}
             />
-            <Box class="border py-4 px-4 space-y-2 rounded max-w-md bg-subtle">
-                <Show when={form.type === "static"}>
-                    <TextInput
-                        name="details.strip"
-                        label="Strip prefix"
-                        placeholder="/prefix"
-                        tip="Strip the given prefix from the request path before evaluating local file"
-                    />
-                    <TextInput
-                        name="details.root"
-                        label="Root"
-                        placeholder="/path/to/root"
-                        tip="Path to serve files from, either absolute or relative to the mox working directory"
-                    />
-                    <Checkbox
-                        name="details.list"
-                        label="List Files"
-                        tip="Display a list of files for directories where index.html is not present"
-                    />
-                    <Checkbox
-                        name="details.continue"
-                        label="Continue"
-                        tip="If file is not found, continue to next handler instead of returning 404, GET/HEAD only"
-                    />
-                    <Associative
-                        // label="Additional response headers"
-                        // name="details.headers"
-                        // keyLabel="Header"
-                        // valueLabel="Value"
-                        keyPlaceholder="X-Mox"
-                        valuePlaceholder="Value"
-                        items={form.details.headers}
-                    />
+            <Box
+                class="border p-4 space-y-2 rounded max-w-md"
+                shaded
+                style="min-width: 338px;"
+            >
+                <Show when={type() === "static"}>
+                    <NewStatic />
                 </Show>
-                <Show when={form.type === "forward"}>
+                <Show when={type() === "forward"}>
                     <div>Forward</div>
                 </Show>
-                <Show when={form.type === "redirect"}>
+                <Show when={type() === "redirect"}>
                     <div>Redirect</div>
                 </Show>
             </Box>
             <button>Add new web handler</button>
+        </Form>
+    );
+};
+
+const NewStatic: Component = () => {
+    const { form, setForm, Form } = createForm(
+        StaticSchema,
+        {
+            strip: "",
+            root: "",
+            list: true,
+            continue: false,
+            headers: {
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                Pragma: "no-cache",
+                Expires: "0",
+            },
+        },
+        ({ success }) => {
+            console.log(success);
+        },
+    );
+
+    return (
+        <Form>
+            <TextInput
+                name="strip"
+                label="Strip prefix"
+                placeholder="/prefix"
+                tip="Strip the given prefix from the request path before evaluating local file"
+            />
+            <TextInput
+                name="root"
+                label="Root"
+                placeholder="/path/to/root"
+                tip="Path to serve files from, either absolute or relative to the mox working directory"
+            />
+            <Checkbox
+                name="list"
+                label="List Files"
+                tip="Display a list of files for directories where index.html is not present"
+            />
+            <Checkbox
+                name="continue"
+                label="Continue"
+                tip="If file is not found, continue to next handler instead of returning 404, GET/HEAD only"
+            />
+            <Label label="Additional response headers" />
+            <Associative
+                name="headers"
+                keyPlaceholder="Header"
+                valuePlaceholder="Value"
+            />
         </Form>
     );
 };

@@ -4,6 +4,7 @@ import { Icon } from "./Icon";
 
 export const Box: ParentComponent<{
     class?: string;
+    style?: string;
     border?: boolean;
     shaded?: boolean;
     variant?: "danger" | "attention" | "success";
@@ -17,6 +18,7 @@ export const Box: ParentComponent<{
                 "box-variant": props.variant,
                 [`box-${props.variant}`]: props.variant,
             })}
+            style={props.style}
             onClick={props.onClick}
         >
             <Show when={props.variant === "danger"}>

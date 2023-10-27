@@ -1,13 +1,15 @@
-import { Component, For, Show, createEffect, createSignal } from "solid-js";
-import { unwrap } from "solid-js/store";
+import { Component, For, Show, useContext } from "solid-js";
+import { createStore, unwrap } from "solid-js/store";
 import { cls } from "~/lib/util";
 import { Box } from "./Box";
+import { FieldValueEvent, FormContext } from "./Form";
 import { Option } from "./Option";
 import { Select } from "./Select";
 import { TextInput } from "./TextInput";
 
 export const Associative: Component<{
-    items: Record<string, string | undefined>;
+    name?: string;
+    items?: Record<string, string | undefined>;
     keyPlaceholder?: string;
     valuePlaceholder?: string;
     valueOptions?: Option[];
@@ -16,19 +18,18 @@ export const Associative: Component<{
     onDelete?: (key: string) => void;
     onChange?: (key: string, value: string) => void;
 }> = (props) => {
-    const [items, setItems] = createSignal(
-        structuredClone(unwrap(props.items) ?? {}),
+    const { form, setForm } = useContext(FormContext);
+    const [items, setItems] = createStore(
+        structuredClone(
+            unwrap(props.items ?? (props.name && form?.[props.name]) ?? {}),
+        ),
     );
-    createEffect(() => {
-        if (!props.items) return;
-        setItems(structuredClone(props.items ?? {}));
-    });
     let keyField: HTMLInputElement;
     let valueField: HTMLInputElement | HTMLSelectElement;
     function handleSubmit() {
         const key = keyField.value;
         const value = valueField.value;
-        if (key && value && !Object.keys(items()).includes(key)) {
+        if (key && value && !Object.keys(items).includes(key)) {
             if (props.onSubmit) {
                 props.onSubmit(key, value);
             } else {
@@ -36,6 +37,7 @@ export const Associative: Component<{
                     ...prev,
                     [key]: value,
                 }));
+                props.name && setForm?.(props.name, unwrap(items));
             }
             if (!props.valueOptions) {
                 valueField.value = "";
@@ -52,10 +54,14 @@ export const Associative: Component<{
                 ...prev,
                 [key]: undefined,
             }));
+            props.name && setForm?.(props.name, unwrap(items));
+            ref.dispatchEvent(new FieldValueEvent(""));
+            Event;
         }
     }
+    let ref: HTMLDivElement;
     return (
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1" ref={ref!}>
             <Box
                 class={cls("grid grid-cols-2 gap-1", {
                     "p-2 mb-1": props.submitLabel,
@@ -90,7 +96,7 @@ export const Associative: Component<{
                 </Show>
             </Box>
             <div class="text-xs grid grid-cols-2 gap-1">
-                <For each={Object.entries(items())}>
+                <For each={Object.entries(items)}>
                     {([key, value]) => (
                         <>
                             <TextInput

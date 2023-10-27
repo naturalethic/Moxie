@@ -12,6 +12,20 @@ type Form = ParentComponent<{ class?: string }>;
 type FormData = Record<string, unknown>;
 type FormError = Record<string, string | undefined>;
 
+export class FieldValueEvent extends CustomEvent<{ value: unknown }> {
+    constructor(value: unknown) {
+        super("FieldValue", { bubbles: true, detail: { value } });
+    }
+}
+
+declare module "solid-js" {
+    namespace JSX {
+        interface CustomEvents {
+            FieldValue: FieldValueEvent;
+        }
+    }
+}
+
 export const FormContext = createContext<{
     form?: FormData;
     setForm?: SetStoreFunction<FormData>;
@@ -21,7 +35,7 @@ export const FormContext = createContext<{
 
 type CreateForm<S extends BaseSchema> = {
     form: Input<S>;
-    setForm: SetStoreFunction<Partial<Input<S>>>;
+    setForm: SetStoreFunction<Input<S>>;
     Form: Form;
     resetForm: () => void;
     error: FormError;
@@ -51,9 +65,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
         maybeOnSubmit ??
         (dataOrOnSubmit as (result: SafeParseResult<S>) => void);
 
-    const [form, setForm] = createStore<Partial<Input<S>>>(
-        structuredClone(data ?? {}),
-    );
+    const [form, setForm] = createStore<Input<S>>(structuredClone(data ?? {}));
     const [error, setError] = createStore<FormError>({});
     const [message, setMessage] = createSignal("");
 
@@ -75,6 +87,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
             }
             onSubmit?.(result);
         }
+
         return (
             <FormContext.Provider
                 value={{
@@ -84,7 +97,11 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
                     setError,
                 }}
             >
-                <form onSubmit={handleSubmit} class={props.class}>
+                <form
+                    onSubmit={handleSubmit}
+                    class={props.class}
+                    on:FieldValue={(...args) => console.log(args)}
+                >
                     {props.children}
                 </form>
             </FormContext.Provider>
