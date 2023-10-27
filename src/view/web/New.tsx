@@ -1,4 +1,5 @@
 import { Component, Show } from "solid-js";
+import { boolean, object, record, string } from "valibot";
 import { Associative } from "~/kit/Associative";
 import { Box } from "~/kit/Box";
 import { Checkbox } from "~/kit/Checkbox";
@@ -8,48 +9,49 @@ import { Select } from "~/kit/Select";
 import { TextInput } from "~/kit/TextInput";
 import { useDomains } from "~/lib/api";
 
-type Data = {
-    log: string;
-    domain: string;
-    path: string;
-    secure: boolean;
-    compress: boolean;
-    type: "static" | "forward" | "redirect";
-    details: {
-        strip: string;
-        root: string;
-        list: boolean;
-        continue: boolean;
-        headers: Record<string, string>;
-    };
-};
-
 export const New: Component = () => {
     const domains = useDomains();
 
-    const { form, setForm, Form } = createForm<Data>({
-        log: "",
-        // domain: domains[0].ASCII,
-        path: "",
-        secure: true,
-        compress: false,
-        type: "static",
-        details: {
-            strip: "",
-            root: "",
-            list: true,
-            continue: false,
-            headers: {
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                Pragma: "no-cache",
-                Expires: "0",
+    const { form, setForm, Form } = createForm(
+        object({
+            log: string(),
+            domain: string(),
+            path: string(),
+            secure: boolean(),
+            compress: boolean(),
+            type: string(),
+            details: object({
+                strip: string(),
+                root: string(),
+                list: boolean(),
+                continue: boolean(),
+                headers: record(string()),
+            }),
+        }),
+        {
+            log: "",
+            domain: "",
+            path: "",
+            secure: true,
+            compress: false,
+            type: "static",
+            details: {
+                strip: "",
+                root: "",
+                list: true,
+                continue: false,
+                headers: {
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    Pragma: "no-cache",
+                    Expires: "0",
+                },
             },
         },
-    });
-
-    const handleSubmit = (data: Data) => {
-        console.log(data);
-    };
+        ({ success }) => {
+            console.log(success);
+        },
+    );
+    console.log("New", form.details.headers);
     return (
         <Form>
             <Box class="py-4 px-4 space-y-4 max-w-md" shaded>
@@ -85,7 +87,7 @@ export const New: Component = () => {
             <Segmented
                 name="type"
                 defaultValue={form.type}
-                onChange={(type: Data["type"]) => setForm("type", type)}
+                onChange={(type) => setForm("type", type)}
                 options={[
                     { value: "static", label: "Static" },
                     { value: "forward", label: "Forward" },
@@ -117,13 +119,13 @@ export const New: Component = () => {
                         tip="If file is not found, continue to next handler instead of returning 404, GET/HEAD only"
                     />
                     <Associative
-                        label="Additional response headers"
-                        name="details.headers"
-                        keyLabel="Header"
-                        valueLabel="Value"
+                        // label="Additional response headers"
+                        // name="details.headers"
+                        // keyLabel="Header"
+                        // valueLabel="Value"
                         keyPlaceholder="X-Moxie"
                         valuePlaceholder="Value"
-                        // items={form.details.headers}
+                        items={form.details.headers}
                     />
                 </Show>
                 <Show when={form.type === "forward"}>

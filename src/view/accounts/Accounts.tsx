@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
+import { Browser } from "~/kit/Browser";
 import { useAccounts } from "~/lib/api";
-import { Browser } from "../../kit/Browser";
 import { Account } from "./Account";
 import { New } from "./New";
 

@@ -1,5 +1,4 @@
-import { Component, Show, onMount } from "solid-js";
-import { createStore } from "solid-js/store";
+import { Component, Show, createSignal, onMount } from "solid-js";
 import { minLength, object, string } from "valibot";
 import { Box } from "~/kit/Box";
 import { createForm } from "~/kit/Form";
@@ -40,16 +39,14 @@ export const New: Component = () => {
         usernameInput.focus();
     });
 
-    const [state, setState] = createStore({
-        username: "",
-    });
+    const [username, setUsername] = createSignal<string>("");
 
     function handleUsernameChange(value: string) {
-        if (state.username === form.localpart) {
+        if (username() === form.localpart) {
             setForm("localpart", value);
             setError("localpart", undefined);
         }
-        setState("username", value);
+        setUsername(value);
     }
 
     return (

@@ -1,5 +1,4 @@
-import { Component, For, JSX, Show } from "solid-js";
-import { createStore } from "solid-js/store";
+import { Component, For, JSX, Show, createSignal } from "solid-js";
 import { cls } from "~/lib/util";
 import { Icon } from "./Icon";
 
@@ -14,13 +13,9 @@ export const Browser: Component<{ items: BrowserItem[]; cacheKey?: string }> = (
     props,
 ) => {
     const cacheKey = props.cacheKey && `browser:${props.cacheKey}`;
-    const [state, setState] = createStore<{
-        selectedItem: number;
-    }>({
-        selectedItem: cacheKey
-            ? Number(localStorage.getItem(cacheKey) ?? 0)
-            : 0,
-    });
+    const [selectedItem, setSelectedItem] = createSignal<number>(
+        cacheKey ? Number(localStorage.getItem(cacheKey) ?? 0) : 0,
+    );
 
     return (
         <div class="flex gap-4">
@@ -32,12 +27,11 @@ export const Browser: Component<{ items: BrowserItem[]; cacheKey?: string }> = (
                                 class={cls(
                                     "browser-label flex items-center gap-1",
                                     {
-                                        selected:
-                                            index() === state.selectedItem,
+                                        selected: index() === selectedItem(),
                                     },
                                 )}
                                 onClick={() => {
-                                    setState("selectedItem", index);
+                                    setSelectedItem(index);
                                     cacheKey &&
                                         localStorage.setItem(
                                             cacheKey,
@@ -60,7 +54,7 @@ export const Browser: Component<{ items: BrowserItem[]; cacheKey?: string }> = (
             <div class="browser-content">
                 <For each={props.items}>
                     {(item, index) => (
-                        <Show when={index() === state.selectedItem}>
+                        <Show when={index() === selectedItem()}>
                             {item.view()}
                         </Show>
                     )}

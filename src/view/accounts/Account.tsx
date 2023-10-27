@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { Browser } from "../../kit/Browser";
+import { Browser } from "~/kit/Browser";
 import { Delete } from "./Delete";
 import { Emails } from "./Emails";
 import { Password } from "./Password";

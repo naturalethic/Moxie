@@ -1,6 +1,6 @@
 import { Box } from "~/kit/Box";
+import { Browser } from "~/kit/Browser";
 import { Toast } from "~/kit/Toast";
-import { Browser } from "../kit/Browser";
 import { Accounts } from "./accounts/Accounts";
 import { Domains } from "./domains/Domains";
 import { Web } from "./web/Web";

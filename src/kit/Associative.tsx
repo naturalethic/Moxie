@@ -1,4 +1,5 @@
 import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { unwrap } from "solid-js/store";
 import { cls } from "~/lib/util";
 import { Box } from "./Box";
 import { Option } from "./Option";
@@ -15,16 +16,22 @@ export const Associative: Component<{
     onDelete?: (key: string) => void;
     onChange?: (key: string, value: string) => void;
 }> = (props) => {
-    const [items, setItems] = createSignal(structuredClone(props.items));
+    console.log("Ass", unwrap(props.items));
+    const [items, setItems] = createSignal(
+        structuredClone(unwrap(props.items ?? {})),
+    );
+    console.log("Ass2", props.items);
     createEffect(() => {
-        setItems(structuredClone(props.items));
+        if (!props.items) return;
+        console.log("Ass", unwrap(props.items));
+        setItems(structuredClone(unwrap(props.items ?? {})));
     });
     let keyField: HTMLInputElement;
     let valueField: HTMLInputElement | HTMLSelectElement;
     function handleSubmit() {
         const key = keyField.value;
         const value = valueField.value;
-        if (key && value && !Object.keys(items).includes(key)) {
+        if (key && value && !Object.keys(items()).includes(key)) {
             if (props.onSubmit) {
                 props.onSubmit(key, value);
             } else {

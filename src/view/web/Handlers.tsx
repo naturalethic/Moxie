@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
+import { Browser } from "~/kit/Browser";
 import { useWebServerConfig } from "~/lib/api";
-import { Browser } from "../../kit/Browser";
 import { New } from "./New";
 
 export const Handlers: Component = () => {

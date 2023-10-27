@@ -1,5 +1,4 @@
-import { For } from "solid-js";
-import { createStore } from "solid-js/store";
+import { For, createSignal } from "solid-js";
 import { cls } from "~/lib/util";
 import { Option, optionLabel, optionValue } from "./Option";
 
@@ -11,23 +10,23 @@ type SegementedProps<T extends string> = {
 };
 
 export const Segmented = <T extends string,>(props: SegementedProps<T>) => {
-    const [state, setState] = createStore<{ value: string }>({
-        value: optionValue(props.options[0]),
-    });
+    const [value, setValue] = createSignal<string>(
+        optionValue(props.options[0]),
+    );
     function handleClick(option: Option<T>) {
-        setState("value", optionValue(option));
+        setValue(optionValue(option) as string);
         props.onChange?.(optionValue(option));
     }
     return (
         <div class="segmented">
-            <input type="hidden" name={props.name} value={state.value} />
+            <input type="hidden" name={props.name} value={value()} />
             <For each={props.options}>
                 {(option) => {
                     return (
                         <button
                             type="button"
                             class={cls("segmented-button", {
-                                selected: optionValue(option) === state.value,
+                                selected: optionValue(option) === value(),
                             })}
                             onClick={() => handleClick(option)}
                         >

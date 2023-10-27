@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { Browser } from "../../kit/Browser";
+import { Browser } from "~/kit/Browser";
 import { Handlers } from "./Handlers";
 
 export const Web: Component = () => {
