@@ -1,5 +1,12 @@
 import { Component, Show, createSignal } from "solid-js";
-import { boolean, object, optional, record, string } from "valibot";
+import {
+    boolean,
+    discriminatedUnion,
+    literal,
+    object,
+    record,
+    string,
+} from "valibot";
 import { Associative } from "~/kit/Associative";
 import { Box } from "~/kit/Box";
 import { Checkbox } from "~/kit/Checkbox";
@@ -13,6 +20,7 @@ import { useDomains } from "~/lib/api";
 type HandlerType = "static" | "forward" | "redirect";
 
 const StaticSchema = object({
+    type: literal("static"),
     strip: string(),
     root: string(),
     list: boolean(),
@@ -20,19 +28,29 @@ const StaticSchema = object({
     headers: record(string()),
 });
 
+const DetailsSchema = discriminatedUnion("type", [
+    StaticSchema,
+    object({
+        type: literal("forward"),
+    }),
+    object({
+        type: literal("redirect"),
+    }),
+]);
+
 export const New: Component = () => {
     const domains = useDomains();
 
     const [type, setType] = createSignal<HandlerType>("static");
 
-    const { form, setForm, Form } = createForm(
+    const { Form } = createForm(
         object({
             log: string(),
             domain: string(),
             path: string(),
             secure: boolean(),
             compress: boolean(),
-            static: optional(StaticSchema),
+            details: DetailsSchema,
         }),
         {
             log: "",
@@ -40,6 +58,18 @@ export const New: Component = () => {
             path: "",
             secure: true,
             compress: false,
+            details: {
+                type: "static",
+                strip: "",
+                root: "",
+                list: true,
+                continue: false,
+                headers: {
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    Pragma: "no-cache",
+                    Expires: "0",
+                },
+            },
         },
         ({ success }) => {
             console.log(success);
@@ -94,7 +124,7 @@ export const New: Component = () => {
                 style="min-width: 338px;"
             >
                 <Show when={type() === "static"}>
-                    <NewStatic />
+                    <NewStatic name="details" />
                 </Show>
                 <Show when={type() === "forward"}>
                     <div>Forward</div>
@@ -108,24 +138,8 @@ export const New: Component = () => {
     );
 };
 
-const NewStatic: Component = () => {
-    const { form, setForm, Form } = createForm(
-        StaticSchema,
-        {
-            strip: "",
-            root: "",
-            list: true,
-            continue: false,
-            headers: {
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                Pragma: "no-cache",
-                Expires: "0",
-            },
-        },
-        ({ success }) => {
-            console.log(success);
-        },
-    );
+const NewStatic: Component<{ name: string }> = (props) => {
+    const { Form } = createForm(props.name, StaticSchema);
 
     return (
         <Form>

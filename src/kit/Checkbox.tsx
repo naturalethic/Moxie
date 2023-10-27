@@ -1,15 +1,31 @@
-import { Component, Show, splitProps } from "solid-js";
+import { Component, Show, splitProps, useContext } from "solid-js";
+import { FormContext } from "./Form";
 
 export const Checkbox: Component<{
-    name: string;
+    name?: string;
     label: string;
     tip?: string;
     error?: string;
 }> = (props) => {
     const [, inputProps] = splitProps(props, ["label", "error", "tip"]);
+
+    const { form, setForm } = useContext(FormContext);
+
     return (
         <label class="flex gap-[5px] tooltip-host select-none">
-            <input type="checkbox" {...inputProps} />
+            <input
+                type="checkbox"
+                {...inputProps}
+                checked={
+                    props.name && form ? (form[props.name] as boolean) : false
+                }
+                onChange={(event) => {
+                    const input = event.target as HTMLInputElement;
+                    if (props.name && setForm) {
+                        setForm(props.name, input.checked);
+                    }
+                }}
+            />
             <div
                 class="flex items-baseline justify-between"
                 data-tip={props.tip}

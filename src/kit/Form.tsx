@@ -4,38 +4,27 @@ import {
     Setter,
     createContext,
     createSignal,
+    useContext,
 } from "solid-js";
-import { SetStoreFunction, createStore } from "solid-js/store";
+import { SetStoreFunction, createStore, unwrap } from "solid-js/store";
 import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
 
 type Form = ParentComponent<{ class?: string }>;
 type FormData = Record<string, unknown>;
 type FormError = Record<string, string | undefined>;
 
-export class FieldValueEvent extends CustomEvent<{ value: unknown }> {
-    constructor(value: unknown) {
-        super("FieldValue", { bubbles: true, detail: { value } });
-    }
-}
-
-declare module "solid-js" {
-    namespace JSX {
-        interface CustomEvents {
-            FieldValue: FieldValueEvent;
-        }
-    }
-}
-
-export const FormContext = createContext<{
+type FormContext = {
     form?: FormData;
-    setForm?: SetStoreFunction<FormData>;
+    setForm?: (key: string, value: unknown) => void;
     error?: FormError;
     setError?: SetStoreFunction<FormError>;
-}>({});
+};
+
+export const FormContext = createContext<FormContext>({});
 
 type CreateForm<S extends BaseSchema> = {
     form: Input<S>;
-    setForm: SetStoreFunction<Input<S>>;
+    setForm: (key: string, value: unknown) => void;
     Form: Form;
     resetForm: () => void;
     error: FormError;
@@ -56,26 +45,72 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
 ): CreateForm<S>;
 
 export function createForm<S extends BaseSchema = BaseSchema,>(
+    name: string,
     schema: S,
-    dataOrOnSubmit?: Partial<Input<S>> | ((result: SafeParseResult<S>) => void),
-    maybeOnSubmit?: (result: SafeParseResult<S>) => void,
-): CreateForm<S> {
-    const data = maybeOnSubmit && (dataOrOnSubmit as Partial<Input<S>>);
-    const onSubmit =
-        maybeOnSubmit ??
-        (dataOrOnSubmit as (result: SafeParseResult<S>) => void);
+    onSubmit?: (result: SafeParseResult<S>) => void,
+): CreateForm<S>;
 
-    const [form, setForm] = createStore<Input<S>>(structuredClone(data ?? {}));
+export function createForm<S extends BaseSchema = BaseSchema,>(
+    name: string,
+    schema: S,
+    data?: Partial<Input<S>>,
+    onSubmit?: (result: SafeParseResult<S>) => void,
+): CreateForm<S>;
+
+export function createForm<S extends BaseSchema = BaseSchema,>(
+    ...args: unknown[]
+): CreateForm<S> {
+    let name: string | undefined = undefined;
+    if (typeof args[0] === "string") {
+        name = args.shift() as string;
+    }
+    const schema = args.shift() as S;
+    let data: Partial<Input<S>> | undefined = undefined;
+    if (typeof args[0] === "object") {
+        data = args.shift() as Partial<Input<S>>;
+    }
+    const onSubmit = args[0] as
+        | ((result: SafeParseResult<S>) => void)
+        | undefined;
+
+    const parent = name
+        ? (useContext(FormContext) as Required<FormContext>)
+        : undefined;
+
+    if (parent) {
+        data ??= parent.form[name!] as Partial<Input<S>>;
+    }
+
+    const [form, setFormStore] = createStore<Input<S>>(
+        structuredClone(unwrap(data ?? {})),
+    );
     const [error, setError] = createStore<FormError>({});
     const [message, setMessage] = createSignal("");
 
+    function setForm(key: string, value: unknown) {
+        setFormStore({ [key]: value });
+        if (parent) {
+            parent.setForm(name!, structuredClone(unwrap(form)));
+        }
+    }
+
     function resetForm() {
-        setForm(structuredClone(data ?? {}));
+        setFormStore(structuredClone(data ?? {}));
     }
 
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
+            if (parent) {
+                const parentElement = (event.target as HTMLFormElement)
+                    .parentElement!;
+                const parentForm = parentElement.closest("form")!;
+                const submit = parentForm.querySelector(
+                    "input[name=__submit]",
+                ) as HTMLInputElement;
+                submit.click();
+                return;
+            }
             const result = safeParse(schema, form);
             if (!result.success) {
                 for (const issue of result.issues) {
@@ -97,11 +132,12 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
                     setError,
                 }}
             >
-                <form
-                    onSubmit={handleSubmit}
-                    class={props.class}
-                    on:FieldValue={(...args) => console.log(args)}
-                >
+                <form onSubmit={handleSubmit} class={props.class}>
+                    <input
+                        name="__submit"
+                        style="display: none;"
+                        type="submit"
+                    />
                     {props.children}
                 </form>
             </FormContext.Provider>

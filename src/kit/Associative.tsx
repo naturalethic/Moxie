@@ -2,7 +2,7 @@ import { Component, For, Show, useContext } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
 import { cls } from "~/lib/util";
 import { Box } from "./Box";
-import { FieldValueEvent, FormContext } from "./Form";
+import { FormContext } from "./Form";
 import { Option } from "./Option";
 import { Select } from "./Select";
 import { TextInput } from "./TextInput";
@@ -54,9 +54,10 @@ export const Associative: Component<{
                 ...prev,
                 [key]: undefined,
             }));
-            props.name && setForm?.(props.name, unwrap(items));
-            ref.dispatchEvent(new FieldValueEvent(""));
-            Event;
+            // props.name &&
+            //     setForm?.({ [props.name]: structuredClone(unwrap(items)) });
+            props.name && setForm?.(props.name, structuredClone(unwrap(items)));
+            // ref.dispatchEvent(new FieldValueEvent(""));
         }
     }
     let ref: HTMLDivElement;
