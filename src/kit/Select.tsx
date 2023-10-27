@@ -33,7 +33,7 @@ export const Select: Component<{
         if (
             form &&
             props.name &&
-            !form[props.name] &&
+            !form()[props.name] &&
             setForm &&
             props.options &&
             props.options.length > 0
@@ -60,7 +60,7 @@ export const Select: Component<{
                                 optionValue(option) ===
                                 (props.value ??
                                     (props.name &&
-                                        (form?.[props.name] as string)))
+                                        (form?.()[props.name] as string)))
                             }
                         >
                             {optionLabel(option)}

@@ -49,7 +49,7 @@ export const TextInput: Component<{
     function handleInput(event: InputEvent) {
         const input = event.target as HTMLInputElement;
         if (props.name && setForm && setError) {
-            setForm(props.name.split("."), input.value);
+            setForm(props.name, input.value);
             setError(props.name, undefined);
         }
         props.onChange?.(input.value);
@@ -63,14 +63,15 @@ export const TextInput: Component<{
 
     createEffect(() => {
         // Initialize the form data value for this input to an empty string, if it is not yet defined.
-        if (form && setForm && props.name && form[props.name] === undefined) {
+        if (form && setForm && props.name && form()[props.name] === undefined) {
             setForm(props.name.split("."), "");
         }
     });
+
     return (
         <Label
             label={props.label}
-            error={props.error ?? (props.name && error?.[props.name])}
+            error={props.error ?? (props.name && error?.()[props.name])}
             tip={props.tip}
         >
             <div class="input-container">
@@ -78,11 +79,12 @@ export const TextInput: Component<{
                     {...inputProps}
                     value={
                         props.value ??
-                        (props.name && (form?.[props.name] as string))
+                        (props.name && (form?.()[props.name] as string))
                     }
                     class={cls({
                         "border-danger":
-                            props.error ?? (props.name && error?.[props.name]),
+                            props.error ??
+                            (props.name && error?.()[props.name]),
                         "text-sm": !props.size || props.size === "normal",
                         "text-xs": props.size === "small",
                     })}

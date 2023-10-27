@@ -27,17 +27,5 @@ export const Checkbox: Component<{
                 </Show>
             </div>
         </label>
-
-        // <Label label={props.label} error={props.error} tip={props.tip}>
-        //     <div class="input-container">
-        //         <input {...inputProps} class={cls({ danger: props.error })} />
-        //         <Show when={props.leadingIcon}>
-        //             <Icon
-        //                 name={props.leadingIcon!}
-        //                 class="input-leading-icon"
-        //             />
-        //         </Show>
-        //     </div>
-        // </Label>
     );
 };

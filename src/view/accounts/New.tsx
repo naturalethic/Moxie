@@ -20,8 +20,8 @@ export const New: Component = () => {
         async ({ success }) => {
             if (success) {
                 const { error } = await createAccount(
-                    form.username,
-                    `${form.localpart}@${form.domain}`,
+                    form().username,
+                    `${form().localpart}@${form().domain}`,
                 );
                 if (error) {
                     setError("username", error.split(":")[1]);
@@ -42,7 +42,7 @@ export const New: Component = () => {
     const [username, setUsername] = createSignal<string>("");
 
     function handleUsernameChange(value: string) {
-        if (username() === form.localpart) {
+        if (username() === form().localpart) {
             setForm("localpart", value);
             setError("localpart", undefined);
         }
@@ -63,14 +63,14 @@ export const New: Component = () => {
                 label="Domain"
                 options={domains.latest.map((d) => d.ASCII)}
             />
-            <Show when={form.username && form.localpart}>
+            <Show when={form().username && form().localpart}>
                 <Box variant="attention">
                     The user&nbsp;
-                    <span class="font-semibold">{form.username}</span> <br />
+                    <span class="font-semibold">{form().username}</span> <br />
                     will be assigned the address
                     <br />
                     <span class="font-semibold">
-                        {form.localpart}@{form.domain}
+                        {form().localpart}@{form().domain}
                     </span>
                 </Box>
             </Show>
