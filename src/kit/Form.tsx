@@ -106,7 +106,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
                     .parentElement!;
                 const parentForm = parentElement.closest("form")!;
                 const submit = parentForm.querySelector(
-                    "input[name=__submit]",
+                    "input[data-hidden-submit]",
                 ) as HTMLInputElement;
                 submit.click();
                 return;
@@ -134,7 +134,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
             >
                 <form onSubmit={handleSubmit} class={props.class}>
                     <input
-                        name="__submit"
+                        data-hidden-submit
                         style="display: none;"
                         type="submit"
                     />
