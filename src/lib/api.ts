@@ -3,6 +3,7 @@ import {
     ResourceReturn,
     createResource,
 } from "solid-js";
+import { unwrap } from "solid-js/store";
 
 export async function api<T>(resource: string, params: unknown[] = []) {
     const endpoint = import.meta.env.VITE_MOX_ENDPOINT ?? "";
@@ -71,9 +72,13 @@ function apiResource<T>(
 
 const resourceCache: Record<string, unknown> = {};
 
-function reload(resource: string, params: unknown[] = []) {
-    const [, { refetch }] = apiResource(resource, params);
-    refetch();
+function reload(resource: string, params: unknown[] = [], data?: unknown) {
+    const [, { refetch, mutate }] = apiResource(resource, params);
+    if (data) {
+        mutate(data);
+    } else {
+        refetch();
+    }
 }
 
 export function useAccounts() {
@@ -146,6 +151,58 @@ export function reloadDomainLocalparts(domain: string) {
 
 export function useWebServerConfig() {
     return apiResource<WebServerConfig>("WebserverConfig")[0];
+}
+
+function generateWebDomainRedirects(
+    webServerConfig: WebServerConfig,
+    modify?: { from: string; to?: string },
+) {
+    let modifyWasPresent = false;
+    const redirects =
+        webServerConfig.WebDNSDomainRedirects.map(([from, to]) => {
+            if (from.ASCII === modify?.from) {
+                modifyWasPresent = true;
+                return [from.ASCII, modify?.to];
+            }
+            return [from.ASCII, to.ASCII];
+        }) ?? [];
+    if (modify && !modifyWasPresent) {
+        redirects.push([modify?.from, modify?.to]);
+    }
+    return redirects;
+}
+
+function generateWebServerConfigParams() {
+    const webServerConfig = useWebServerConfig().latest!;
+    return [
+        webServerConfig,
+        {
+            WebDomainRedirects: generateWebDomainRedirects(webServerConfig),
+            WebHandlers: structuredClone(unwrap(webServerConfig.WebHandlers)),
+        },
+    ];
+}
+
+export async function saveHandler(handler: WebHandler) {
+    const params = generateWebServerConfigParams();
+    if (handler.Name) {
+        // XXX: This presumes the Name field is always the index.  In current mox app, it can be the log name.
+        params[1].WebHandlers[Number(handler.Name)] = handler;
+    } else {
+        params[1].WebHandlers.push(handler);
+    }
+    const response = await safeApi("WebserverConfigSave", params);
+    if (response.result) {
+        reload("WebserverConfig", [], response.result);
+    }
+    return response;
+}
+
+export async function deleteHandler(index: number) {
+    const params = generateWebServerConfigParams();
+    params[1].WebHandlers.splice(index, 1);
+    const result = await api("WebserverConfigSave", params);
+    reload("WebserverConfig", [], result);
 }
 
 export type Domain = {

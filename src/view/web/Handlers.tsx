@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { Browser } from "~/kit/Browser";
-import { useWebServerConfig } from "~/lib/api";
+import { deleteHandler, useWebServerConfig } from "~/lib/api";
 import { New } from "./New";
 
 export const Handlers: Component = () => {
@@ -20,6 +20,12 @@ export const Handlers: Component = () => {
                         (handler) => ({
                             label: `${handler.Domain}:${handler.PathRegexp}`,
                             view: () => <div>{handler.Name}</div>,
+                            onDelete: (index: number) => {
+                                deleteHandler(
+                                    // webServerConfig.latest!,
+                                    index - 1,
+                                );
+                            },
                         }),
                     ),
                 ]}

@@ -101,6 +101,16 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
+            const result = safeParse(schema, form);
+            if (!result.success) {
+                for (const issue of result.issues) {
+                    if (issue.path) {
+                        console.log(issue.path);
+                        const path = issue.path.map((p) => p.key);
+                        setError(path, issue.message);
+                    }
+                }
+            }
             if (parent) {
                 const parentElement = (event.target as HTMLFormElement)
                     .parentElement!;
@@ -109,18 +119,9 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
                     "input[data-hidden-submit]",
                 ) as HTMLInputElement;
                 submit.click();
-                return;
+            } else {
+                onSubmit?.(result);
             }
-            const result = safeParse(schema, form);
-            if (!result.success) {
-                for (const issue of result.issues) {
-                    if (issue.path) {
-                        const path = issue.path.map((p) => p.key);
-                        setError(path, issue.message);
-                    }
-                }
-            }
-            onSubmit?.(result);
         }
 
         return (

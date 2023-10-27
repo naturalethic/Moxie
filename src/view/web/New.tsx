@@ -3,6 +3,7 @@ import {
     boolean,
     discriminatedUnion,
     literal,
+    minLength,
     object,
     record,
     string,
@@ -15,14 +16,14 @@ import { Label } from "~/kit/Label";
 import { Segmented } from "~/kit/Segmented";
 import { Select } from "~/kit/Select";
 import { TextInput } from "~/kit/TextInput";
-import { useDomains } from "~/lib/api";
+import { WebHandler, saveHandler, useDomains } from "~/lib/api";
 
 type HandlerType = "static" | "forward" | "redirect";
 
 const StaticSchema = object({
     type: literal("static"),
     strip: string(),
-    root: string(),
+    root: string([minLength(1, "required")]),
     list: boolean(),
     continue: boolean(),
     headers: record(string()),
@@ -43,7 +44,7 @@ export const New: Component = () => {
 
     const [type, setType] = createSignal<HandlerType>("static");
 
-    const { Form } = createForm(
+    const { form, Form } = createForm(
         object({
             log: string(),
             domain: string(),
@@ -71,8 +72,29 @@ export const New: Component = () => {
                 },
             },
         },
-        ({ success }) => {
+        async ({ success }) => {
             console.log(success);
+            if (!success) return;
+            if (form.details.type === "static") {
+                const handler: WebHandler = {
+                    LogName: form.log,
+                    Domain: form.domain,
+                    PathRegexp: `^${form.path}`,
+                    DontRedirectPlainHTTP: !form.secure,
+                    Compress: form.compress,
+                    WebStatic: {
+                        StripPrefix: form.details.strip,
+                        Root: form.details.root,
+                        ListFiles: form.details.list,
+                        ContinueNotFound: form.details.continue,
+                        ResponseHeaders: form.details.headers,
+                    },
+                    WebForward: null,
+                    WebRedirect: null,
+                };
+                const { error } = await saveHandler(handler);
+                console.log(error);
+            }
         },
     );
 

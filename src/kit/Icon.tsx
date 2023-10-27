@@ -10,7 +10,7 @@ export const Icon: Component<{
 }> = (props) => {
     return (
         <svg
-            class={cls("icon", props.class, {
+            class={cls("icon", `icon-${props.name}`, props.class, {
                 clickable: props.onClick,
             })}
             viewBox="0 0 24 24"

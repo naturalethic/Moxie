@@ -7,11 +7,13 @@ type BrowserItem = {
     view: () => JSX.Element;
     divider?: boolean;
     icon?: string;
+    onDelete?: (index: number) => void;
 };
 
-export const Browser: Component<{ items: BrowserItem[]; cacheKey?: string }> = (
-    props,
-) => {
+export const Browser: Component<{
+    items: BrowserItem[];
+    cacheKey?: string;
+}> = (props) => {
     const cacheKey = props.cacheKey && `browser:${props.cacheKey}`;
     const [selectedItem, setSelectedItem] = createSignal<number>(
         cacheKey ? Number(localStorage.getItem(cacheKey) ?? 0) : 0,
@@ -42,7 +44,17 @@ export const Browser: Component<{ items: BrowserItem[]; cacheKey?: string }> = (
                                 <Show when={item.icon}>
                                     <Icon name={item.icon!} class="h-5" />
                                 </Show>
-                                {item.label}
+                                <div class="flex justify-between w-full">
+                                    <div>{item.label}</div>
+                                    <Show when={item.onDelete}>
+                                        <Icon
+                                            name="trash"
+                                            onClick={() =>
+                                                item.onDelete?.(index())
+                                            }
+                                        />
+                                    </Show>
+                                </div>
                             </div>
                             <Show when={item.divider}>
                                 <hr class="browser-divider" />
