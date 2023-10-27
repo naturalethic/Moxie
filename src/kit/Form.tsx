@@ -45,6 +45,9 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
     onSubmit?: (result: SafeParseResult<S>) => void,
 ): CreateForm<S>;
 
+// XXX: In order to keep bundle size down, we're using signals instead of stores
+//      for the deep form state.  Thus, we are comparing the whole form state for
+//      every field update.  This is not efficient, but should be ok for smallish forms.
 export function createForm<S extends BaseSchema = BaseSchema,>(
     schema: S,
     dataOrOnSubmit?: Partial<Input<S>> | ((result: SafeParseResult<S>) => void),
@@ -57,16 +60,25 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
 
     const [form, setFormSignal] = createSignal<Partial<Input<S>>>(
         structuredClone(data ?? {}),
-        { equals: false },
+        {
+            equals(prev, next) {
+                // XXX: This is obviously not the most efficient
+                return JSON.stringify(prev) === JSON.stringify(next);
+            },
+        },
     );
     const [error, setErrorSignal] = createSignal<FormError>(
         {},
-        { equals: false },
+        {
+            equals(prev, next) {
+                // XXX: This is obviously not the most efficient
+                return JSON.stringify(prev) === JSON.stringify(next);
+            },
+        },
     );
     const [message, setMessage] = createSignal("");
 
     function setForm(path: string | string[], value: unknown) {
-        console.log("setForm", path, value);
         setFormSignal((form) => setPath(form, path, value));
     }
 
