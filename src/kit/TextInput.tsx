@@ -6,7 +6,7 @@ import {
     useContext,
 } from "solid-js";
 import { Icon } from "~/kit/Icon";
-import { cls } from "~/lib/util";
+import { cls, getPath, setPath } from "~/lib/util";
 import { FormContext } from "./Form";
 import { Label } from "./Label";
 
@@ -37,7 +37,7 @@ export const TextInput: Component<{
         "onChange",
     ]);
     const size = props.size ?? "normal";
-    const { form, setForm, error, setError } = useContext(FormContext);
+    const form = useContext(FormContext);
 
     function handleKeyPress(event: KeyboardEvent) {
         if (event.key === "Enter" && props.onEnter) {
@@ -48,30 +48,35 @@ export const TextInput: Component<{
 
     function handleInput(event: InputEvent) {
         const input = event.target as HTMLInputElement;
-        if (props.name && setForm && setError) {
-            setForm(props.name, input.value);
-            setError(props.name, undefined);
+        if (props.name && form) {
+            setPath(form.value, props.name, input.value);
+            setPath(form.error, props.name, undefined);
         }
         props.onChange?.(input.value);
     }
 
     function handleFocus() {
-        if (props.name && setError) {
-            setError(props.name, undefined);
+        if (props.name && form) {
+            setPath(form.error, props.name, undefined);
         }
     }
 
     createEffect(() => {
         // Initialize the form data value for this input to an empty string, if it is not yet defined.
-        if (form && setForm && props.name && form[props.name] === undefined) {
-            setForm(props.name.split("."), "");
+        if (form && props.name && form.value[props.name] === undefined) {
+            setPath(form.value, props.name, "");
         }
     });
 
     return (
         <Label
             label={props.label}
-            error={props.error ?? (props.name && error?.[props.name])}
+            error={
+                props.error ??
+                (props.name &&
+                    form &&
+                    (getPath(form.error, props.name) as string))
+            }
             tip={props.tip}
         >
             <div class="input-container">
@@ -79,11 +84,16 @@ export const TextInput: Component<{
                     {...inputProps}
                     value={
                         props.value ??
-                        (props.name && (form?.[props.name] as string))
+                        (props.name &&
+                            form &&
+                            (getPath(form.value, props.name) as string))
                     }
                     class={cls({
                         "border-danger":
-                            props.error ?? (props.name && error?.[props.name]),
+                            props.error ??
+                            (props.name &&
+                                form &&
+                                getPath(form.error, props.name)),
                         "text-sm": !props.size || props.size === "normal",
                         "text-xs": props.size === "small",
                     })}

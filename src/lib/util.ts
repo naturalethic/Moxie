@@ -68,3 +68,37 @@ export function setPath<T extends Record<string, unknown>>(
     }
     return object;
 }
+
+/**
+ * Retrieves the value of a nested property in an object based on a given path.
+ *
+ * @param {Record<string, unknown>} object - The object to retrieve the property from.
+ * @param {string | string[]} path - The path to the nested property. Can be a dot-separated string or an array of strings.
+ * @return {unknown} - The value of the nested property. Returns undefined if the property does not exist.
+ * @example
+ * @import.meta.vitest
+ * ```ts
+ * expect(getPath({ a: { b: 1 } }, "a.b")).toEqual(1);
+ * expect(getPath({ a: {} }, "a.b.c")).toBeUndefined();
+ * ```
+ */
+export function getPath<T extends Record<string, unknown>>(
+    object: T,
+    path: string | string[],
+) {
+    const parts = typeof path === "string" ? path.split(".") : path;
+    const next = parts.shift();
+    if (!next) {
+        console.warn("getPath: missing path");
+        return undefined;
+    }
+    if (parts.length === 0) {
+        // @ts-ignore
+        return object[next];
+    } else {
+        if (!object[next]) {
+            return undefined;
+        }
+        return getPath(object[next] as Record<string, unknown>, parts);
+    }
+}

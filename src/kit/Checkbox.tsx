@@ -9,7 +9,7 @@ export const Checkbox: Component<{
 }> = (props) => {
     const [, inputProps] = splitProps(props, ["label", "error", "tip"]);
 
-    const { form, setForm } = useContext(FormContext);
+    const form = useContext(FormContext);
 
     return (
         <label class="flex gap-[5px] tooltip-host select-none">
@@ -17,12 +17,14 @@ export const Checkbox: Component<{
                 type="checkbox"
                 {...inputProps}
                 checked={
-                    props.name && form ? (form[props.name] as boolean) : false
+                    props.name && form
+                        ? (form.value[props.name] as boolean)
+                        : false
                 }
                 onChange={(event) => {
                     const input = event.target as HTMLInputElement;
-                    if (props.name && setForm) {
-                        setForm(props.name, input.checked);
+                    if (props.name && form) {
+                        form.value[props.name] = input.checked;
                     }
                 }}
             />

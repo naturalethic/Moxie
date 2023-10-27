@@ -44,7 +44,7 @@ export const New: Component = () => {
 
     const [type, setType] = createSignal<HandlerType>("static");
 
-    const { form, Form } = createForm(
+    const form = createForm(
         object({
             log: string(),
             domain: string(),
@@ -73,21 +73,22 @@ export const New: Component = () => {
             },
         },
         async ({ success }) => {
-            console.log(success);
+            console.log("Domain", form.value.domain);
+            // console.log(success);
             if (!success) return;
-            if (form.details.type === "static") {
+            if (form.value.details.type === "static") {
                 const handler: WebHandler = {
-                    LogName: form.log,
-                    Domain: form.domain,
-                    PathRegexp: `^${form.path}`,
-                    DontRedirectPlainHTTP: !form.secure,
-                    Compress: form.compress,
+                    LogName: form.value.log,
+                    Domain: form.value.domain,
+                    PathRegexp: `^${form.value.path}`,
+                    DontRedirectPlainHTTP: !form.value.secure,
+                    Compress: form.value.compress,
                     WebStatic: {
-                        StripPrefix: form.details.strip,
-                        Root: form.details.root,
-                        ListFiles: form.details.list,
-                        ContinueNotFound: form.details.continue,
-                        ResponseHeaders: form.details.headers,
+                        StripPrefix: form.value.details.strip,
+                        Root: form.value.details.root,
+                        ListFiles: form.value.details.list,
+                        ContinueNotFound: form.value.details.continue,
+                        ResponseHeaders: form.value.details.headers,
                     },
                     WebForward: null,
                     WebRedirect: null,
@@ -99,7 +100,7 @@ export const New: Component = () => {
     );
 
     return (
-        <Form>
+        <form.Form>
             <Box class="py-4 px-4 space-y-4 max-w-md" shaded>
                 <TextInput
                     name="name"
@@ -146,7 +147,34 @@ export const New: Component = () => {
                 style="min-width: 338px;"
             >
                 <Show when={type() === "static"}>
-                    <NewStatic name="details" />
+                    <TextInput
+                        name="details.strip"
+                        label="Strip prefix"
+                        placeholder="/prefix"
+                        tip="Strip the given prefix from the request path before evaluating local file"
+                    />
+                    <TextInput
+                        name="details.root"
+                        label="Root"
+                        placeholder="/path/to/root"
+                        tip="Path to serve files from, either absolute or relative to the mox working directory"
+                    />
+                    <Checkbox
+                        name="details.list"
+                        label="List Files"
+                        tip="Display a list of files for directories where index.html is not present"
+                    />
+                    <Checkbox
+                        name="details.continue"
+                        label="Continue"
+                        tip="If file is not found, continue to next handler instead of returning 404, GET/HEAD only"
+                    />
+                    <Label label="Additional response headers" />
+                    <Associative
+                        name="details.headers"
+                        keyPlaceholder="Header"
+                        valuePlaceholder="Value"
+                    />
                 </Show>
                 <Show when={type() === "forward"}>
                     <div>Forward</div>
@@ -156,43 +184,6 @@ export const New: Component = () => {
                 </Show>
             </Box>
             <button>Add new web handler</button>
-        </Form>
-    );
-};
-
-const NewStatic: Component<{ name: string }> = (props) => {
-    const { Form } = createForm(props.name, StaticSchema);
-
-    return (
-        <Form>
-            <TextInput
-                name="strip"
-                label="Strip prefix"
-                placeholder="/prefix"
-                tip="Strip the given prefix from the request path before evaluating local file"
-            />
-            <TextInput
-                name="root"
-                label="Root"
-                placeholder="/path/to/root"
-                tip="Path to serve files from, either absolute or relative to the mox working directory"
-            />
-            <Checkbox
-                name="list"
-                label="List Files"
-                tip="Display a list of files for directories where index.html is not present"
-            />
-            <Checkbox
-                name="continue"
-                label="Continue"
-                tip="If file is not found, continue to next handler instead of returning 404, GET/HEAD only"
-            />
-            <Label label="Additional response headers" />
-            <Associative
-                name="headers"
-                keyPlaceholder="Header"
-                valuePlaceholder="Value"
-            />
-        </Form>
+        </form.Form>
     );
 };

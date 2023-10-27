@@ -1,36 +1,28 @@
-import {
-    Accessor,
-    ParentComponent,
-    Setter,
-    createContext,
-    createSignal,
-    useContext,
-} from "solid-js";
-import { SetStoreFunction, createStore, unwrap } from "solid-js/store";
+import { ParentComponent, createContext, createSignal } from "solid-js";
+import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
 import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
+import { setPath } from "~/lib/util";
 
 type Form = ParentComponent<{ class?: string }>;
 type FormData = Record<string, unknown>;
 type FormError = Record<string, string | undefined>;
 
-type FormContext = {
-    form?: FormData;
-    setForm?: (key: string, value: unknown) => void;
-    error?: FormError;
-    setError?: SetStoreFunction<FormError>;
-};
+type FormContext =
+    | {
+          value: FormData;
+          error: FormError;
+      }
+    | undefined;
 
-export const FormContext = createContext<FormContext>({});
+export const FormContext = createContext<FormContext>();
 
 type CreateForm<S extends BaseSchema> = {
-    form: Input<S>;
-    setForm: (key: string, value: unknown) => void;
     Form: Form;
-    resetForm: () => void;
+    value: Input<S>;
     error: FormError;
-    setError: SetStoreFunction<FormError>;
-    message: Accessor<string>;
-    setMessage: Setter<string>;
+    reset: () => void;
+    set message(message: string);
+    get message(): string;
 };
 
 export function createForm<S extends BaseSchema = BaseSchema,>(
@@ -60,12 +52,8 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
 export function createForm<S extends BaseSchema = BaseSchema,>(
     ...args: unknown[]
 ): CreateForm<S> {
-    let name: string | undefined = undefined;
-    if (typeof args[0] === "string") {
-        name = args.shift() as string;
-    }
     const schema = args.shift() as S;
-    let data: Partial<Input<S>> | undefined = undefined;
+    let data: Partial<Input<S>> = {};
     if (typeof args[0] === "object") {
         data = args.shift() as Partial<Input<S>>;
     }
@@ -73,85 +61,59 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
         | ((result: SafeParseResult<S>) => void)
         | undefined;
 
-    const parent = name
-        ? (useContext(FormContext) as Required<FormContext>)
-        : undefined;
-
-    if (parent) {
-        data ??= parent.form[name!] as Partial<Input<S>>;
-    }
-
-    const [form, setFormStore] = createStore<Input<S>>(
-        structuredClone(unwrap(data ?? {})),
-    );
-    const [error, setError] = createStore<FormError>({});
+    const value = createMutable<S>(structuredClone(unwrap(data)) as S);
+    const error = createMutable<FormError>({});
     const [message, setMessage] = createSignal("");
 
-    function setForm(key: string, value: unknown) {
-        setFormStore({ [key]: value });
-        if (parent) {
-            parent.setForm(name!, structuredClone(unwrap(form)));
-        }
-    }
-
-    function resetForm() {
-        setFormStore(structuredClone(data ?? {}));
+    function reset() {
+        modifyMutable(
+            value,
+            produce((value) => {
+                for (const key in data) {
+                    value[key] = data[key]!;
+                }
+            }),
+        );
     }
 
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
-            const result = safeParse(schema, form);
+            const result = safeParse(schema, value);
             if (!result.success) {
                 for (const issue of result.issues) {
                     if (issue.path) {
-                        console.log(issue.path);
                         const path = issue.path.map((p) => p.key);
-                        setError(path, issue.message);
+                        setPath(error, path, issue.message);
                     }
                 }
             }
-            if (parent) {
-                const parentElement = (event.target as HTMLFormElement)
-                    .parentElement!;
-                const parentForm = parentElement.closest("form")!;
-                const submit = parentForm.querySelector(
-                    "input[data-hidden-submit]",
-                ) as HTMLInputElement;
-                submit.click();
-            } else {
-                onSubmit?.(result);
-            }
+            onSubmit?.(result);
         }
 
         return (
             <FormContext.Provider
                 value={{
-                    form,
-                    setForm,
+                    value,
                     error,
-                    setError,
                 }}
             >
                 <form onSubmit={handleSubmit} class={props.class}>
-                    <input
-                        data-hidden-submit
-                        style="display: none;"
-                        type="submit"
-                    />
                     {props.children}
                 </form>
             </FormContext.Provider>
         );
     };
     return {
-        form,
-        setForm,
-        resetForm,
         Form,
+        value,
         error,
-        setError,
-        message,
-        setMessage,
+        reset,
+        set message(value: string) {
+            setMessage(value);
+        },
+        get message() {
+            return message();
+        },
     };
 }

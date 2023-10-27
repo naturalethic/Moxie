@@ -1,6 +1,6 @@
 import { Component, For, Show, useContext } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
-import { cls } from "~/lib/util";
+import { cls, getPath, setPath } from "~/lib/util";
 import { Box } from "./Box";
 import { FormContext } from "./Form";
 import { Option } from "./Option";
@@ -18,10 +18,14 @@ export const Associative: Component<{
     onDelete?: (key: string) => void;
     onChange?: (key: string, value: string) => void;
 }> = (props) => {
-    const { form, setForm } = useContext(FormContext);
+    const form = useContext(FormContext);
     const [items, setItems] = createStore(
         structuredClone(
-            unwrap(props.items ?? (props.name && form?.[props.name]) ?? {}),
+            unwrap(
+                props.items ??
+                    (props.name && form && getPath(form.value, props.name)) ??
+                    {},
+            ),
         ),
     );
     let keyField: HTMLInputElement;
@@ -37,7 +41,13 @@ export const Associative: Component<{
                     ...prev,
                     [key]: value,
                 }));
-                props.name && setForm?.(props.name, unwrap(items));
+                if (form && props.name) {
+                    setPath(
+                        form.value,
+                        props.name,
+                        structuredClone(unwrap(items)),
+                    );
+                }
             }
             if (!props.valueOptions) {
                 valueField.value = "";
@@ -54,10 +64,9 @@ export const Associative: Component<{
                 ...prev,
                 [key]: undefined,
             }));
-            // props.name &&
-            //     setForm?.({ [props.name]: structuredClone(unwrap(items)) });
-            props.name && setForm?.(props.name, structuredClone(unwrap(items)));
-            // ref.dispatchEvent(new FieldValueEvent(""));
+            if (form && props.name) {
+                setPath(form.value, props.name, structuredClone(unwrap(items)));
+            }
         }
     }
     let ref: HTMLDivElement;

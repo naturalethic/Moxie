@@ -1,5 +1,5 @@
 import { Component, For, createEffect, splitProps, useContext } from "solid-js";
-import { cls } from "~/lib/util";
+import { cls, getPath, setPath } from "~/lib/util";
 import { FormContext } from "./Form";
 import { Label } from "./Label";
 import { Option, optionLabel, optionValue } from "./Option";
@@ -19,26 +19,26 @@ export const Select: Component<{
         "value",
         "size",
     ]);
-    const { form, setForm } = useContext(FormContext);
+    const form = useContext(FormContext);
 
     function handleChange(event: Event) {
         const select = event.target as HTMLSelectElement;
-        if (props.name && setForm) {
-            setForm(props.name.split("."), select.value);
+        if (props.name && form) {
+            setPath(form.value, props.name, select.value);
         }
         props.onChange?.(select.value);
     }
 
     createEffect(() => {
+        // Initialize the form data value for this select to the first item, if it is not yet defined.
         if (
             form &&
             props.name &&
-            !form[props.name] &&
-            setForm &&
             props.options &&
-            props.options.length > 0
+            props.options.length > 0 &&
+            !getPath(form.value, props.name)
         ) {
-            setForm(props.name.split("."), optionValue(props.options[0]));
+            setPath(form.value, props.name, optionValue(props.options[0]));
         }
     });
 
@@ -60,7 +60,8 @@ export const Select: Component<{
                                 optionValue(option) ===
                                 (props.value ??
                                     (props.name &&
-                                        (form?.[props.name] as string)))
+                                        form &&
+                                        getPath(form.value, props.name)))
                             }
                         >
                             {optionLabel(option)}
