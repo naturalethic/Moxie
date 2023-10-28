@@ -1,13 +1,19 @@
 import { Component } from "solid-js";
 import { Browser } from "~/kit/Browser";
-import { deleteHandler, useWebServerConfig } from "~/lib/api";
+import { deleteHandler, moveHandler, useWebServerConfig } from "~/lib/api";
 import { New } from "./New";
 
 export const Handlers: Component = () => {
     const webServerConfig = useWebServerConfig();
+
+    function handleMove(from: number, to: number) {
+        moveHandler(from - 1, to - 1);
+    }
+
     return (
         <div>
             <Browser
+                onMove={handleMove}
                 cacheKey="Handlers"
                 items={[
                     {
@@ -18,13 +24,11 @@ export const Handlers: Component = () => {
                     },
                     ...(webServerConfig.latest?.WebHandlers ?? []).map(
                         (handler) => ({
+                            moveable: true,
                             label: `${handler.Domain}:${handler.PathRegexp}`,
                             view: () => <div>{handler.Name}</div>,
                             onDelete: (index: number) => {
-                                deleteHandler(
-                                    // webServerConfig.latest!,
-                                    index - 1,
-                                );
+                                deleteHandler(index - 1);
                             },
                         }),
                     ),

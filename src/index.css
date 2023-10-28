@@ -306,6 +306,30 @@ form {
         @apply w-4;
         color: var(--color-neutral);
     }
+
+    & .drag-marker.insert-above {
+        &::after {
+            @apply absolute;
+            top: -6px;
+            left: -10px;
+            content: "";
+            /* background-color: var(--color-neutral-subtle); */
+            border: 5px solid black;
+            border-color: transparent transparent transparent var(--color-neutral);
+        }
+    }
+
+    & .drag-marker.insert-below {
+        &::after {
+            @apply absolute;
+            top: calc(100% + -4px);
+            left: -10px;
+            content: "";
+            background-color: var(--color-neutral-subtle);
+            border: 5px solid black;
+            border-color: transparent transparent transparent var(--color-neutral);
+        }
+    }
 }
 
 .browser-divider {

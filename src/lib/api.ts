@@ -207,6 +207,20 @@ export async function saveHandler(handler: WebHandler) {
     return response;
 }
 
+export async function moveHandler(from: number, to: number) {
+    const params = generateWebServerConfigParams();
+    params[1].WebHandlers.splice(
+        to,
+        0,
+        params[1].WebHandlers.splice(from, 1)[0],
+    );
+    const response = await safeApi("WebserverConfigSave", params);
+    if (response.result) {
+        reload("WebserverConfig", [], response.result);
+    }
+    return response;
+}
+
 export async function deleteHandler(index: number) {
     const params = generateWebServerConfigParams();
     params[1].WebHandlers.splice(index, 1);
