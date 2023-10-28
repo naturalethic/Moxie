@@ -82,10 +82,10 @@ export function setPath<T extends Record<string, unknown>>(
  * expect(getPath({ a: {} }, "a.b.c")).toBeUndefined();
  * ```
  */
-export function getPath<T extends Record<string, unknown>>(
-    object: T,
-    path: string | string[],
-) {
+export function getPath<
+    R,
+    T extends Record<string, unknown> = Record<string, unknown>,
+>(object: T, path: string | string[]): R | undefined {
     const parts = typeof path === "string" ? path.split(".") : path;
     const next = parts.shift();
     if (!next) {

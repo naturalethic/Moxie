@@ -99,6 +99,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
                 }}
             >
                 <form onSubmit={handleSubmit} class={props.class}>
+                    <input type="submit" style="display: none" />
                     {props.children}
                 </form>
             </FormContext.Provider>

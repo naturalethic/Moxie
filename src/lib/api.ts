@@ -155,32 +155,41 @@ export function useWebServerConfig() {
 
 function generateWebDomainRedirects(
     webServerConfig: WebServerConfig,
-    modify?: { from: string; to?: string },
+    redirects: Record<string, string> = {},
 ) {
-    let modifyWasPresent = false;
-    const redirects =
-        webServerConfig.WebDNSDomainRedirects.map(([from, to]) => {
-            if (from.ASCII === modify?.from) {
-                modifyWasPresent = true;
-                return [from.ASCII, modify?.to];
-            }
-            return [from.ASCII, to.ASCII];
-        }) ?? [];
-    if (modify && !modifyWasPresent) {
-        redirects.push([modify?.from, modify?.to]);
+    if (redirects) {
+        return Object.entries(redirects);
     }
-    return redirects;
+    if (!webServerConfig.WebDNSDomainRedirects) {
+        return [];
+    }
+    return webServerConfig.WebDNSDomainRedirects.map(([from, to]) => [
+        from,
+        to,
+    ]);
 }
 
-function generateWebServerConfigParams() {
+function generateWebServerConfigParams(redirects: Record<string, string> = {}) {
     const webServerConfig = useWebServerConfig().latest!;
     return [
         webServerConfig,
         {
-            WebDomainRedirects: generateWebDomainRedirects(webServerConfig),
+            WebDomainRedirects: generateWebDomainRedirects(
+                webServerConfig,
+                redirects,
+            ),
             WebHandlers: structuredClone(unwrap(webServerConfig.WebHandlers)),
         },
     ];
+}
+
+export async function saveRedirects(redirects: Record<string, string> = {}) {
+    const params = generateWebServerConfigParams(redirects);
+    const response = await safeApi("WebserverConfigSave", params);
+    if (response.result) {
+        reload("WebserverConfig", [], response.result);
+    }
+    return response;
 }
 
 export async function saveHandler(handler: WebHandler) {
@@ -201,8 +210,11 @@ export async function saveHandler(handler: WebHandler) {
 export async function deleteHandler(index: number) {
     const params = generateWebServerConfigParams();
     params[1].WebHandlers.splice(index, 1);
-    const result = await api("WebserverConfigSave", params);
-    reload("WebserverConfig", [], result);
+    const response = await safeApi("WebserverConfigSave", params);
+    if (response.result) {
+        reload("WebserverConfig", [], response.result);
+    }
+    return response;
 }
 
 export type Domain = {

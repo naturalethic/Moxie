@@ -1,15 +1,17 @@
-import { Component, For, Show, useContext } from "solid-js";
-import { createStore, unwrap } from "solid-js/store";
-import { cls, getPath, setPath } from "~/lib/util";
+import { Component, Index, Show, useContext } from "solid-js";
+import { createMutable, unwrap } from "solid-js/store";
+import { cls, getPath } from "~/lib/util";
 import { Box } from "./Box";
 import { FormContext } from "./Form";
 import { Option } from "./Option";
 import { Select } from "./Select";
 import { TextInput } from "./TextInput";
 
+type Items = Record<string, string>;
+
 export const Associative: Component<{
     name?: string;
-    items?: Record<string, string | undefined>;
+    items?: Items;
     keyPlaceholder?: string;
     valuePlaceholder?: string;
     valueOptions?: Option[];
@@ -19,34 +21,26 @@ export const Associative: Component<{
     onChange?: (key: string, value: string) => void;
 }> = (props) => {
     const form = useContext(FormContext);
-    const [items, setItems] = createStore(
-        structuredClone(
-            unwrap(
-                props.items ??
-                    (props.name && form && getPath(form.value, props.name)) ??
-                    {},
-            ),
-        ),
-    );
+    // XXX: This isn't used if their is a form, so maybe don't create it.
+    //      Clean up this distinction.
+    const items = createMutable(structuredClone(unwrap(props.items ?? {})));
     let keyField: HTMLInputElement;
     let valueField: HTMLInputElement | HTMLSelectElement;
     function handleSubmit() {
         const key = keyField.value;
         const value = valueField.value;
-        if (key && value && !Object.keys(items).includes(key)) {
+        const values =
+            form && props.name
+                ? (getPath(form.value, props.name) as Items)
+                : items;
+        if (key && value && !Object.keys(values).includes(key)) {
             if (props.onSubmit) {
                 props.onSubmit(key, value);
             } else {
-                setItems((prev) => ({
-                    ...prev,
-                    [key]: value,
-                }));
                 if (form && props.name) {
-                    setPath(
-                        form.value,
-                        props.name,
-                        structuredClone(unwrap(items)),
-                    );
+                    values[key] = value;
+                } else {
+                    items[key] = value;
                 }
             }
             if (!props.valueOptions) {
@@ -60,18 +54,17 @@ export const Associative: Component<{
         if (props.onDelete) {
             props.onDelete(key);
         } else {
-            setItems((prev) => ({
-                ...prev,
-                [key]: undefined,
-            }));
             if (form && props.name) {
-                setPath(form.value, props.name, structuredClone(unwrap(items)));
+                const values = getPath<Items>(form.value, props.name)!;
+                delete values[key];
+            } else {
+                delete items[key];
             }
         }
     }
-    let ref: HTMLDivElement;
+
     return (
-        <div class="flex flex-col gap-1" ref={ref!}>
+        <div class="flex flex-col gap-1">
             <Box
                 class={cls("grid grid-cols-2 gap-1", {
                     "p-2 mb-1": props.submitLabel,
@@ -100,42 +93,61 @@ export const Associative: Component<{
                     />
                 </Show>
                 <Show when={props.submitLabel}>
-                    <button class="col-span-2 text-xs" onClick={handleSubmit}>
+                    <button
+                        type="button"
+                        class="col-span-2 text-xs"
+                        onClick={handleSubmit}
+                    >
                         {props.submitLabel}
                     </button>
                 </Show>
             </Box>
             <div class="text-xs grid grid-cols-2 gap-1">
-                <For each={Object.entries(items)}>
-                    {([key, value]) => (
+                <Index
+                    each={Object.entries(
+                        (form &&
+                            props.name &&
+                            getPath(form.value, props.name)) ??
+                            items,
+                    ).map(([key, value]) => ({
+                        key,
+                        value,
+                    }))}
+                >
+                    {(item) => (
                         <>
                             <TextInput
                                 size="small"
-                                value={key}
+                                value={item().key}
                                 disabled
                                 trailingIcon="trash"
-                                onClickTrailingIcon={() => handleDelete(key)}
+                                onClickTrailingIcon={() =>
+                                    handleDelete(item().key)
+                                }
                             />
                             <Show when={!props.valueOptions}>
                                 <TextInput
                                     size="small"
                                     placeholder="Value"
-                                    value={value}
+                                    value={item().value}
+                                    onChange={(value) =>
+                                        props.onChange?.(item().key, value)
+                                    }
                                 />
                             </Show>
                             <Show when={props.valueOptions}>
                                 <Select
                                     options={props.valueOptions}
                                     size="small"
-                                    value={value}
+                                    value={item().value}
                                     onChange={(value: string) =>
-                                        props.onChange?.(key, value)
+                                        props.onChange?.(item().key, value)
                                     }
                                 />
                             </Show>
                         </>
                     )}
-                </For>
+                </Index>
             </div>
         </div>
     );
