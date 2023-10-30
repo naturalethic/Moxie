@@ -3,6 +3,7 @@ import { cls } from "~/lib/util";
 import { Icon } from "./Icon";
 
 type BrowserItem = {
+    route?: string;
     label: string;
     view: () => JSX.Element;
     divider?: boolean;
