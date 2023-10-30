@@ -9,20 +9,19 @@ export const Admin: Component = () => {
     return (
         <Box class="m-2 p-2" border>
             <Browser
-                cacheKey="Admin"
                 items={[
                     {
-                        route: "accounts",
+                        route: "/admin/accounts",
                         label: "Accounts",
                         view: () => <Accounts />,
                     },
                     {
-                        route: "domains",
+                        route: "/admin/domains",
                         label: "Domains",
                         view: () => <Domains />,
                     },
                     {
-                        route: "web",
+                        route: "/admin/web",
                         label: "Web",
                         view: () => <Web />,
                     },

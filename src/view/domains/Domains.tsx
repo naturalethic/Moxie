@@ -10,15 +10,16 @@ export const Domains: Component = () => {
     return (
         <div>
             <Browser
-                cacheKey="Domains"
                 items={[
                     {
+                        route: "/admin/domains/new",
                         label: "Add new domain",
                         view: () => <New />,
                         divider: true,
                         icon: "circle-plus",
                     },
                     ...domains.latest.map((domain) => ({
+                        route: `/admin/domains/${domain.ASCII}`,
                         label: domain.ASCII,
                         view: () => <Domain domain={domain.ASCII} />,
                     })),
