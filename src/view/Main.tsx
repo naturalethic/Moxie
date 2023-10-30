@@ -1,33 +1,29 @@
-import { Box } from "~/kit/Box";
-import { Browser } from "~/kit/Browser";
+import { Deck } from "~/kit/Deck";
+import { History } from "~/kit/History";
 import { Toast } from "~/kit/Toast";
-import { Accounts } from "./accounts/Accounts";
-import { Domains } from "./domains/Domains";
-import { Web } from "./web/Web";
+import { Admin } from "./Admin";
+import { Header } from "./Header";
+import { Mail } from "./Mail";
 
-export default function () {
+export const Main = () => {
     return (
         <Toast>
-            <header>Moxie</header>
-            <Box class="m-2 p-2" border>
-                <Browser
-                    cacheKey="Main"
+            <History>
+                <Header />
+                <Deck
                     items={[
+                        { route: "/", view: () => <div>Home</div> },
                         {
-                            label: "Accounts",
-                            view: () => <Accounts />,
+                            route: "/admin",
+                            view: () => <Admin />,
                         },
                         {
-                            label: "Domains",
-                            view: () => <Domains />,
-                        },
-                        {
-                            label: "Web",
-                            view: () => <Web />,
+                            route: "/mail",
+                            view: () => <Mail />,
                         },
                     ]}
                 />
-            </Box>
+            </History>
         </Toast>
     );
-}
+};
