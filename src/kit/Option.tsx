@@ -1,19 +1,17 @@
-export type Option<T extends string = string> =
-    | string
-    | { value: T; label: string };
+export type Option<T extends string | number> = T | { value: T; label: string };
 
-export function optionValue<T extends string>(option: Option<T>): T {
-    if (typeof option === "string") {
-        return option as T;
-    } else {
+export function optionValue<T extends string | number>(option: Option<T>): T {
+    if (typeof option === "object") {
         return option.value;
+    } else {
+        return option as T;
     }
 }
 
-export function optionLabel<T extends string>(option: Option<T>) {
-    if (typeof option === "string") {
-        return option;
-    } else {
+export function optionLabel<T extends string | number>(option: Option<T>) {
+    if (typeof option === "object") {
         return option.label;
+    } else {
+        return option;
     }
 }

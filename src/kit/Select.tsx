@@ -1,32 +1,53 @@
-import { Component, For, createEffect, splitProps, useContext } from "solid-js";
+import {
+    ComponentProps,
+    For,
+    createEffect,
+    splitProps,
+    useContext,
+} from "solid-js";
 import { cls, getPath, setPath } from "~/lib/util";
 import { FormContext } from "./Form";
 import { Label } from "./Label";
 import { Option, optionLabel, optionValue } from "./Option";
 
-export const Select: Component<{
+type SelectProps<T extends string | number> = {
     name?: string;
     label?: string;
-    options?: Option[];
+    options?: Option<T>[];
     error?: string;
-    value?: string;
+    value?: T;
     size?: "small" | "normal";
-    onChange?: (value: string) => void;
-}> = (props) => {
+    tip?: string;
+    onChange?: (value: T) => void;
+} & ComponentProps<"select">;
+
+// export const Select: Component<{
+//     name?: string;
+//     label?: string;
+//     options?: Option[];
+//     error?: string;
+//     value?: string;
+//     size?: "small" | "normal";
+//     tip?: string;
+//     onChange?: (value: string) => void;
+// }> = (props) => {
+export const Select = <T extends string | number,>(props: SelectProps<T>) => {
     const [, selectProps] = splitProps(props, [
         "label",
         "error",
         "value",
         "size",
+        "tip",
     ]);
     const form = useContext(FormContext);
 
     function handleChange(event: Event) {
         const select = event.target as HTMLSelectElement;
+        const value = optionValue(props.options![select.selectedIndex]);
         if (props.name && form) {
-            setPath(form.value, props.name, select.value);
+            setPath(form.value, props.name, value);
         }
-        props.onChange?.(select.value);
+        props.onChange?.(value);
     }
 
     createEffect(() => {
@@ -43,7 +64,7 @@ export const Select: Component<{
     });
 
     return (
-        <Label label={props.label} error={props.error}>
+        <Label label={props.label} error={props.error} tip={props.tip}>
             <select
                 {...selectProps}
                 onChange={handleChange}

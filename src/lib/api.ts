@@ -171,6 +171,7 @@ function generateWebDomainRedirects(
 
 function generateWebServerConfigParams(redirects: Record<string, string> = {}) {
     const webServerConfig = useWebServerConfig().latest!;
+    console.log(webServerConfig);
     return [
         webServerConfig,
         {
@@ -178,7 +179,8 @@ function generateWebServerConfigParams(redirects: Record<string, string> = {}) {
                 webServerConfig,
                 redirects,
             ),
-            WebHandlers: structuredClone(unwrap(webServerConfig.WebHandlers)),
+            WebHandlers:
+                structuredClone(unwrap(webServerConfig.WebHandlers)) ?? [],
         },
     ];
 }

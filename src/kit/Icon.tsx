@@ -6,7 +6,7 @@ import { cls } from "~/lib/util";
 export const Icon: Component<{
     name: string;
     class?: string;
-    onClick?: () => void;
+    onClick?: (event: MouseEvent) => void;
 }> = (props) => {
     return (
         <svg

@@ -113,15 +113,16 @@ export const Browser: Component<{
                                     <Show when={item.onDelete}>
                                         <Icon
                                             name="trash"
-                                            onClick={() =>
-                                                item.onDelete?.(index())
-                                            }
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                item.onDelete?.(index());
+                                            }}
                                         />
                                     </Show>
                                 </div>
                                 <Show when={item.moveable}>
                                     <div
-                                        class="drag-marker absolute h-full w-full"
+                                        class="drag-marker absolute h-full w-full pointer-events-none"
                                         data-index={index()}
                                     />
                                 </Show>
