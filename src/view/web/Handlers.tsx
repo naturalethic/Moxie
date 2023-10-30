@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { Browser } from "~/kit/Browser";
 import { deleteHandler, moveHandler, useWebServerConfig } from "~/lib/api";
-import { New } from "./New";
+import { Handler } from "./Handler";
 
 export const Handlers: Component = () => {
     const webServerConfig = useWebServerConfig();
@@ -18,15 +18,15 @@ export const Handlers: Component = () => {
                 items={[
                     {
                         label: "Add new web handler",
-                        view: () => <New />,
+                        view: () => <Handler />,
                         divider: true,
                         icon: "circle-plus",
                     },
                     ...(webServerConfig.latest?.WebHandlers ?? []).map(
-                        (handler) => ({
+                        (handler, index) => ({
                             moveable: true,
                             label: `${handler.Domain}:${handler.PathRegexp}`,
-                            view: () => <div>{handler.Name}</div>,
+                            view: () => <Handler index={index} />,
                             onDelete: (index: number) => {
                                 deleteHandler(index - 1);
                             },

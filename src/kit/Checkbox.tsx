@@ -1,4 +1,5 @@
 import { Component, Show, splitProps, useContext } from "solid-js";
+import { getPath, setPath } from "~/lib/util";
 import { FormContext } from "./Form";
 
 export const Checkbox: Component<{
@@ -18,13 +19,13 @@ export const Checkbox: Component<{
                 {...inputProps}
                 checked={
                     props.name && form
-                        ? (form.value[props.name] as boolean)
+                        ? (getPath(form.value, props.name) as boolean)
                         : false
                 }
                 onChange={(event) => {
                     const input = event.target as HTMLInputElement;
                     if (props.name && form) {
-                        form.value[props.name] = input.checked;
+                        setPath(form.value, props.name, input.checked);
                     }
                 }}
             />

@@ -171,7 +171,6 @@ function generateWebDomainRedirects(
 
 function generateWebServerConfigParams(redirects: Record<string, string> = {}) {
     const webServerConfig = useWebServerConfig().latest!;
-    console.log(webServerConfig);
     return [
         webServerConfig,
         {
@@ -194,14 +193,19 @@ export async function saveRedirects(redirects: Record<string, string> = {}) {
     return response;
 }
 
-export async function saveHandler(handler: WebHandler) {
+export async function createHandler(handler: WebHandler) {
     const params = generateWebServerConfigParams();
-    if (handler.Name) {
-        // XXX: This presumes the Name field is always the index.  In current mox app, it can be the log name.
-        params[1].WebHandlers[Number(handler.Name)] = handler;
-    } else {
-        params[1].WebHandlers.push(handler);
+    params[1].WebHandlers.push(handler);
+    const response = await safeApi("WebserverConfigSave", params);
+    if (response.result) {
+        reload("WebserverConfig", [], response.result);
     }
+    return response;
+}
+
+export async function updateHandler(index: number, handler: WebHandler) {
+    const params = generateWebServerConfigParams();
+    params[1].WebHandlers[index] = handler;
     const response = await safeApi("WebserverConfigSave", params);
     if (response.result) {
         reload("WebserverConfig", [], response.result);

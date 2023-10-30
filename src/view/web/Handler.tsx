@@ -18,7 +18,14 @@ import { Label } from "~/kit/Label";
 import { Segmented } from "~/kit/Segmented";
 import { Select } from "~/kit/Select";
 import { TextInput } from "~/kit/TextInput";
-import { WebHandler, saveHandler, useDomains } from "~/lib/api";
+import { useToast } from "~/kit/Toast";
+import {
+    WebHandler,
+    createHandler,
+    updateHandler,
+    useDomains,
+    useWebServerConfig,
+} from "~/lib/api";
 
 const StaticDetail = object({
     type: literal("static"),
@@ -44,32 +51,61 @@ const ForwardDetail = object({
     headers: record(string()),
 });
 
-export const New: Component = () => {
+export const Handler: Component<{ index?: number }> = (props) => {
+    const toast = useToast();
     const domains = useDomains();
+    const handler =
+        props.index === undefined
+            ? undefined
+            : useWebServerConfig()?.latest?.WebHandlers?.[props.index]!;
 
-    const staticDetail: Input<typeof StaticDetail> = {
-        type: "static",
-        strip: "",
-        root: "",
-        list: true,
-        continue: false,
-        headers: {},
-    };
+    const staticDetail: Input<typeof StaticDetail> = handler?.WebStatic
+        ? {
+              type: "static",
+              strip: handler.WebStatic.StripPrefix,
+              root: handler.WebStatic.Root,
+              list: handler.WebStatic.ListFiles,
+              continue: handler.WebStatic.ContinueNotFound,
+              headers: handler.WebStatic.ResponseHeaders ?? {},
+          }
+        : {
+              type: "static",
+              strip: "",
+              root: "",
+              list: true,
+              continue: false,
+              headers: {},
+          };
 
-    const redirectDetail: Input<typeof RedirectDetail> = {
-        type: "redirect",
-        target: "",
-        sourcePath: "",
-        targetPath: "",
-        status: 308,
-    };
+    const redirectDetail: Input<typeof RedirectDetail> = handler?.WebRedirect
+        ? {
+              type: "redirect",
+              target: handler.WebRedirect.BaseURL,
+              sourcePath: handler.WebRedirect.OrigPathRegexp,
+              targetPath: handler.WebRedirect.ReplacePath,
+              status: handler.WebRedirect.StatusCode,
+          }
+        : {
+              type: "redirect",
+              target: "",
+              sourcePath: "",
+              targetPath: "",
+              status: 308,
+          };
 
-    const forwardDetail: Input<typeof ForwardDetail> = {
-        type: "forward",
-        strip: false,
-        url: "",
-        headers: {},
-    };
+    const forwardDetail: Input<typeof ForwardDetail> = handler?.WebForward
+        ? {
+              type: "forward",
+              strip: handler.WebForward.StripPath,
+              url: handler.WebForward.URL,
+              headers: handler.WebForward.ResponseHeaders ?? {},
+          }
+        : {
+              type: "forward",
+              strip: false,
+              url: "",
+              headers: {},
+          };
 
     const form = createForm(
         object({
@@ -85,19 +121,24 @@ export const New: Component = () => {
             ]),
         }),
         {
-            log: "",
-            domain: "",
-            path: "",
-            secure: true,
-            compress: false,
-            detail: staticDetail,
+            log: handler?.LogName ?? "",
+            domain: handler?.Domain ?? "",
+            path: handler?.PathRegexp.substring(1),
+            secure: !handler?.DontRedirectPlainHTTP ?? true,
+            compress: handler?.Compress ?? false,
+            detail:
+                !handler || handler.WebStatic
+                    ? staticDetail
+                    : handler.WebRedirect
+                    ? redirectDetail
+                    : forwardDetail,
         },
         async ({ success }) => {
             if (!success) {
                 console.log(form.error);
                 return;
             }
-            const handler: WebHandler = {
+            const payload: WebHandler = {
                 LogName: form.value.log,
                 Domain: form.value.domain,
                 PathRegexp: `^${form.value.path}`,
@@ -131,13 +172,21 @@ export const New: Component = () => {
                           }
                         : null,
             };
-            const { error } = await saveHandler(handler);
-            console.log(error);
+            const { error } = handler
+                ? await updateHandler(props.index!, payload)
+                : await createHandler(payload);
+            if (error) {
+                toast("danger", error);
+            } else {
+                toast(
+                    "success",
+                    handler ? "Web handler updated" : "Web handler created",
+                );
+            }
         },
     );
 
     function handleChangeType(type: "static" | "redirect" | "forward") {
-        // XXX: Perhaps preserve the old values for the previous type.
         form.value.detail =
             type === "static"
                 ? staticDetail
@@ -294,7 +343,9 @@ export const New: Component = () => {
                     />
                 </Show>
             </Box>
-            <button>Add new web handler</button>
+            <button>
+                {handler ? "Update web handler" : "Add new web handler"}
+            </button>
         </form.Form>
     );
 };

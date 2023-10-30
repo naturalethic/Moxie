@@ -63,7 +63,11 @@ export const TextInput: Component<{
 
     createEffect(() => {
         // Initialize the form data value for this input to an empty string, if it is not yet defined.
-        if (form && props.name && form.value[props.name] === undefined) {
+        if (
+            form &&
+            props.name &&
+            getPath(form.value, props.name) === undefined
+        ) {
             setPath(form.value, props.name, "");
         }
     });
