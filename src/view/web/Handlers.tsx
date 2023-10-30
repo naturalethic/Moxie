@@ -14,9 +14,9 @@ export const Handlers: Component = () => {
         <div>
             <Browser
                 onMove={handleMove}
-                cacheKey="Handlers"
                 items={[
                     {
+                        route: "/admin/web/handlers/new",
                         label: "Add new web handler",
                         view: () => <Handler />,
                         divider: true,
@@ -24,6 +24,7 @@ export const Handlers: Component = () => {
                     },
                     ...(webServerConfig.latest?.WebHandlers ?? []).map(
                         (handler, index) => ({
+                            route: `/admin/web/handlers/${index}`,
                             moveable: true,
                             label: `${handler.Domain}:${handler.PathRegexp}`,
                             view: () => <Handler index={index} />,

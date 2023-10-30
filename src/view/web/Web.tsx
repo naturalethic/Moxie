@@ -7,10 +7,17 @@ export const Web: Component = () => {
     return (
         <div>
             <Browser
-                cacheKey="Web"
                 items={[
-                    { label: "Handlers", view: () => <Handlers /> },
-                    { label: "Redirects", view: () => <Redirects /> },
+                    {
+                        route: "/admin/web/handlers",
+                        label: "Handlers",
+                        view: () => <Handlers />,
+                    },
+                    {
+                        route: "/admin/web/redirects",
+                        label: "Redirects",
+                        view: () => <Redirects />,
+                    },
                 ]}
             />
         </div>

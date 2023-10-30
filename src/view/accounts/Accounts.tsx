@@ -10,15 +10,16 @@ export const Accounts: Component = () => {
     return (
         <div>
             <Browser
-                cacheKey="Accounts"
                 items={[
                     {
                         label: "Add new account",
+                        route: "/admin/accounts/new",
                         view: () => <New />,
                         divider: true,
                         icon: "circle-plus",
                     },
                     ...accounts.latest.map((account) => ({
+                        route: `/admin/accounts/${account}`,
                         label: account,
                         view: () => <Account username={account} />,
                     })),

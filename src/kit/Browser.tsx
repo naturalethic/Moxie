@@ -1,9 +1,9 @@
-import { Component, For, JSX, Show, createSignal } from "solid-js";
+import { Component, For, JSX, Show } from "solid-js";
 import { cls } from "~/lib/util";
+import { Routable, useHistory } from "./History";
 import { Icon } from "./Icon";
 
-type BrowserItem = {
-    route?: string;
+type BrowserItem = Routable & {
     label: string;
     view: () => JSX.Element;
     divider?: boolean;
@@ -14,13 +14,10 @@ type BrowserItem = {
 
 export const Browser: Component<{
     items: BrowserItem[];
-    cacheKey?: string;
     onMove?: (from: number, to: number) => void;
 }> = (props) => {
-    const cacheKey = props.cacheKey && `browser:${props.cacheKey}`;
-    const [selectedItem, setSelectedItem] = createSignal<number>(
-        cacheKey ? Number(localStorage.getItem(cacheKey) ?? 0) : 0,
-    );
+    const history = useHistory();
+    const selectedItem = history.matchRoute(props.items);
 
     let dragFrom = 0;
 
@@ -94,16 +91,12 @@ export const Browser: Component<{
                                 class={cls(
                                     "browser-label flex items-center gap-1",
                                     {
-                                        selected: index() === selectedItem(),
+                                        selected:
+                                            item.route === selectedItem().route,
                                     },
                                 )}
                                 onClick={() => {
-                                    setSelectedItem(index);
-                                    cacheKey &&
-                                        localStorage.setItem(
-                                            cacheKey,
-                                            String(index()),
-                                        );
+                                    history.push(item.route);
                                 }}
                             >
                                 <Show when={item.icon}>
@@ -135,15 +128,7 @@ export const Browser: Component<{
                     )}
                 </For>
             </div>
-            <div class="browser-content">
-                <For each={props.items}>
-                    {(item, index) => (
-                        <Show when={index() === selectedItem()}>
-                            {item.view()}
-                        </Show>
-                    )}
-                </For>
-            </div>
+            <div class="browser-content">{selectedItem().view()}</div>
         </div>
     );
 };

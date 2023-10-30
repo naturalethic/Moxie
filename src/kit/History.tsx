@@ -2,6 +2,8 @@ import {
     ParentComponent,
     createContext,
     createSignal,
+    onCleanup,
+    onMount,
     splitProps,
     useContext,
 } from "solid-js";
@@ -44,6 +46,19 @@ export const History: ParentComponent = (props) => {
             setRoute(route);
         },
     };
+
+    function handlePopState() {
+        setRoute(location.pathname);
+    }
+
+    onMount(() => {
+        window.addEventListener("popstate", handlePopState);
+    });
+
+    onCleanup(() => {
+        window.removeEventListener("popstate", handlePopState);
+    });
+
     return (
         <HistoryContext.Provider value={value}>
             {props.children}
@@ -61,13 +76,6 @@ export const Link: ParentComponent<{
     function handleClick(event: MouseEvent) {
         event.preventDefault();
         history.push(props.route!);
-        // if (props.onClick) {
-        //     props.onClick();
-        // }
-        // if (props.route) {
-        //     event.preventDefault();
-        //     history.push(props.route);
-        // }
     }
 
     return (
