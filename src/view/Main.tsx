@@ -8,6 +8,7 @@ import { Web } from "./web/Web";
 export default function () {
     return (
         <Toast>
+            <header>Moxie</header>
             <Box class="m-2 p-2" border>
                 <Browser
                     cacheKey="Main"

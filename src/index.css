@@ -383,6 +383,7 @@ form {
     }
 }
 
+/*
 .defcon {
     @apply flex gap-1 w-full;
 
@@ -434,4 +435,10 @@ form {
             background-color: var(--color-success-emphasis);
         }
     }
+} */
+
+header {
+    @apply h-20 flex items-center px-4 text-2xl;
+    background-color: var(--color-neutral-emphasis);
+    color: white;
 }
