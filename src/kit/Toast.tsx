@@ -37,8 +37,8 @@ export const Toast: ParentComponent = (props) => {
     const [state, setState] = createSignal<State>({});
     const value = [state, setState] as ContextData;
     return (
-        <div>
-            <Context.Provider value={value}>{props.children}</Context.Provider>
+        <Context.Provider value={value}>
+            {props.children}
             <Box
                 class={cls("toast", { active: state().active })}
                 variant={state().variant}
@@ -48,6 +48,6 @@ export const Toast: ParentComponent = (props) => {
             >
                 {state().message}
             </Box>
-        </div>
+        </Context.Provider>
     );
 };
