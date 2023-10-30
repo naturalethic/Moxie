@@ -1,7 +1,8 @@
 import { Component, Show } from "solid-js";
 import {
+    Input,
     boolean,
-    enumType,
+    discriminatedUnion,
     literal,
     minLength,
     number,
@@ -19,8 +20,56 @@ import { Select } from "~/kit/Select";
 import { TextInput } from "~/kit/TextInput";
 import { WebHandler, saveHandler, useDomains } from "~/lib/api";
 
+const StaticDetail = object({
+    type: literal("static"),
+    strip: string(),
+    root: string([minLength(1, "required")]),
+    list: boolean(),
+    continue: boolean(),
+    headers: record(string()),
+});
+
+const RedirectDetail = object({
+    type: literal("redirect"),
+    target: string(),
+    sourcePath: string(),
+    targetPath: string(),
+    status: number(),
+});
+
+const ForwardDetail = object({
+    type: literal("forward"),
+    strip: boolean(),
+    url: string(),
+    headers: record(string()),
+});
+
 export const New: Component = () => {
     const domains = useDomains();
+
+    const staticDetail: Input<typeof StaticDetail> = {
+        type: "static",
+        strip: "",
+        root: "",
+        list: true,
+        continue: false,
+        headers: {},
+    };
+
+    const redirectDetail: Input<typeof RedirectDetail> = {
+        type: "redirect",
+        target: "",
+        sourcePath: "",
+        targetPath: "",
+        status: 308,
+    };
+
+    const forwardDetail: Input<typeof ForwardDetail> = {
+        type: "forward",
+        strip: false,
+        url: "",
+        headers: {},
+    };
 
     const form = createForm(
         object({
@@ -29,27 +78,11 @@ export const New: Component = () => {
             path: string(),
             secure: boolean(),
             compress: boolean(),
-            type: enumType(["static", "redirect", "forward"]),
-            static: object({
-                strip: string(),
-                root: string([minLength(1, "required")]),
-                list: boolean(),
-                continue: boolean(),
-                headers: record(string()),
-            }),
-            redirect: object({
-                type: literal("redirect"),
-                target: string(),
-                sourcePath: string(),
-                targetPath: string(),
-                status: number(),
-            }),
-            forward: object({
-                type: literal("forward"),
-                strip: boolean(),
-                url: string(),
-                headers: record(string()),
-            }),
+            detail: discriminatedUnion("type", [
+                StaticDetail,
+                RedirectDetail,
+                ForwardDetail,
+            ]),
         }),
         {
             log: "",
@@ -57,31 +90,9 @@ export const New: Component = () => {
             path: "",
             secure: true,
             compress: false,
-            type: "forward",
-            static: {
-                strip: "",
-                root: "",
-                list: true,
-                continue: false,
-                headers: {},
-            },
-            redirect: {
-                type: "redirect",
-                target: "",
-                sourcePath: "",
-                targetPath: "",
-                status: 308,
-            },
-            forward: {
-                type: "forward",
-                strip: false,
-                url: "",
-                headers: {},
-            },
+            detail: staticDetail,
         },
         async ({ success }) => {
-            // console.log("Domain", form.value.domain);
-            // console.log(success);
             if (!success) {
                 console.log(form.error);
                 return;
@@ -93,30 +104,30 @@ export const New: Component = () => {
                 DontRedirectPlainHTTP: !form.value.secure,
                 Compress: form.value.compress,
                 WebStatic:
-                    form.value.type === "static"
+                    form.value.detail.type === "static"
                         ? {
-                              StripPrefix: form.value.static.strip,
-                              Root: form.value.static.root,
-                              ListFiles: form.value.static.list,
-                              ContinueNotFound: form.value.static.continue,
-                              ResponseHeaders: form.value.static.headers,
+                              StripPrefix: form.value.detail.strip,
+                              Root: form.value.detail.root,
+                              ListFiles: form.value.detail.list,
+                              ContinueNotFound: form.value.detail.continue,
+                              ResponseHeaders: form.value.detail.headers,
                           }
                         : null,
                 WebRedirect:
-                    form.value.type === "redirect"
+                    form.value.detail.type === "redirect"
                         ? {
-                              BaseURL: form.value.redirect.target,
-                              OrigPathRegexp: form.value.redirect.sourcePath,
-                              ReplacePath: form.value.redirect.targetPath,
-                              StatusCode: form.value.redirect.status,
+                              BaseURL: form.value.detail.target,
+                              OrigPathRegexp: form.value.detail.sourcePath,
+                              ReplacePath: form.value.detail.targetPath,
+                              StatusCode: form.value.detail.status,
                           }
                         : null,
                 WebForward:
-                    form.value.type === "forward"
+                    form.value.detail.type === "forward"
                         ? {
-                              StripPath: form.value.forward.strip,
-                              URL: form.value.forward.url,
-                              ResponseHeaders: form.value.forward.headers,
+                              StripPath: form.value.detail.strip,
+                              URL: form.value.detail.url,
+                              ResponseHeaders: form.value.detail.headers,
                           }
                         : null,
             };
@@ -124,6 +135,16 @@ export const New: Component = () => {
             console.log(error);
         },
     );
+
+    function handleChangeType(type: "static" | "redirect" | "forward") {
+        // XXX: Perhaps preserve the old values for the previous type.
+        form.value.detail =
+            type === "static"
+                ? staticDetail
+                : type === "redirect"
+                ? redirectDetail
+                : forwardDetail;
+    }
 
     return (
         <form.Form>
@@ -159,10 +180,8 @@ export const New: Component = () => {
             </Box>
             <Segmented
                 name="type"
-                value={form.value.type}
-                onChange={(type) => {
-                    form.value.type = type;
-                }}
+                value={form.value.detail.type}
+                onChange={handleChangeType}
                 options={[
                     { value: "static", label: "Static" },
                     { value: "redirect", label: "Redirect" },
@@ -174,57 +193,57 @@ export const New: Component = () => {
                 shaded
                 style="min-width: 338px;"
             >
-                <Show when={form.value.type === "static"}>
+                <Show when={form.value.detail.type === "static"}>
                     <TextInput
-                        name="static.strip"
+                        name="detail.strip"
                         label="Strip prefix"
                         placeholder="/prefix"
                         tip="Strip the given prefix from the request path before evaluating local file"
                     />
                     <TextInput
-                        name="static.root"
+                        name="detail.root"
                         label="Root"
                         placeholder="/path/to/root"
                         tip="Path to serve files from, either absolute or relative to the mox working directory"
                     />
                     <Checkbox
-                        name="static.list"
+                        name="detail.list"
                         label="List Files"
                         tip="Display a list of files for directories where index.html is not present"
                     />
                     <Checkbox
-                        name="static.continue"
+                        name="detail.continue"
                         label="Continue"
                         tip="If file is not found, continue to next handler instead of returning 404, GET/HEAD only"
                     />
                     <Label label="Additional response headers" />
                     <Associative
-                        name="static.headers"
+                        name="detail.headers"
                         keyPlaceholder="Header"
                         valuePlaceholder="Value"
                     />
                 </Show>
-                <Show when={form.value.type === "redirect"}>
+                <Show when={form.value.detail.type === "redirect"}>
                     <TextInput
-                        name="redirect.target"
+                        name="detail.target"
                         label="Target host:port"
                         placeholder="example.org:2700"
                         tip="Destination hostname/ip and optional port separated by a colon.  May be blank.  If a redirect results in an identical url, the handler doesn't match."
                     />
                     <TextInput
-                        name="redirect.sourcePath"
+                        name="detail.sourcePath"
                         label="Path regular expression"
                         placeholder="^/path/([0-9]+)"
                         tip="Regular expression for matching path. If set and path does not match, a 404 is returned. The HTTP path used for matching always starts with a slash."
                     />
                     <TextInput
-                        name="redirect.targetPath"
+                        name="detail.targetPath"
                         label="Regular expression replacement"
                         placeholder="^/newpath/$1"
                         tip="Replacement path for destination URL. Implemented with Go's Regexp.ReplaceAllString: $1 is replaced with the text of the first submatch, etc."
                     />
                     <Select
-                        name="redirect.status"
+                        name="detail.status"
                         label="HTTP Status"
                         tip="Status code to use in redirect"
                         options={[
@@ -255,21 +274,21 @@ export const New: Component = () => {
                         ]}
                     />
                 </Show>
-                <Show when={form.value.type === "forward"}>
+                <Show when={form.value.detail.type === "forward"}>
                     <Checkbox
-                        name="forward.strip"
+                        name="detail.strip"
                         label="Strip path"
                         tip="Strip the matching handler path before forwarding the request."
                     />
                     <TextInput
-                        name="forward.url"
+                        name="detail.url"
                         label="Destination URL"
                         placeholder="http://127.0.0.1:8888/path"
                         tip="If strip path is false the full request path is added to the URL. Host headers are sent unmodified. New X-Forwarded-{For,Host,Proto} headers are set. Any query string in the URL is ignored. Requests are made using Go's net/http.DefaultTransport that takes environment variables HTTP_PROXY and HTTPS_PROXY into account. Websocket connections are forwarded and data is copied between client and backend without looking at the framing. The websocket 'version' and 'key'/'accept' headers are verified during the handshake, but other websocket headers, including 'origin', 'protocol' and 'extensions' headers, are not inspected and the backend is responsible for verifying/interpreting them."
                     />
                     <Label label="Additional response headers" />
                     <Associative
-                        name="static.headers"
+                        name="detail.headers"
                         keyPlaceholder="Header"
                         valuePlaceholder="Value"
                     />
