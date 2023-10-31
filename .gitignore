@@ -1,3 +1,5 @@
 .env
+.envrc
+.mox
 /node_modules
 /dist

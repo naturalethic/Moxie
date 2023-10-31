@@ -7,7 +7,8 @@ import { unwrap } from "solid-js/store";
 
 export async function api<T>(resource: string, params: unknown[] = []) {
     const endpoint = import.meta.env.VITE_MOX_ENDPOINT ?? "";
-    const response = await fetch(`${endpoint}/api/${resource}`, {
+    const url = `${endpoint}/mox/admin/api/${resource}`;
+    const response = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

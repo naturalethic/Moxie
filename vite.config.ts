@@ -1,7 +1,10 @@
+import { loadEnv } from "vite";
 import { doctest } from "vite-plugin-doctest";
 import solid from "vite-plugin-solid";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
+
+process.env = { ...process.env, ...loadEnv("dev", process.cwd()) };
 
 export default defineConfig({
     plugins: [tsconfigPaths(), solid(), doctest()],
@@ -23,9 +26,11 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/api": {
-                target: "http://localhost:8080/admin",
+            "/mox": {
+                target:
+                    process.env.VITE_SERVER_PROXY ?? "http://localhost:1080",
                 changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/mox/, ""),
             },
         },
     },

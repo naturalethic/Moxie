@@ -30,23 +30,30 @@ Build dependencies include [vite](https://github.com/vitejs/vite), [tailwind](ht
 
 ### Development
 
-Edit `vite.config.ts` and update the `proxy` configuration to point to your mox admin api.
-
 Install dependencies:
 
 `npm install`
 
-As there is no token mechanism for authentication with mox yet, basic auth is used.  If you want to auto-fill your username and password, create a `.env` file with these keys:
+Make sure you have golang installed and build a local test version of mox:
 
-```sh
-VITE_USERNAME=
-VITE_PASSWORD=
-```
+`npm run test:mox:build`
 
-Run:
+Run that in a separate window:
+
+`npm run test:mox:serve`
+
+Finally,
 
 `npm run dev`
 
-Analyze package composition:
+### Developing against a deployed instance of mox
+
+Please don't use this configuration for production.
+
+Configure `.env.dev` with the proper values.  `VITE_SERVER_PROXY` is the endpoint to your mox web server.
+
+### Bundle analysis
+
+To get a nice visual breakdown of bundle composition, run:
 
 `npm run analyze`
