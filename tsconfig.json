@@ -5,7 +5,7 @@
         "module": "ESNext",
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "skipLibCheck": true,
-        "types": ["vite/client"],
+        "types": ["vite/client", "cypress", "node"],
 
         /* Bundler mode */
         "moduleResolution": "bundler",
@@ -27,5 +27,5 @@
             "valibot": ["node_modules/valibot/library/src/index"]
         }
     },
-    "include": ["src"],
+    "include": ["src", "test"],
 }
