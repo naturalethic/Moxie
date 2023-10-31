@@ -15,6 +15,9 @@ export const New: Component = () => {
             domain: string([minLength(1, "required")]),
             username: string(),
         }),
+        {
+            domain: "",
+        },
         async ({ success }) => {
             if (success) {
                 const { error } = await createDomain(
@@ -24,16 +27,15 @@ export const New: Component = () => {
                 if (error) {
                     form.error.username = error.split(":")[1];
                 } else {
-                    // XXX: calling this causes this component to be re-created
                     reloadDomains();
+                    form.reset();
                 }
             }
+            domainInput.focus();
         },
     );
 
     onMount(() => {
-        // XXX: Since the component is re-created as mentioned above, need to
-        //      call focus here.  Incidentally, this doesn't focus on the first mount.
         domainInput.focus();
     });
 

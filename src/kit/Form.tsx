@@ -66,6 +66,12 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
     const [message, setMessage] = createSignal("");
 
     function reset() {
+        if (Object.keys(data).length === 0) {
+            console.warn(
+                "Called form.reset() when no initial data was provided",
+            );
+            return;
+        }
         modifyMutable(
             value,
             produce((value) => {

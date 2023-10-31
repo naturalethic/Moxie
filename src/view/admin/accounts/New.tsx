@@ -17,6 +17,11 @@ export const New: Component = () => {
             localpart: string([minLength(1, "required")]),
             domain: string(),
         }),
+        {
+            username: "",
+            localpart: "",
+            domain: "",
+        },
         async ({ success }) => {
             if (success) {
                 const { error } = await createAccount(
@@ -26,16 +31,15 @@ export const New: Component = () => {
                 if (error) {
                     form.error.username = error.split(":")[1];
                 } else {
-                    // XXX: calling this causes this component to be re-created
+                    form.reset();
                     reloadAccounts();
                 }
             }
+            usernameInput.focus();
         },
     );
 
     onMount(() => {
-        // XXX: Since the component is re-created as mentioned above, need to
-        //      call focus here.
         usernameInput.focus();
     });
 
