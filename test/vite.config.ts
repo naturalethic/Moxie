@@ -1,34 +1,16 @@
 import { loadEnv } from "vite";
-import { doctest } from "vite-plugin-doctest";
-import solid from "vite-plugin-solid";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 process.env = { ...process.env, ...loadEnv("dev", process.cwd()) };
 
 export default defineConfig({
-    plugins: [tsconfigPaths(), solid(), doctest()],
+    plugins: [tsconfigPaths()],
     test: {
-        root: "src",
-        includeSource: ["**/*.{ts,tsx}"],
-        include: [],
+        include: ["**/*.{ts,tsx}"],
+        exclude: ["vite.config.ts"],
         cache: {
             dir: "../node_modules/.vitest",
-        },
-    },
-    build: {
-        target: "esnext",
-        cssMinify: false,
-        minify: false,
-        modulePreload: {
-            polyfill: false,
-        },
-        rollupOptions: {
-            output: {
-                entryFileNames: "[name].js",
-                chunkFileNames: "[name].js",
-                assetFileNames: "[name].[ext]",
-            },
         },
     },
     server: {
