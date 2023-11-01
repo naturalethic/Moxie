@@ -24,6 +24,7 @@ export const FormContext = createContext<FormContext>();
 type CreateForm<S extends BaseSchema> = {
     Form: Form;
     value: Input<S>;
+    initialValue: Partial<Input<S>>;
     error: FormError;
     reset: () => void;
     set message(message: string);
@@ -51,6 +52,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(options: {
                 value,
                 produce((value) => {
                     for (const key in effectValue) {
+                        initialValue[key] = effectValue[key]!;
                         value[key] = effectValue[key]!;
                     }
                 }),
@@ -107,6 +109,7 @@ export function createForm<S extends BaseSchema = BaseSchema,>(options: {
     return {
         Form,
         value,
+        initialValue,
         error,
         reset,
         set message(value: string) {

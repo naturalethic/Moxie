@@ -21,8 +21,12 @@ export function reloadAccount() {
     return reload("Account");
 }
 
-export function saveFullName(fullName: string) {
+export function updateFullName(fullName: string) {
     return safeApi("AccountSaveFullName", [fullName]);
+}
+
+export function updatePassword(password: string) {
+    return safeApi("SetPassword", [password]);
 }
 
 type Email = {

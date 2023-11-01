@@ -1,5 +1,6 @@
 import {
     Accessor,
+    For,
     ParentComponent,
     Setter,
     createContext,
@@ -10,9 +11,9 @@ import { cls } from "~/lib/util";
 import { Box } from "./box";
 
 type State = {
-    active?: boolean;
-    variant?: "danger" | "attention" | "success";
-    message?: string;
+    active: boolean;
+    variant: "danger" | "attention" | "success";
+    message: string | string[];
 };
 
 type ContextData = [Accessor<State>, Setter<State>];
@@ -22,7 +23,7 @@ export function useToast() {
     const [state, setState] = useContext(Context);
     return function (
         variant: "danger" | "attention" | "success",
-        message: string,
+        message: string | string[],
     ) {
         setState({ active: true, variant, message });
         // XXX: Rapid invocations of toast will cause goofiness.  Need to store and
@@ -34,7 +35,11 @@ export function useToast() {
 }
 
 export const Toast: ParentComponent = (props) => {
-    const [state, setState] = createSignal<State>({});
+    const [state, setState] = createSignal<State>({
+        active: false,
+        variant: "success",
+        message: "",
+    });
     const value = [state, setState] as ContextData;
     return (
         <Context.Provider value={value}>
@@ -46,7 +51,15 @@ export const Toast: ParentComponent = (props) => {
                     setState({ ...state(), active: false });
                 }}
             >
-                {state().message}
+                <For
+                    each={
+                        Array.isArray(state().message)
+                            ? (state().message as string[])
+                            : [state().message as string]
+                    }
+                >
+                    {(message) => <p>{message}</p>}
+                </For>
             </Box>
         </Context.Provider>
     );
