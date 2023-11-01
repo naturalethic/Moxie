@@ -1,9 +1,9 @@
 import { Component, Show, createEffect } from "solid-js";
 import { object, record, string } from "valibot";
-import { Associative } from "~/kit/Associative";
-import { Box } from "~/kit/Box";
-import { createForm } from "~/kit/Form";
-import { useToast } from "~/kit/Toast";
+import { Associative } from "~/kit/associative";
+import { Box } from "~/kit/box";
+import { createForm } from "~/kit/form";
+import { useToast } from "~/kit/toast";
 import { saveRedirects, useWebServerConfig } from "~/lib/api";
 
 export const Redirects: Component = () => {

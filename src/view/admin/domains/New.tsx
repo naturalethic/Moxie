@@ -1,8 +1,8 @@
 import { Component, onMount } from "solid-js";
 import { minLength, object, string } from "valibot";
-import { createForm } from "~/kit/Form";
-import { Select } from "~/kit/Select";
-import { TextInput } from "~/kit/TextInput";
+import { createForm } from "~/kit/form";
+import { TextInput } from "~/kit/input";
+import { Select } from "~/kit/select";
 import { createDomain, reloadDomains, useAccounts } from "~/lib/api";
 
 export const New: Component = () => {

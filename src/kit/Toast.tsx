@@ -7,7 +7,7 @@ import {
     useContext,
 } from "solid-js";
 import { cls } from "~/lib/util";
-import { Box } from "./Box";
+import { Box } from "./box";
 
 type State = {
     active?: boolean;

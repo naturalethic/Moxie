@@ -1,6 +1,6 @@
 import { ParentComponent, Show } from "solid-js";
 import { cls } from "~/lib/util";
-import { Icon } from "./Icon";
+import { Icon } from "./icon";
 
 export const Box: ParentComponent<{
     class?: string;

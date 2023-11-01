@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { Browser } from "~/kit/Browser";
-import { Delete } from "./Delete";
-import { Emails } from "./Emails";
-import { Password } from "./Password";
+import { Browser } from "~/kit/browser";
+import { Delete } from "./delete";
+import { Emails } from "./emails";
+import { Password } from "./password";
 
 export const Account: Component<{ username: string }> = (props) => {
     return (

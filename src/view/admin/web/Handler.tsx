@@ -10,15 +10,15 @@ import {
     record,
     string,
 } from "valibot";
-import { Associative } from "~/kit/Associative";
-import { Box } from "~/kit/Box";
-import { Checkbox } from "~/kit/Checkbox";
-import { createForm } from "~/kit/Form";
-import { Label } from "~/kit/Label";
-import { Segmented } from "~/kit/Segmented";
-import { Select } from "~/kit/Select";
-import { TextInput } from "~/kit/TextInput";
-import { useToast } from "~/kit/Toast";
+import { Associative } from "~/kit/associative";
+import { Box } from "~/kit/box";
+import { Checkbox } from "~/kit/checkbox";
+import { createForm } from "~/kit/form";
+import { TextInput } from "~/kit/input";
+import { Label } from "~/kit/label";
+import { Segmented } from "~/kit/segmented";
+import { Select } from "~/kit/select";
+import { useToast } from "~/kit/toast";
 import {
     WebHandler,
     createHandler,

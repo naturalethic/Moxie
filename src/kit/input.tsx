@@ -5,10 +5,10 @@ import {
     splitProps,
     useContext,
 } from "solid-js";
-import { Icon } from "~/kit/Icon";
+import { Icon } from "~/kit/icon";
 import { cls, getPath, setPath } from "~/lib/util";
-import { FormContext } from "./Form";
-import { Label } from "./Label";
+import { FormContext } from "./form";
+import { Label } from "./label";
 
 export const TextInput: Component<{
     type?: string;

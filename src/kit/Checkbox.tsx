@@ -1,6 +1,6 @@
 import { Component, Show, splitProps, useContext } from "solid-js";
 import { getPath, setPath } from "~/lib/util";
-import { FormContext } from "./Form";
+import { FormContext } from "./form";
 
 export const Checkbox: Component<{
     name?: string;

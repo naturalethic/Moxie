@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { Browser } from "~/kit/Browser";
+import { Browser } from "~/kit/browser";
 import { useDomains } from "~/lib/api";
-import { Domain } from "./Domain";
-import { New } from "./New";
+import { Domain } from "./domain";
+import { New } from "./new";
 
 export const Domains: Component = () => {
     const domains = useDomains();

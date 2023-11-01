@@ -1,6 +1,6 @@
 import { For, createSignal } from "solid-js";
 import { cls } from "~/lib/util";
-import { Option, optionLabel, optionValue } from "./Option";
+import { Option, optionLabel, optionValue } from "./option";
 
 type SegementedProps<T extends string> = {
     name: string;

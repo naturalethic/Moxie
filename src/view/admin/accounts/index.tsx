@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { Browser } from "~/kit/Browser";
+import { Browser } from "~/kit/browser";
 import { useAccounts } from "~/lib/api";
-import { Account } from "./Account";
-import { New } from "./New";
+import { Account } from "./account";
+import { New } from "./new";
 
 export const Accounts: Component = () => {
     const accounts = useAccounts();

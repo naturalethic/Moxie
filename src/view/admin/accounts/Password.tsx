@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import { minLength, object, string } from "valibot";
-import { Box } from "~/kit/Box";
-import { createForm } from "~/kit/Form";
-import { TextInput } from "~/kit/TextInput";
+import { Box } from "~/kit/box";
+import { createForm } from "~/kit/form";
+import { TextInput } from "~/kit/input";
 import { setPassword } from "~/lib/api";
 
 export const Password: Component<{ username: string }> = (props) => {

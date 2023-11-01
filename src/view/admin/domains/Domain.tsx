@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { Browser } from "~/kit/Browser";
-import { Delete } from "./Delete";
-import { Emails } from "./Emails";
-import { Records } from "./Records";
+import { Browser } from "~/kit/browser";
+import { Delete } from "./delete";
+import { Emails } from "./emails";
+import { Records } from "./records";
 
 export const Domain: Component<{ domain: string }> = (props) => {
     return (

@@ -1,9 +1,9 @@
 import { Component } from "solid-js";
-import { Box } from "~/kit/Box";
-import { Browser } from "~/kit/Browser";
-import { Accounts } from "./accounts/Accounts";
-import { Domains } from "./domains/Domains";
-import { Web } from "./web/Web";
+import { Box } from "~/kit/box";
+import { Browser } from "~/kit/browser";
+import { Accounts } from "./accounts";
+import { Domains } from "./domains";
+import { Web } from "./web";
 
 export const Admin: Component = () => {
     return (

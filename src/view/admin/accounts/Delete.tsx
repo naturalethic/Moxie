@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import { custom, object, string } from "valibot";
-import { Box } from "~/kit/Box";
-import { createForm } from "~/kit/Form";
-import { TextInput } from "~/kit/TextInput";
+import { Box } from "~/kit/box";
+import { createForm } from "~/kit/form";
+import { TextInput } from "~/kit/input";
 import { deleteAccount, reloadAccounts } from "~/lib/api";
 
 export const Delete: Component<{ username: string }> = (props) => {

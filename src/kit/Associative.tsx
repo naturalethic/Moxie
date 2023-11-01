@@ -1,11 +1,11 @@
 import { Component, Index, Show, useContext } from "solid-js";
 import { createMutable, unwrap } from "solid-js/store";
 import { cls, getPath } from "~/lib/util";
-import { Box } from "./Box";
-import { FormContext } from "./Form";
-import { Option } from "./Option";
-import { Select } from "./Select";
-import { TextInput } from "./TextInput";
+import { Box } from "./box";
+import { FormContext } from "./form";
+import { TextInput } from "./input";
+import { Option } from "./option";
+import { Select } from "./select";
 
 type Items = Record<string, string>;
 

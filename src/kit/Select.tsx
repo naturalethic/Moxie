@@ -6,9 +6,9 @@ import {
     useContext,
 } from "solid-js";
 import { cls, getPath, setPath } from "~/lib/util";
-import { FormContext } from "./Form";
-import { Label } from "./Label";
-import { Option, optionLabel, optionValue } from "./Option";
+import { FormContext } from "./form";
+import { Label } from "./label";
+import { Option, optionLabel, optionValue } from "./option";
 
 type SelectProps<T extends string | number> = {
     name?: string;

@@ -1,8 +1,8 @@
-import { Deck } from "~/kit/Deck";
-import { History } from "~/kit/History";
-import { Toast } from "~/kit/Toast";
-import { Header } from "./Header";
-import { Admin } from "./admin/Admin";
+import { Deck } from "~/kit/deck";
+import { History } from "~/kit/history";
+import { Toast } from "~/kit/toast";
+import { Admin } from "./admin";
+import { Header } from "./header";
 import { Mail } from "./mail/Mail";
 
 export const Main = () => {

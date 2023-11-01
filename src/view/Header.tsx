@@ -1,5 +1,5 @@
 import { Component, For } from "solid-js";
-import { Link } from "~/kit/History";
+import { Link } from "~/kit/history";
 
 export const Header: Component = () => {
     const items = [

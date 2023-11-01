@@ -1,5 +1,5 @@
 import { ParentComponent, Show } from "solid-js";
-import { Icon } from "./Icon";
+import { Icon } from "./icon";
 
 export const Button: ParentComponent<{
     leadingIcon?: string;

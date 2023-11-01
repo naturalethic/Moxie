@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
-import { Associative } from "~/kit/Associative";
-import { useToast } from "~/kit/Toast";
+import { Associative } from "~/kit/associative";
+import { useToast } from "~/kit/toast";
 import {
     createEmail,
     deleteEmail,

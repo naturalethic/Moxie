@@ -1,5 +1,5 @@
 import { Component, For } from "solid-js";
-import { TextInput } from "./TextInput";
+import { TextInput } from "./input";
 
 export const List: Component<{
     items?: string[];

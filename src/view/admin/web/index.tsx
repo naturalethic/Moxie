@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
-import { Browser } from "~/kit/Browser";
-import { Handlers } from "./Handlers";
-import { Redirects } from "./Redirects";
+import { Browser } from "~/kit/browser";
+import { Handlers } from "./handlers";
+import { Redirects } from "./redirects";
 
 export const Web: Component = () => {
     return (
