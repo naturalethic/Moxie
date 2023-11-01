@@ -4,9 +4,11 @@ import { Icon } from "./icon";
 
 export const Box: ParentComponent<{
     class?: string;
+    contentClass?: string;
     style?: string;
     border?: boolean;
     shaded?: boolean;
+    title?: string;
     variant?: "danger" | "attention" | "success";
     onClick?: () => void;
 }> = (props) => {
@@ -41,7 +43,14 @@ export const Box: ParentComponent<{
                     <div>{props.children}</div>
                 </div>
             </Show>
-            <Show when={!props.variant}>{props.children}</Show>
+            <Show when={!props.variant}>
+                <Show when={props.title}>
+                    <div class="box-title">{props.title}</div>
+                </Show>
+                <div class={cls({ "box-titled-content": props.title })}>
+                    <div class={props.contentClass}>{props.children}</div>
+                </div>
+            </Show>
         </div>
     );
 };

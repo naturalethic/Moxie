@@ -1,5 +1,10 @@
 import { apiFunctions, Domain } from ".";
 
+export const credentials = {
+    username: () => import.meta.env.VITE_EMAIL_USERNAME,
+    password: () => import.meta.env.VITE_EMAIL_PASSWORD,
+};
+
 const { apiResource, safeApi, reload } = apiFunctions(
     () => import.meta.env.VITE_EMAIL_USERNAME,
     () => import.meta.env.VITE_EMAIL_PASSWORD,

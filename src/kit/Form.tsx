@@ -46,7 +46,6 @@ export function createForm<S extends BaseSchema = BaseSchema,>(options: {
 
     if (options.initialValueEffect) {
         createEffect(() => {
-            console.warn("Running initialValueEffect");
             const effectValue = options.initialValueEffect!();
             modifyMutable(
                 value,

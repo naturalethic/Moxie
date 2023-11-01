@@ -1,5 +1,6 @@
 import { Component, For, JSX, Show } from "solid-js";
 import { cls } from "~/lib/util";
+import { Divider } from "./divider";
 import { Routable, useHistory } from "./history";
 import { Icon } from "./icon";
 
@@ -122,7 +123,7 @@ export const Browser: Component<{
                                 </Show>
                             </div>
                             <Show when={item.divider}>
-                                <hr class="browser-divider" />
+                                <Divider />
                             </Show>
                         </>
                     )}

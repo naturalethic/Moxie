@@ -21,7 +21,7 @@ export const Associative: Component<{
     onChange?: (key: string, value: string) => void;
 }> = (props) => {
     const form = useContext(FormContext);
-    // XXX: This isn't used if their is a form, so maybe don't create it.
+    // XXX: This isn't used if there is a form, so maybe don't create it.
     //      Clean up this distinction.
     const items = createMutable(structuredClone(unwrap(props.items ?? {})));
     let keyField: HTMLInputElement;
