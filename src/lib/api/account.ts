@@ -1,6 +1,6 @@
 import { apiFunctions, Domain } from ".";
 
-const { apiResource } = apiFunctions(
+const { apiResource, safeApi, reload } = apiFunctions(
     () => import.meta.env.VITE_EMAIL_USERNAME,
     () => import.meta.env.VITE_EMAIL_PASSWORD,
     "/account/api",
@@ -15,6 +15,14 @@ export function useAccount() {
             Emails,
         }),
     )[0];
+}
+
+export function reloadAccount() {
+    return reload("Account");
+}
+
+export function saveFullName(fullName: string) {
+    return safeApi("AccountSaveFullName", [fullName]);
 }
 
 type Email = {
