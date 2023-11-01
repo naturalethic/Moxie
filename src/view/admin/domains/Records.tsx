@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { Box } from "~/kit/box";
 import { Icon } from "~/kit/icon";
 import { useToast } from "~/kit/toast";
-import { useDomainRecords } from "~/lib/api";
+import { useDomainRecords } from "~/lib/api/admin";
 
 export const Records: Component<{ domain: string }> = (props) => {
     const records = useDomainRecords(props.domain);

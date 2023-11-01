@@ -11,7 +11,7 @@ import {
     reloadAccount,
     useAccount,
     useDomains,
-} from "~/lib/api";
+} from "~/lib/api/admin";
 
 export const Emails: Component<{ username: string }> = (props) => {
     const domains = useDomains();

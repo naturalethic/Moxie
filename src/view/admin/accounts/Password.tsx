@@ -3,7 +3,7 @@ import { minLength, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
-import { setPassword } from "~/lib/api";
+import { setPassword } from "~/lib/api/admin";
 
 export const Password: Component<{ username: string }> = (props) => {
     const form = createForm(

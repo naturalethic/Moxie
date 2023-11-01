@@ -3,7 +3,7 @@ import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
-import { deleteDomain, reloadDomains } from "~/lib/api";
+import { deleteDomain, reloadDomains } from "~/lib/api/admin";
 
 export const Delete: Component<{ domain: string }> = (props) => {
     const form = createForm(

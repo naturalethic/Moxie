@@ -7,7 +7,7 @@ import {
     reloadDomainLocalparts,
     useAccounts,
     useDomainLocalparts,
-} from "~/lib/api";
+} from "~/lib/api/admin";
 
 export const Emails: Component<{ domain: string }> = (props) => {
     const localparts = useDomainLocalparts(props.domain);

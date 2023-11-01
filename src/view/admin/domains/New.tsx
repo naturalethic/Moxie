@@ -3,7 +3,7 @@ import { minLength, object, string } from "valibot";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
-import { createDomain, reloadDomains, useAccounts } from "~/lib/api";
+import { createDomain, reloadDomains, useAccounts } from "~/lib/api/admin";
 
 export const New: Component = () => {
     const accounts = useAccounts();

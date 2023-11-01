@@ -1,86 +1,11 @@
-import {
-    InitializedResourceReturn,
-    ResourceReturn,
-    createResource,
-} from "solid-js";
 import { unwrap } from "solid-js/store";
+import { apiFunctions, Domain } from ".";
 
-export async function api<T>(resource: string, params: unknown[] = []) {
-    const endpoint = import.meta.env.VITE_MOX_ENDPOINT ?? "";
-    const url = `${endpoint}/mox/admin/api/${resource}`;
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${btoa(
-                `${import.meta.env.VITE_USERNAME}:${
-                    import.meta.env.VITE_PASSWORD
-                }`,
-            )}`,
-        },
-        body: JSON.stringify({ params }),
-    });
-    const body = await response.json();
-    if (body.error) {
-        throw new Error(body.error.message);
-    }
-    return body.result as T;
-}
-
-export async function safeApi<T>(
-    resource: string,
-    params: unknown[] = [],
-): Promise<{ result?: T; error?: string }> {
-    try {
-        return {
-            result: await api<T>(resource, params),
-        };
-    } catch (error) {
-        return {
-            error: (error as Error).message,
-        };
-    }
-}
-
-function apiResource<T>(
-    resource: string,
-    params: unknown[],
-    initialValue: T,
-): InitializedResourceReturn<T>;
-
-function apiResource<T>(
-    resource: string,
-    params?: unknown[],
-): ResourceReturn<T>;
-
-function apiResource<T>(
-    resource: string,
-    params: unknown[] = [],
-    initialValue?: T,
-): ResourceReturn<T> | InitializedResourceReturn<T> {
-    const key = `${resource}:${JSON.stringify(params)}`;
-    if (!resourceCache[key]) {
-        resourceCache[key] = createResource<T>(() => api<T>(resource, params), {
-            initialValue,
-        });
-    }
-    if (initialValue) {
-        return resourceCache[key] as InitializedResourceReturn<T>;
-    } else {
-        return resourceCache[key] as ResourceReturn<T>;
-    }
-}
-
-const resourceCache: Record<string, unknown> = {};
-
-function reload(resource: string, params: unknown[] = [], data?: unknown) {
-    const [, { refetch, mutate }] = apiResource(resource, params);
-    if (data) {
-        mutate(data);
-    } else {
-        refetch();
-    }
-}
+const { safeApi, apiResource, reload } = apiFunctions(
+    () => import.meta.env.VITE_USERNAME,
+    () => import.meta.env.VITE_PASSWORD,
+    "/admin/api",
+);
 
 export function useAccounts() {
     return apiResource<string[]>("Accounts", [], [])[0];
@@ -237,11 +162,6 @@ export async function deleteHandler(index: number) {
     }
     return response;
 }
-
-export type Domain = {
-    ASCII: string;
-    Unicode: string;
-};
 
 export type WebHandler = {
     LogName: string;

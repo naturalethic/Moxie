@@ -4,7 +4,7 @@ import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
-import { createAccount, reloadAccounts, useDomains } from "~/lib/api";
+import { createAccount, reloadAccounts, useDomains } from "~/lib/api/admin";
 
 export const New: Component = () => {
     const domains = useDomains();

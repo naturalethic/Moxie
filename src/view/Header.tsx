@@ -8,6 +8,10 @@ export const Header: Component = () => {
             label: "Mail",
         },
         {
+            link: "/account",
+            label: "Account",
+        },
+        {
             link: "/admin",
             label: "Admin",
         },

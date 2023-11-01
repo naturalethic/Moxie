@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { Browser } from "~/kit/browser";
-import { useDomains } from "~/lib/api";
+import { useDomains } from "~/lib/api/admin";
 import { Domain } from "./domain";
 import { New } from "./new";
 

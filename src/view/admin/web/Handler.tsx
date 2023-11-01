@@ -25,7 +25,7 @@ import {
     updateHandler,
     useDomains,
     useWebServerConfig,
-} from "~/lib/api";
+} from "~/lib/api/admin";
 
 const StaticDetail = object({
     type: literal("static"),

@@ -4,7 +4,7 @@ import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { useToast } from "~/kit/toast";
-import { saveRedirects, useWebServerConfig } from "~/lib/api";
+import { saveRedirects, useWebServerConfig } from "~/lib/api/admin";
 
 export const Redirects: Component = () => {
     const webServerConfig = useWebServerConfig();
