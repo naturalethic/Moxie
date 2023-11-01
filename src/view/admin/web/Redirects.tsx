@@ -10,10 +10,9 @@ export const Redirects: Component = () => {
     const webServerConfig = useWebServerConfig();
     const toast = useToast();
 
-    const form = createForm(
-        object({ redirects: record(string()) }),
-        {},
-        async () => {
+    const form = createForm({
+        schema: object({ redirects: record(string()) }),
+        onSubmit: async () => {
             const { error } = await saveRedirects(form.value.redirects);
             if (error) {
                 toast("danger", error.split(":").pop()!);
@@ -21,7 +20,7 @@ export const Redirects: Component = () => {
                 toast("success", "Redirects saved");
             }
         },
-    );
+    });
 
     createEffect(() => {
         if (webServerConfig.latest?.WebDNSDomainRedirects) {

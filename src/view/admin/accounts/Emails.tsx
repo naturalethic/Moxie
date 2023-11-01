@@ -17,12 +17,12 @@ export const Emails: Component<{ username: string }> = (props) => {
     const domains = useDomains();
     const account = useAccount(props.username);
 
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             localpart: string(),
             domain: string(),
         }),
-        async () => {
+        onSubmit: async () => {
             const { error } = await createEmail(
                 props.username,
                 `${form.value.localpart}@${form.value.domain}`,
@@ -33,7 +33,7 @@ export const Emails: Component<{ username: string }> = (props) => {
                 reloadAccount(props.username);
             }
         },
-    );
+    });
 
     async function handleDelete(address: string) {
         await deleteEmail(address);

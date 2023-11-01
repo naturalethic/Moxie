@@ -10,15 +10,15 @@ export const New: Component = () => {
 
     let domainInput!: HTMLInputElement;
 
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             domain: string([minLength(1, "required")]),
             username: string(),
         }),
-        {
+        initialValue: {
             domain: "",
         },
-        async ({ success }) => {
+        onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await createDomain(
                     form.value.domain,
@@ -33,7 +33,7 @@ export const New: Component = () => {
             }
             domainInput.focus();
         },
-    );
+    });
 
     onMount(() => {
         domainInput.focus();

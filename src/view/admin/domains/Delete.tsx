@@ -6,13 +6,13 @@ import { TextInput } from "~/kit/input";
 import { deleteDomain, reloadDomains } from "~/lib/api/admin";
 
 export const Delete: Component<{ domain: string }> = (props) => {
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             domain: string([
                 custom((value) => value === props.domain, "incorrect"),
             ]),
         }),
-        async ({ success }) => {
+        onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await deleteDomain(form.value.domain);
                 if (error) {
@@ -22,7 +22,7 @@ export const Delete: Component<{ domain: string }> = (props) => {
                 }
             }
         },
-    );
+    });
 
     return (
         <form.Form>

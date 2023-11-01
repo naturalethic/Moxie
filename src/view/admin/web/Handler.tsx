@@ -107,8 +107,8 @@ export const Handler: Component<{ index?: number }> = (props) => {
               headers: {},
           };
 
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             log: string(),
             domain: string(),
             path: string(),
@@ -120,7 +120,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
                 ForwardDetail,
             ]),
         }),
-        {
+        initialValue: {
             log: handler?.LogName ?? "",
             domain: handler?.Domain ?? "",
             path: handler?.PathRegexp.substring(1),
@@ -133,7 +133,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
                     ? redirectDetail
                     : forwardDetail,
         },
-        async ({ success }) => {
+        onSubmit: async ({ success }) => {
             if (!success) {
                 console.log(form.error);
                 return;
@@ -184,7 +184,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
                 );
             }
         },
-    );
+    });
 
     function handleChangeType(type: "static" | "redirect" | "forward") {
         form.value.detail =

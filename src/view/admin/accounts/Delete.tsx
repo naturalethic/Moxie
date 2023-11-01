@@ -6,13 +6,13 @@ import { TextInput } from "~/kit/input";
 import { deleteAccount, reloadAccounts } from "~/lib/api/admin";
 
 export const Delete: Component<{ username: string }> = (props) => {
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             username: string([
                 custom((value) => value === props.username, "incorrect"),
             ]),
         }),
-        async ({ success }) => {
+        onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await deleteAccount(form.value.username);
                 if (error) {
@@ -22,7 +22,7 @@ export const Delete: Component<{ username: string }> = (props) => {
                 }
             }
         },
-    );
+    });
 
     return (
         <form.Form>

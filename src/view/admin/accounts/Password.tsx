@@ -6,12 +6,12 @@ import { TextInput } from "~/kit/input";
 import { setPassword } from "~/lib/api/admin";
 
 export const Password: Component<{ username: string }> = (props) => {
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             password: string([minLength(8, "8 chars minimum")]),
         }),
-        { password: "" },
-        async () => {
+        initialValue: { password: "" },
+        onSubmit: async () => {
             const { error } = await setPassword(
                 props.username,
                 form.value.password,
@@ -22,7 +22,7 @@ export const Password: Component<{ username: string }> = (props) => {
                 form.reset();
             }
         },
-    );
+    });
 
     return (
         <form.Form>

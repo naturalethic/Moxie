@@ -1,4 +1,9 @@
-import { ParentComponent, createContext, createSignal } from "solid-js";
+import {
+    ParentComponent,
+    createContext,
+    createEffect,
+    createSignal,
+} from "solid-js";
 import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
 import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
 import { setPath } from "~/lib/util";
@@ -25,48 +30,36 @@ type CreateForm<S extends BaseSchema> = {
     get message(): string;
 };
 
-export function createForm<S extends BaseSchema = BaseSchema,>(
-    schema: S,
-    onSubmit?: (result: SafeParseResult<S>) => void,
-): CreateForm<S>;
+export function createForm<S extends BaseSchema = BaseSchema,>(options: {
+    schema: S;
+    initialValue?: Partial<Input<S>>;
+    initialValueEffect?: () => Partial<Input<S>>;
+    onSubmit?: (result: SafeParseResult<S>) => void;
+}): CreateForm<S> {
+    const { schema, onSubmit } = options;
+    const initialValue = options.initialValue ?? ({} as Partial<Input<S>>);
 
-export function createForm<S extends BaseSchema = BaseSchema,>(
-    schema: S,
-    data?: Partial<Input<S>>,
-    onSubmit?: (result: SafeParseResult<S>) => void,
-): CreateForm<S>;
-
-export function createForm<S extends BaseSchema = BaseSchema,>(
-    name: string,
-    schema: S,
-    onSubmit?: (result: SafeParseResult<S>) => void,
-): CreateForm<S>;
-
-export function createForm<S extends BaseSchema = BaseSchema,>(
-    name: string,
-    schema: S,
-    data?: Partial<Input<S>>,
-    onSubmit?: (result: SafeParseResult<S>) => void,
-): CreateForm<S>;
-
-export function createForm<S extends BaseSchema = BaseSchema,>(
-    ...args: unknown[]
-): CreateForm<S> {
-    const schema = args.shift() as S;
-    let data: Partial<Input<S>> = {};
-    if (typeof args[0] === "object") {
-        data = args.shift() as Partial<Input<S>>;
-    }
-    const onSubmit = args[0] as
-        | ((result: SafeParseResult<S>) => void)
-        | undefined;
-
-    const value = createMutable<S>(structuredClone(unwrap(data)) as S);
+    const value = createMutable<S>(structuredClone(unwrap(initialValue)) as S);
     const error = createMutable<FormError>({});
     const [message, setMessage] = createSignal("");
 
+    if (options.initialValueEffect) {
+        createEffect(() => {
+            console.warn("Running initialValueEffect");
+            const effectValue = options.initialValueEffect!();
+            modifyMutable(
+                value,
+                produce((value) => {
+                    for (const key in effectValue) {
+                        value[key] = effectValue[key]!;
+                    }
+                }),
+            );
+        });
+    }
+
     function reset() {
-        if (Object.keys(data).length === 0) {
+        if (Object.keys(initialValue).length === 0) {
             console.warn(
                 "Called form.reset() when no initial data was provided",
             );
@@ -75,8 +68,8 @@ export function createForm<S extends BaseSchema = BaseSchema,>(
         modifyMutable(
             value,
             produce((value) => {
-                for (const key in data) {
-                    value[key] = data[key]!;
+                for (const key in initialValue) {
+                    value[key] = initialValue[key]!;
                 }
             }),
         );

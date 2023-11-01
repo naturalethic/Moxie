@@ -1,4 +1,4 @@
-import { Component, createEffect } from "solid-js";
+import { Component } from "solid-js";
 import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
@@ -9,8 +9,8 @@ import { reloadAccount, saveFullName, useAccount } from "~/lib/api/account";
 export const Account: Component = (props) => {
     const account = useAccount();
     const toast = useToast();
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             name: string(),
             password: string([
                 custom(
@@ -19,19 +19,18 @@ export const Account: Component = (props) => {
                 ),
             ]),
         }),
-        async ({ success }) => {
+        initialValueEffect: () => {
+            return {
+                name: account.latest?.FullName,
+            };
+        },
+        onSubmit: async ({ success }) => {
             if (success) {
                 await saveFullName(form.value.name);
                 toast("success", "Full name saved");
                 reloadAccount();
             }
         },
-    );
-
-    createEffect(() => {
-        if (!form.value.name && account.latest) {
-            form.value.name = account.latest.FullName;
-        }
     });
 
     return (

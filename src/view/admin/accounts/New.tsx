@@ -11,18 +11,18 @@ export const New: Component = () => {
 
     let usernameInput!: HTMLInputElement;
 
-    const form = createForm(
-        object({
+    const form = createForm({
+        schema: object({
             username: string([minLength(1, "required")]),
             localpart: string([minLength(1, "required")]),
             domain: string(),
         }),
-        {
+        initialValue: {
             username: "",
             localpart: "",
             domain: "",
         },
-        async ({ success }) => {
+        onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await createAccount(
                     form.value.username,
@@ -37,7 +37,7 @@ export const New: Component = () => {
             }
             usernameInput.focus();
         },
-    );
+    });
 
     onMount(() => {
         usernameInput.focus();
