@@ -72,21 +72,11 @@ Run unit tests under the `src` folder:
 
 `npm run test`
 
-End to end tests are implemented with [cypress](cypress.io).
+End to end tests are implemented with [cypress](cypress.io) and located under `test`.
 
-These require properly setting up and running the mox test server.
-
-Reset the test server to a clean slate:
-
-`npm run test:mox:clean`
-
-Run it:
+Make sure mox is runnning:
 
 `npm run test:mox:serve`
-
-In another terminal, first backup the mox data, this will be restored on every test run:
-
-`npm run test:mox:backup`
 
 To run the cypress tests from the command line:
 
