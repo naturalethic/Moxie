@@ -1,6 +1,7 @@
 import { Component, Show, createSignal } from "solid-js";
 import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
+import { Browser } from "~/kit/browser";
 import { createForm } from "~/kit/form";
 import { FileInput, TextInput } from "~/kit/input";
 import { Progress } from "~/kit/progress";
@@ -13,6 +14,7 @@ import {
     updatePassword,
     useAccount,
 } from "~/lib/api/account";
+import { Email } from "./email";
 
 export const Account: Component = () => {
     const account = useAccount();
@@ -126,9 +128,9 @@ export const Account: Component = () => {
     }
 
     return (
-        <div class="pt-8">
+        <div class="m-4">
             {/* <pre>{JSON.stringify(account.latest, null, 4)}</pre> */}
-            <div class="flex justify-center gap-4">
+            <div class="flex gap-4 items-stretch">
                 <div class="flex flex-col gap-4">
                     <Box shaded contentClass="p-4 w-64" title="Settings">
                         <form.Form>
@@ -203,6 +205,27 @@ export const Account: Component = () => {
                             Export
                         </button>
                         <a ref={exportLink!} class="hidden" />
+                    </Box>
+                </div>
+                <div class="w-full">
+                    <Box
+                        title="Email addresses"
+                        class="h-full"
+                        contentClass="pt-4 h-full"
+                    >
+                        <Browser
+                            class="h-full"
+                            contentClass="w-full"
+                            items={[
+                                ...Object.keys(
+                                    account.latest?.Emails ?? {},
+                                ).map((address) => ({
+                                    route: `/account/${address}`,
+                                    label: address,
+                                    view: () => <Email address={address} />,
+                                })),
+                            ]}
+                        />
                     </Box>
                 </div>
             </div>

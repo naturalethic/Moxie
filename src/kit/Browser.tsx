@@ -16,6 +16,8 @@ type BrowserItem = Routable & {
 export const Browser: Component<{
     items: BrowserItem[];
     onMove?: (from: number, to: number) => void;
+    class?: string;
+    contentClass?: string;
 }> = (props) => {
     const history = useHistory();
     const selectedItem = history.matchRoute(props.items);
@@ -76,7 +78,7 @@ export const Browser: Component<{
     let container: HTMLDivElement;
 
     return (
-        <div class="flex gap-4">
+        <div class={cls("flex gap-4", props.class)}>
             <div
                 class="flex flex-col"
                 onDragOver={handleDragOver}
@@ -93,7 +95,8 @@ export const Browser: Component<{
                                     "browser-label flex items-center gap-1",
                                     {
                                         selected:
-                                            item.route === selectedItem().route,
+                                            item.route ===
+                                            selectedItem()?.route,
                                     },
                                 )}
                                 onClick={() => {
@@ -129,7 +132,9 @@ export const Browser: Component<{
                     )}
                 </For>
             </div>
-            <div class="browser-content">{selectedItem().view()}</div>
+            <div class={cls("browser-content", props.contentClass)}>
+                {selectedItem()?.view() ?? ""}
+            </div>
         </div>
     );
 };

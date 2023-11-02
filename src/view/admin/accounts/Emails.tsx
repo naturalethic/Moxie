@@ -1,4 +1,4 @@
-import { Component, Show } from "solid-js";
+import { Component, Show, onMount } from "solid-js";
 import { object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
@@ -31,6 +31,8 @@ export const Emails: Component<{ username: string }> = (props) => {
                 form.message = error.split(":")[1];
             } else {
                 reloadAccount(props.username);
+                localpartInput.value = "";
+                localpartInput.focus();
             }
         },
     });
@@ -40,12 +42,19 @@ export const Emails: Component<{ username: string }> = (props) => {
         reloadAccount(props.username);
     }
 
+    let localpartInput: HTMLInputElement;
+
+    onMount(() => {
+        localpartInput.focus();
+    });
+
     return (
         <Box class="space-y-2">
             <form.Form>
                 <Box shaded class="flex flex-col p-2 space-y-1">
                     <div class="flex gap-1">
                         <TextInput
+                            ref={localpartInput!}
                             size="small"
                             name="localpart"
                             placeholder="localpart"

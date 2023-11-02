@@ -7,7 +7,7 @@ import { Web } from "./web";
 
 export const Admin: Component = () => {
     return (
-        <Box class="m-2 p-2" border>
+        <Box class="m-4 p-2" border>
             <Browser
                 items={[
                     {

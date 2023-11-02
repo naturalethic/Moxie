@@ -47,7 +47,11 @@ export const Box: ParentComponent<{
                 <Show when={props.title}>
                     <div class="box-title">{props.title}</div>
                 </Show>
-                <div class={cls({ "box-titled-content": props.title })}>
+                <div
+                    class={cls("w-full h-full", {
+                        "box-titled-content": props.title,
+                    })}
+                >
                     <div class={props.contentClass}>{props.children}</div>
                 </div>
             </Show>

@@ -14,7 +14,7 @@ export type Routable = {
 
 type History = {
     route: string;
-    matchRoute<R extends Routable>(routables: R[]): () => R;
+    matchRoute<R extends Routable>(routables: R[]): () => R | undefined;
     push(route: string): void;
 };
 
@@ -37,8 +37,10 @@ export const History: ParentComponent = (props) => {
                         return routables[i];
                     }
                 }
-                history.replaceState(null, "", routables[0].route);
-                return routables[0];
+                if (routables.length > 0) {
+                    history.replaceState(null, "", routables[0].route);
+                    return routables[0];
+                }
             };
         },
         push(route: string) {
