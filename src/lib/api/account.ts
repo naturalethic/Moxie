@@ -34,14 +34,29 @@ export function updatePassword(password: string) {
     return safeApi("SetPassword", [password]);
 }
 
-type Email = {
-    Mailbox: "";
-    Rulesets: null;
-    FullName: "";
-};
+export function updateEmail(address: string, email: Email) {
+    const extantEmail = useAccount().latest!.Emails[address];
+    return safeApi("DestinationSave", [address, extantEmail, email]);
+}
 
-type Account = {
+export type Account = {
     FullName: string;
     Domain: Domain;
     Emails: Record<string, Email>;
+};
+
+export type Email = {
+    FullName: "";
+    Mailbox: "";
+    Rulesets: Ruleset[] | null;
+};
+
+export type Ruleset = {
+    SMTPMailFromRegexp: string;
+    VerifiedDomain: string;
+    HeadersRegexp: Record<string, string>;
+    IsForward: boolean;
+    ListAllowDomain: string;
+    AcceptRejectsToMailbox: string;
+    Mailbox: string;
 };

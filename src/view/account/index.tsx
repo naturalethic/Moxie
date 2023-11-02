@@ -217,12 +217,21 @@ export const Account: Component = () => {
                             class="h-full"
                             contentClass="w-full"
                             items={[
-                                ...Object.keys(
+                                ...Object.entries(
                                     account.latest?.Emails ?? {},
-                                ).map((address) => ({
+                                ).map(([address, item]) => ({
                                     route: `/account/${address}`,
                                     label: address,
-                                    view: () => <Email address={address} />,
+                                    view: () => (
+                                        <Email
+                                            address={address}
+                                            defaultName={
+                                                account.latest?.FullName ?? ""
+                                            }
+                                            name={item.FullName}
+                                            mailbox={item.Mailbox}
+                                        />
+                                    ),
                                 })),
                             ]}
                         />
