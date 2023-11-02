@@ -1,8 +1,9 @@
-import { Component, createSignal } from "solid-js";
+import { Component, Show, createSignal } from "solid-js";
 import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { FileInput, TextInput } from "~/kit/input";
+import { Progress } from "~/kit/progress";
 import { Select } from "~/kit/select";
 import { useToast } from "~/kit/toast";
 import {
@@ -55,23 +56,59 @@ export const Account: Component = () => {
 
     let importStripInput: HTMLInputElement;
     const [importFile, setImportFile] = createSignal<File | undefined>();
+    const [importProgress, setImportProgress] = createSignal<
+        { current: number; total: number } | undefined
+    >();
+
+    let xhr: XMLHttpRequest;
 
     async function handleClickImport() {
         // XXX: Incorporate file uploading into the normal api framework.
         if (!importFile()) return;
+        setImportProgress({
+            current: 0,
+            total: 0,
+        });
         const body = new FormData();
         body.append("file", importFile()!);
         body.append("stripMailboxPrefix", importStripInput.value);
-        const response = await fetch("/mox/account/import", {
-            method: "POST",
-            headers: {
-                Authorization: `Basic ${btoa(
-                    `${credentials.username()}:${credentials.password()}`,
-                )}`,
-            },
-            body,
+        xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener("progress", (event) => {
+            if (event.lengthComputable) {
+                setImportProgress({
+                    current: event.loaded,
+                    total: event.total,
+                });
+            }
         });
-        console.log(response);
+        xhr.addEventListener("load", () => {
+            if (xhr.status === 200) {
+                toast("success", "Messages imported");
+            } else {
+                toast("danger", "Import failed");
+            }
+            setImportProgress(undefined);
+        });
+        xhr.addEventListener("error", () => {
+            toast("danger", "Import failed");
+            setImportProgress(undefined);
+        });
+        xhr.addEventListener("abort", () => {
+            toast("attention", "Import cancelled");
+            setImportProgress(undefined);
+        });
+        xhr.open(
+            "POST",
+            "/mox/account/import",
+            true,
+            credentials.username(),
+            credentials.password(),
+        );
+        xhr.send(body);
+    }
+
+    async function handleClickCancelImport() {
+        xhr.abort();
     }
 
     let exportLink: HTMLAnchorElement;
@@ -105,25 +142,45 @@ export const Account: Component = () => {
                         title="Import"
                         contentClass="p-4 w-64 flex flex-col gap-2"
                     >
-                        <div class="text-xs">
-                            Import messages from a .zip or .tgz file with
-                            maildirs and/or mbox files.
-                        </div>
-                        <FileInput
-                            name="file"
-                            accept=".zip,.tgz"
-                            onChange={setImportFile}
-                        />
-                        <TextInput
-                            ref={importStripInput!}
-                            name="strip"
-                            label="Strip path prefix"
-                            placeholder="folder/"
-                            tip='If set, any mbox/maildir path with this prefix will have it stripped before importing. For example, if all mailboxes are in a directory "Takeout", specify that path in the field above so mailboxes like "Takeout/Inbox.mbox" are imported into a mailbox called "Inbox" instead of "Takeout/Inbox".'
-                        />
-                        <button type="button" onClick={handleClickImport}>
-                            Import
-                        </button>
+                        <Show when={!importProgress()}>
+                            <div class="text-xs">
+                                Import messages from a .zip or .tgz file with
+                                maildirs and/or mbox files.
+                            </div>
+                            <FileInput
+                                name="file"
+                                accept=".zip,.tgz"
+                                onChange={setImportFile}
+                            />
+                            <TextInput
+                                ref={importStripInput!}
+                                name="strip"
+                                label="Strip path prefix"
+                                placeholder="folder/"
+                                tip='If set, any mbox/maildir path with this prefix will have it stripped before importing. For example, if all mailboxes are in a directory "Takeout", specify that path in the field above so mailboxes like "Takeout/Inbox.mbox" are imported into a mailbox called "Inbox" instead of "Takeout/Inbox".'
+                            />
+                            <button type="button" onClick={handleClickImport}>
+                                Import
+                            </button>
+                        </Show>
+                        <Show when={importProgress()}>
+                            <Box class="text-xs">
+                                Importing:{" "}
+                                <span class="text-accent-semimuted">
+                                    {importFile()!.name}
+                                </span>
+                            </Box>
+                            <Progress
+                                current={importProgress()!.current}
+                                total={importProgress()!.total}
+                            />
+                            <button
+                                type="button"
+                                onClick={handleClickCancelImport}
+                            >
+                                Cancel
+                            </button>
+                        </Show>
                     </Box>
                     <Box
                         shaded

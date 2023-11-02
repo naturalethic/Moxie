@@ -204,7 +204,7 @@ button {
 }
 
 input {
-    @apply rounded px-2 py-1;
+    @apply rounded px-2 py-1 w-full;
     border: 1px solid var(--color-border);
 }
 
@@ -405,6 +405,19 @@ form {
         display: none;
     }
 }
+
+.progress {
+    @apply rounded-full;
+    border: 1px solid var(--color-border);
+    height: 10px;
+
+    & .progress-meter {
+        @apply rounded-full;
+        background-color: var(--color-accent);
+        height: 100%;
+    }
+}
+
 
 /*
 .defcon {
