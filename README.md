@@ -22,8 +22,8 @@ An experimental UI for administration of [mox](https://github.com/mjl-/mox).
 
 ```
 dist/index.html    0.32 kB │ gzip:  0.23 kB
-dist/index.css    23.21 kB │ gzip:  5.49 kB
-dist/index.js    127.64 kB │ gzip: 26.89 kB
+dist/index.css    24.60 kB │ gzip:  5.74 kB
+dist/index.js    144.97 kB │ gzip: 30.36 kB
 ```
 
 ### Deployment
