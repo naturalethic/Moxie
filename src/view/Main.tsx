@@ -1,3 +1,4 @@
+import { Kit } from "~/kit";
 import { Deck } from "~/kit/deck";
 import { History } from "~/kit/history";
 import { Toast } from "~/kit/toast";
@@ -7,24 +8,42 @@ import { Header } from "./header";
 import { Mail } from "./mail/Mail";
 
 export const Main = () => {
+    const main = [
+        {
+            route: "/",
+            view: () => <div>Home</div>,
+        },
+        {
+            route: "/admin",
+            view: () => <Admin />,
+        },
+        {
+            route: "/mail",
+            view: () => <Mail />,
+        },
+        {
+            route: "/account",
+            view: () => <Account />,
+        },
+    ];
+
     return (
         <Toast>
             <History>
-                <Header />
                 <Deck
                     items={[
-                        { route: "/", view: () => <div>Home</div> },
                         {
-                            route: "/admin",
-                            view: () => <Admin />,
+                            route: "/",
+                            view: () => (
+                                <>
+                                    <Header />
+                                    <Deck items={main} />
+                                </>
+                            ),
                         },
                         {
-                            route: "/mail",
-                            view: () => <Mail />,
-                        },
-                        {
-                            route: "/account",
-                            view: () => <Account />,
+                            route: "/kit",
+                            view: () => <Kit />,
                         },
                     ]}
                 />

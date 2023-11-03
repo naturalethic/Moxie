@@ -71,6 +71,7 @@ export const History: ParentComponent = (props) => {
 export const Link: ParentComponent<{
     href?: string;
     route?: string;
+    class?: string;
 }> = (props) => {
     const [, anchorProps] = splitProps(props, ["route"]);
     const history = useHistory();

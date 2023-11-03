@@ -18,7 +18,9 @@ export const Header: Component = () => {
     ];
     return (
         <header>
-            <div class="header-logo">Moxie</div>
+            <Link route="/" class="header-logo">
+                Moxie
+            </Link>
             <ul>
                 <For each={items}>
                     {(item) => (
