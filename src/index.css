@@ -34,6 +34,10 @@
     --color-severe-subtle: #fff1e5;
 }
 
+body {
+    min-height: 100vh;
+}
+
 .border-danger {
     border-color: var(--color-danger);
 }

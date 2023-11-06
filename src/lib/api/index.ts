@@ -103,16 +103,17 @@ export function apiFunctions(
                 params,
             );
         },
-        apiResource<T, F>(
-            ...args: unknown[]
-        ): ResourceReturn<T> | InitializedResourceReturn<T> {
-            const transform =
-                typeof args[args.length - 1] === "function"
-                    ? (args.pop() as Transform<T, F>)
-                    : undefined;
-            const initialValue = args.length === 3 ? args.pop() : undefined;
-            const params = args.length === 2 ? (args.pop() as []) : [];
-            const resource = args.pop();
+        apiResource<T, F = undefined>({
+            resource,
+            params = [],
+            initialValue,
+            transform,
+        }: {
+            resource: string;
+            params?: unknown[];
+            initialValue?: T;
+            transform?: Transform<T, F>;
+        }) {
             return apiResource(
                 username(),
                 password(),
@@ -122,29 +123,6 @@ export function apiFunctions(
                 transform,
             ) as ResourceReturn<T> | InitializedResourceReturn<T>;
         },
-        // apiResource<T>(
-        //     resource: string,
-        //     params: unknown[] = [],
-        //     initialValue?: T | ((data: unknown) => T),
-        //     transform?: (data: unknown) => T,
-        // ): ResourceReturn<T> | InitializedResourceReturn<T> {
-        //     return apiResource(
-        //         username(),
-        //         password(),
-        //         `${path}/${resource}`,
-        //         params,
-        //         initialValue
-        //             ? typeof initialValue === "function"
-        //                 ? undefined
-        //                 : (initialValue as T)
-        //             : undefined,
-        //         initialValue
-        //             ? typeof initialValue === "function"
-        //                 ? (initialValue as (data: unknown) => T)
-        //                 : transform
-        //             : undefined,
-        //     );
-        // },
         reload(resource: string, params: unknown[] = [], data?: unknown) {
             const [, { refetch, mutate }] = apiResource(
                 username(),
@@ -158,36 +136,6 @@ export function apiFunctions(
                 refetch();
             }
         },
-    } as {
-        api<T>(resource: string, params?: unknown[]): Promise<T>;
-        safeApi<T>(
-            resource: string,
-            params?: unknown[],
-        ): Promise<{ result?: T; error?: string }>;
-        // apiResource<T>(resource: string): ResourceReturn<T>;
-        apiResource<T>(resource: string): ResourceReturn<T>;
-        apiResource<T, F>(
-            resource: string,
-            transform: Transform<T, F>,
-        ): ResourceReturn<T>;
-        apiResource<T>(resource: string, params: unknown[]): ResourceReturn<T>;
-        apiResource<T, F>(
-            resource: string,
-            params: unknown[],
-            transform?: Transform<T, F>,
-        ): ResourceReturn<T>;
-        apiResource<T>(
-            resource: string,
-            params: unknown[],
-            initialValue: T,
-        ): InitializedResourceReturn<T>;
-        apiResource<T, F>(
-            resource: string,
-            params: unknown[],
-            initialValue?: T,
-            transform?: Transform<T, F>,
-        ): InitializedResourceReturn<T>;
-        reload(resource: string, params?: unknown[], data?: unknown): void;
     };
 }
 

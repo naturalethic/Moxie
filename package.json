@@ -23,7 +23,7 @@
         "tailwindcss": "^3.3.5",
         "typescript": "^5.2.2",
         "uglify-js": "^3.17.4",
-        "valibot": "github:fabian-hiller/valibot",
+        "valibot": "github:Saeris/valibot#feat/add-reflection-api",
         "vite": "^4.5.0",
         "vite-bundle-visualizer": "^0.10.0",
         "vite-plugin-doctest": "^0.1.1",
