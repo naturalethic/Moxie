@@ -44,6 +44,11 @@ export async function setPassword(username: string, password: string) {
 }
 
 export function useDomains() {
+    // const resource = apiResource<Domain[]>({
+    //     resource: "Domains",
+    //     initialValue: [],
+    // });
+    // // const foo = resource[0].latest;
     return apiResource<Domain[]>({ resource: "Domains", initialValue: [] })[0];
 }
 

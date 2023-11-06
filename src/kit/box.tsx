@@ -1,13 +1,13 @@
 import { ParentComponent, Show } from "solid-js";
 import {
-    Input,
+    Infer,
     boolean,
-    enumType,
     object,
     optional,
     special,
     string,
-} from "valibot";
+    variant,
+} from "~/lib/schema";
 import { cls } from "~/lib/util";
 import { Icon } from "./icon";
 
@@ -18,22 +18,11 @@ export const BoxProps = object({
     border: optional(boolean()),
     shaded: optional(boolean()),
     title: optional(string()),
-    variant: optional(enumType(["danger", "attention", "success"])),
-    onClick: special<() => void>(() => true),
+    variant: optional(variant("danger", "attention", "success")),
+    onClick: special<() => void>(),
 });
 
-// export type BoxProps = {
-//     class?: string;
-//     contentClass?: string;
-//     style?: string;
-//     border?: boolean;
-//     shaded?: boolean;
-//     title?: string;
-//     variant?: "danger" | "attention" | "success";
-//     onClick?: () => void;
-// };
-
-export type BoxProps = Input<typeof BoxProps>;
+export type BoxProps = Infer<typeof BoxProps>;
 
 export const Box: ParentComponent<BoxProps> = (props) => {
     return (
