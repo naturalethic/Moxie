@@ -1,7 +1,7 @@
 import { Component, JSX } from "solid-js";
-import { Box, BoxProps } from "./box";
 import { Deck } from "./deck";
 import { Demo } from "./demo";
+import { Divider, DividerProps } from "./divider";
 import { Link, Routable } from "./history";
 
 type KitItem = Routable & {
@@ -11,16 +11,16 @@ type KitItem = Routable & {
 
 export const Kit: Component = () => {
     const items: KitItem[] = [
-        {
-            label: "Box",
-            route: "/kit/box",
-            view: () => <Demo component={Box} schema={BoxProps} />,
-        },
         // {
-        //     label: "Divider",
-        //     route: "/kit/divider",
-        //     view: () => <Demo component={Divider} schema={DividerProps} />,
+        //     label: "Box",
+        //     route: "/kit/box",
+        //     view: () => <Demo component={Box} schema={BoxProps} />,
         // },
+        {
+            label: "Divider",
+            route: "/kit/divider",
+            view: () => <Demo component={Divider} schema={DividerProps} />,
+        },
     ];
 
     return (

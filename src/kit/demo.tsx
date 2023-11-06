@@ -1,9 +1,10 @@
 import { Component, ParentComponent } from "solid-js";
 import { BaseSchema, Input } from "valibot";
+import { AnySchema } from "~/lib/schema";
 
 type DemoProps<S extends BaseSchema,> = {
     component: Component<Input<S>> | ParentComponent<Input<S>>;
-    schema: S;
+    schema: AnySchema;
 };
 
 export const Demo = <S extends BaseSchema,>(props: DemoProps<S>) => {
