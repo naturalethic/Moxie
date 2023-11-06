@@ -5,8 +5,9 @@ import {
     createSignal,
 } from "solid-js";
 import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
-import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
-import { setPath } from "~/lib/util";
+import { Infer, Schema } from "~/lib/schema";
+// import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
+// import { setPath } from "~/lib/util";
 
 type Form = ParentComponent<{ class?: string }>;
 type FormData = Record<string, unknown>;
@@ -21,26 +22,29 @@ type FormContext =
 
 export const FormContext = createContext<FormContext>();
 
-type CreateForm<S extends BaseSchema> = {
+type CreateForm<S extends Schema<"object">, V extends Partial<Infer<S>>> = {
     Form: Form;
-    value: Input<S>;
-    initialValue: Partial<Input<S>>;
+    value: V;
+    initialValue: V;
     error: FormError;
     reset: () => void;
     set message(message: string);
     get message(): string;
 };
 
-export function createForm<S extends BaseSchema = BaseSchema,>(options: {
+export function createForm<
+    S extends Schema<"object">,
+    V extends Partial<Infer<S>>,
+>(options: {
     schema: S;
-    initialValue?: Partial<Input<S>>;
-    initialValueEffect?: () => Partial<Input<S>>;
-    onSubmit?: (result: SafeParseResult<S>) => void;
-}): CreateForm<S> {
-    const { schema, onSubmit } = options;
-    const initialValue = options.initialValue ?? ({} as Partial<Input<S>>);
+    initialValue?: V;
+    initialValueEffect?: () => V;
+    onSubmit?: (result: { success: boolean; value: V }) => void;
+}): CreateForm<S, V> {
+    const { /* schema , */ onSubmit } = options;
+    const initialValue = options.initialValue ?? ({} as V);
 
-    const value = createMutable<S>(structuredClone(unwrap(initialValue)) as S);
+    const value = createMutable<V>(structuredClone(unwrap(initialValue)));
     const error = createMutable<FormError>({});
     const [message, setMessage] = createSignal("");
 
@@ -79,16 +83,17 @@ export function createForm<S extends BaseSchema = BaseSchema,>(options: {
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
-            const result = safeParse(schema, value);
-            if (!result.success) {
-                for (const issue of result.issues) {
-                    if (issue.path) {
-                        const path = issue.path.map((p) => p.key);
-                        setPath(error, path, issue.message);
-                    }
-                }
-            }
-            onSubmit?.(result);
+            onSubmit?.({ success: true, value });
+            // const result = safeParse(schema, value);
+            // if (!result.success) {
+            //     for (const issue of result.issues) {
+            //         if (issue.path) {
+            //             const path = issue.path.map((p) => p.key);
+            //             setPath(error, path, issue.message);
+            //         }
+            //     }
+            // }
+            // onSubmit?.(result);
         }
 
         return (
