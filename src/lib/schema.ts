@@ -1,3 +1,4 @@
+import { modifyMutable, reconcile } from "solid-js/store";
 import { ConditionalExcept, ConditionalPick, Simplify } from "type-fest";
 
 class BaseSchema {
@@ -105,12 +106,12 @@ export function optional<T extends NonOptionalSchema>(entry: T) {
     return new OptionalSchema(entry);
 }
 
-export type Infer<S extends AnySchema> = S extends StringSchema
+export type Infer<S extends AnySchema> = S extends ObjectSchema<infer T>
+    ? InferEntries<T>
+    : S extends StringSchema
     ? string
     : S extends BooleanSchema
     ? boolean
-    : S extends ObjectSchema<infer T>
-    ? InferEntries<T>
     : S extends VariantSchema<infer T>
     ? T
     : S extends SpecialSchema<infer T>
@@ -135,19 +136,37 @@ export type ValidationError = {
     [key: string]: ValidationError | string | undefined;
 };
 
-export function validate<S extends AnySchema, V extends Infer<S>>(
+export function validate<S extends AnyObjectSchema, V extends Infer<S>>(
     schema: S,
     value: Partial<V>,
-): ValidationError {
-    const error: ValidationError = {};
-    if (schema.type === "object") {
-        const objectSchema = schema as AnyObjectSchema;
-        const objectValue = value as Infer<AnyObjectSchema>;
-        for (const [key, entrySchema] of Object.entries(objectSchema.entries)) {
-            if (Object.hasOwn(objectValue, key)) {
-                error[key] = validate(entrySchema, objectValue[key]);
+    error: ValidationError,
+): boolean {
+    modifyMutable(error, reconcile({}));
+    for (const [key, entrySchema] of Object.entries(schema.entries)) {
+        if (Object.hasOwn(value, key)) {
+            if (entrySchema.type === "object") {
+                const entryObjectSchema = entrySchema as AnyObjectSchema;
+                const entryValue = value[
+                    key
+                ] as unknown as Infer<AnyObjectSchema>;
+                error[key] = {};
+                if (
+                    !validate(
+                        entryObjectSchema,
+                        entryValue,
+                        error[key] as ValidationError,
+                    )
+                ) {
+                    delete error[key];
+                }
+            }
+            if (entrySchema.type === "string") {
+                const entryStringSchema = entrySchema as StringSchema;
+                if (entryStringSchema.options.required && !value[key]) {
+                    error[key] = "Required";
+                }
             }
         }
     }
-    return error;
+    return Object.keys(error).length === 0;
 }

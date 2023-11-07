@@ -150,7 +150,6 @@ class ApiFunctions {
         initialValue?: T;
         transform?: Transform<T, F>;
     }): ResourceReturn<T> | InitializedResourceReturn<T> {
-        console.log(this);
         return apiResource<T, F>(
             this.username(),
             this.password(),

@@ -5,7 +5,13 @@ import {
     createSignal,
 } from "solid-js";
 import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
-import { Infer, ObjectEntries, ObjectSchema, validate } from "~/lib/schema";
+import {
+    Infer,
+    ObjectEntries,
+    ObjectSchema,
+    ValidationError,
+    validate,
+} from "~/lib/schema";
 // import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
 // import { setPath } from "~/lib/util";
 
@@ -20,12 +26,12 @@ type FormDataNode =
     | undefined;
 
 // type FormError = Record<string, FormError | string | undefined>;
-type FormError = { [key: string]: FormError | string | undefined };
+// type FormError = { [key: string]: FormError | string | undefined };
 
 type FormContext =
     | {
           value: FormData;
-          error: FormError;
+          error: ValidationError;
       }
     | undefined;
 
@@ -39,7 +45,7 @@ type CreateForm<
     Form: Form;
     value: Partial<V>;
     initialValue: Partial<V>;
-    error: FormError;
+    error: ValidationError;
     reset: () => void;
     set message(message: string);
     get message(): string;
@@ -53,13 +59,13 @@ export function createForm<
     schema: S;
     initialValue?: Partial<V>;
     initialValueEffect?: () => V;
-    onSubmit?: (result: { success: boolean; errors?: FormError }) => void;
+    onSubmit?: (result: { success: boolean }) => void;
 }): CreateForm<E, S, V> {
     const { schema, onSubmit } = options;
     const initialValue = options.initialValue ?? ({} as Partial<V>);
 
     const value = createMutable(structuredClone(unwrap(initialValue)));
-    const error = createMutable<FormError>({});
+    const error = createMutable<ValidationError>({});
     const [message, setMessage] = createSignal("");
 
     if (options.initialValueEffect) {
@@ -97,7 +103,7 @@ export function createForm<
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
-            onSubmit?.({ success: true, errors: validate(schema, value) });
+            onSubmit?.({ success: validate(schema, value, error) });
             // onSubmit?.({ success: true, value });
             // const result = safeParse(schema, value);
             // if (!result.success) {

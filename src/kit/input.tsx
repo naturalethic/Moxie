@@ -56,11 +56,11 @@ export const TextInput: Component<{
         props.onChange?.(input.value);
     }
 
-    function handleFocus() {
-        if (props.name && form) {
-            setPath(form.error, props.name, undefined);
-        }
-    }
+    // function handleFocus() {
+    //     if (props.name && form) {
+    //         setPath(form.error, props.name, undefined);
+    //     }
+    // }
 
     createEffect(() => {
         // Initialize the form data value for this input to an empty string, if it is not yet defined.
@@ -104,7 +104,7 @@ export const TextInput: Component<{
                     })}
                     onKeyPress={handleKeyPress}
                     onInput={handleInput}
-                    onFocus={handleFocus}
+                    // onFocus={handleFocus}
                 />
                 <Show when={props.leadingIcon}>
                     <Icon
