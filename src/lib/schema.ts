@@ -19,9 +19,20 @@ export function boolean(): Schema<"boolean"> {
     };
 }
 
-export function string(): Schema<"string"> {
+type StringOptions = {
+    required?: boolean;
+};
+
+type StringSchema = Schema<"string"> & {
+    options: StringOptions;
+};
+
+export function string({ required = false }: StringOptions = {}): StringSchema {
     return {
         type: "string",
+        options: {
+            required,
+        },
     };
 }
 

@@ -150,6 +150,7 @@ class ApiFunctions {
         initialValue?: T;
         transform?: Transform<T, F>;
     }): ResourceReturn<T> | InitializedResourceReturn<T> {
+        console.log(this);
         return apiResource<T, F>(
             this.username(),
             this.password(),
@@ -166,7 +167,13 @@ export function apiFunctions(
     password: () => string,
     path: string,
 ): ApiFunctions {
-    return new ApiFunctions(username, password, path);
+    const api = new ApiFunctions(username, password, path);
+    return {
+        api: api.api.bind(api),
+        safeApi: api.safeApi.bind(api),
+        reload: api.reload.bind(api),
+        apiResource: api.apiResource.bind(api),
+    } as ApiFunctions;
 }
 
 export type Domain = {

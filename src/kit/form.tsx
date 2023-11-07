@@ -39,7 +39,7 @@ export function createForm<
     schema: S;
     initialValue?: V;
     initialValueEffect?: () => V;
-    onSubmit?: (result: { success: boolean; value: V }) => void;
+    onSubmit?: (result: { success: boolean }) => void;
 }): CreateForm<S, V> {
     const { /* schema , */ onSubmit } = options;
     const initialValue = options.initialValue ?? ({} as V);
@@ -83,7 +83,8 @@ export function createForm<
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
-            onSubmit?.({ success: true, value });
+            onSubmit?.({ success: true });
+            // onSubmit?.({ success: true, value });
             // const result = safeParse(schema, value);
             // if (!result.success) {
             //     for (const issue of result.issues) {

@@ -19,7 +19,7 @@ export const BoxProps = object({
     shaded: optional(boolean()),
     title: optional(string()),
     variant: optional(variant("danger", "attention", "success")),
-    onClick: special<() => void>(),
+    onClick: optional(special<() => void>()),
 });
 
 export type BoxProps = Infer<typeof BoxProps>;
