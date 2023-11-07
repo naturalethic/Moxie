@@ -52,6 +52,24 @@ function apiResource<T, F>(
     username: string,
     password: string,
     path: string,
+    params: unknown[],
+    initialValue: T,
+    transform?: Transform<T, F>,
+): InitializedResourceReturn<T>;
+
+function apiResource<T, F>(
+    username: string,
+    password: string,
+    path: string,
+    params: unknown[],
+    initialValue?: T,
+    transform?: Transform<T, F>,
+): ResourceReturn<T>;
+
+function apiResource<T, F>(
+    username: string,
+    password: string,
+    path: string,
     params: unknown[] = [],
     initialValue?: T,
     transform?: Transform<T, F>,
@@ -71,10 +89,75 @@ function apiResource<T, F>(
             },
         );
     }
-    if (initialValue) {
-        return resourceCache[key] as InitializedResourceReturn<T>;
-    } else {
-        return resourceCache[key] as ResourceReturn<T>;
+    return resourceCache[key] as
+        | ResourceReturn<T>
+        | InitializedResourceReturn<T>;
+}
+
+class ApiFunctions {
+    constructor(
+        private username: () => string,
+        private password: () => string,
+        private path: string,
+    ) {}
+    api<T>(resource: string, params: unknown[]): Promise<T> {
+        return api<T>(
+            this.username(),
+            this.password(),
+            `${this.path}/${resource}`,
+            params,
+        );
+    }
+    safeApi<T>(
+        resource: string,
+        params: unknown[],
+    ): Promise<{ result?: T; error?: string }> {
+        return safeApi<T>(
+            this.username(),
+            this.password(),
+            `${this.path}/${resource}`,
+            params,
+        );
+    }
+    reload(resource: string, params?: unknown[], data?: unknown): void {
+        const [, { refetch, mutate }] = apiResource(
+            this.username(),
+            this.password(),
+            `${this.path}/${resource}`,
+            params ?? [],
+        );
+        if (data) {
+            mutate(data);
+        } else {
+            refetch();
+        }
+    }
+    apiResource<T, F = undefined>(options: {
+        resource: string;
+        params?: unknown[];
+        initialValue: T;
+        transform?: Transform<T, F>;
+    }): InitializedResourceReturn<T>;
+    apiResource<T, F = undefined>(options: {
+        resource: string;
+        params?: unknown[];
+        initialValue?: T;
+        transform?: Transform<T, F>;
+    }): ResourceReturn<T>;
+    apiResource<T, F = undefined>(options: {
+        resource: string;
+        params?: unknown[];
+        initialValue?: T;
+        transform?: Transform<T, F>;
+    }): ResourceReturn<T> | InitializedResourceReturn<T> {
+        return apiResource<T, F>(
+            this.username(),
+            this.password(),
+            `${this.path}/${options.resource}`,
+            options.params ?? [],
+            options.initialValue,
+            options.transform,
+        );
     }
 }
 
@@ -82,113 +165,14 @@ export function apiFunctions(
     username: () => string,
     password: () => string,
     path: string,
-) {
+): ApiFunctions {
+    const api = new ApiFunctions(username, password, path);
     return {
-        api<T>(resource: string, params: unknown[] = []) {
-            return api<T>(
-                username(),
-                password(),
-                `${path}/${resource}`,
-                params,
-            );
-        },
-        safeApi<T>(
-            resource: string,
-            params: unknown[] = [],
-        ): Promise<{ result?: T; error?: string }> {
-            return safeApi<T>(
-                username(),
-                password(),
-                `${path}/${resource}`,
-                params,
-            );
-        },
-        apiResource<T, F>(
-            ...args: unknown[]
-        ): ResourceReturn<T> | InitializedResourceReturn<T> {
-            const transform =
-                typeof args[args.length - 1] === "function"
-                    ? (args.pop() as Transform<T, F>)
-                    : undefined;
-            const initialValue = args.length === 3 ? args.pop() : undefined;
-            const params = args.length === 2 ? (args.pop() as []) : [];
-            const resource = args.pop();
-            return apiResource(
-                username(),
-                password(),
-                `${path}/${resource}`,
-                params,
-                initialValue,
-                transform,
-            ) as ResourceReturn<T> | InitializedResourceReturn<T>;
-        },
-        // apiResource<T>(
-        //     resource: string,
-        //     params: unknown[] = [],
-        //     initialValue?: T | ((data: unknown) => T),
-        //     transform?: (data: unknown) => T,
-        // ): ResourceReturn<T> | InitializedResourceReturn<T> {
-        //     return apiResource(
-        //         username(),
-        //         password(),
-        //         `${path}/${resource}`,
-        //         params,
-        //         initialValue
-        //             ? typeof initialValue === "function"
-        //                 ? undefined
-        //                 : (initialValue as T)
-        //             : undefined,
-        //         initialValue
-        //             ? typeof initialValue === "function"
-        //                 ? (initialValue as (data: unknown) => T)
-        //                 : transform
-        //             : undefined,
-        //     );
-        // },
-        reload(resource: string, params: unknown[] = [], data?: unknown) {
-            const [, { refetch, mutate }] = apiResource(
-                username(),
-                password(),
-                `${path}/${resource}`,
-                params,
-            );
-            if (data) {
-                mutate(data);
-            } else {
-                refetch();
-            }
-        },
-    } as {
-        api<T>(resource: string, params?: unknown[]): Promise<T>;
-        safeApi<T>(
-            resource: string,
-            params?: unknown[],
-        ): Promise<{ result?: T; error?: string }>;
-        // apiResource<T>(resource: string): ResourceReturn<T>;
-        apiResource<T>(resource: string): ResourceReturn<T>;
-        apiResource<T, F>(
-            resource: string,
-            transform: Transform<T, F>,
-        ): ResourceReturn<T>;
-        apiResource<T>(resource: string, params: unknown[]): ResourceReturn<T>;
-        apiResource<T, F>(
-            resource: string,
-            params: unknown[],
-            transform?: Transform<T, F>,
-        ): ResourceReturn<T>;
-        apiResource<T>(
-            resource: string,
-            params: unknown[],
-            initialValue: T,
-        ): InitializedResourceReturn<T>;
-        apiResource<T, F>(
-            resource: string,
-            params: unknown[],
-            initialValue?: T,
-            transform?: Transform<T, F>,
-        ): InitializedResourceReturn<T>;
-        reload(resource: string, params?: unknown[], data?: unknown): void;
-    };
+        api: api.api.bind(api),
+        safeApi: api.safeApi.bind(api),
+        reload: api.reload.bind(api),
+        apiResource: api.apiResource.bind(api),
+    } as ApiFunctions;
 }
 
 export type Domain = {

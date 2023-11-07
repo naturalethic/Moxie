@@ -8,7 +8,7 @@ const { safeApi, apiResource, reload } = apiFunctions(
 );
 
 export function useAccounts() {
-    return apiResource<string[]>("Accounts", [], [])[0];
+    return apiResource<string[]>({ resource: "Accounts", initialValue: [] })[0];
 }
 
 export function reloadAccounts() {
@@ -16,7 +16,7 @@ export function reloadAccounts() {
 }
 
 export function useAccount(username: string) {
-    return apiResource<Account>("Account", [username])[0];
+    return apiResource<Account>({ resource: "Account", params: [username] })[0];
 }
 
 export function reloadAccount(username: string) {
@@ -44,7 +44,12 @@ export async function setPassword(username: string, password: string) {
 }
 
 export function useDomains() {
-    return apiResource<Domain[]>("Domains", [], [])[0];
+    // const resource = apiResource<Domain[]>({
+    //     resource: "Domains",
+    //     initialValue: [],
+    // });
+    // // const foo = resource[0].latest;
+    return apiResource<Domain[]>({ resource: "Domains", initialValue: [] })[0];
 }
 
 export function reloadDomains() {
@@ -52,7 +57,11 @@ export function reloadDomains() {
 }
 
 export function useDomainRecords(domain: string) {
-    return apiResource<string[]>("DomainRecords", [domain], [])[0];
+    return apiResource<string[]>({
+        resource: "DomainRecords",
+        params: [domain],
+        initialValue: [],
+    })[0];
 }
 
 export async function createDomain(domain: string, username: string) {
@@ -64,11 +73,11 @@ export async function deleteDomain(domain: string) {
 }
 
 export function useDomainLocalparts(domain: string) {
-    return apiResource<Record<string, string>>(
-        "DomainLocalparts",
-        [domain],
-        {},
-    )[0];
+    return apiResource<Record<string, string>>({
+        resource: "DomainLocalparts",
+        params: [domain],
+        initialValue: {},
+    })[0];
 }
 
 export function reloadDomainLocalparts(domain: string) {
@@ -76,7 +85,7 @@ export function reloadDomainLocalparts(domain: string) {
 }
 
 export function useWebServerConfig() {
-    return apiResource<WebServerConfig>("WebserverConfig")[0];
+    return apiResource<WebServerConfig>({ resource: "WebserverConfig" })[0];
 }
 
 function generateWebDomainRedirects(

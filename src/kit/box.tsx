@@ -1,17 +1,30 @@
 import { ParentComponent, Show } from "solid-js";
+import {
+    Infer,
+    boolean,
+    object,
+    optional,
+    special,
+    string,
+    variant,
+} from "~/lib/schema";
 import { cls } from "~/lib/util";
 import { Icon } from "./icon";
 
-export const Box: ParentComponent<{
-    class?: string;
-    contentClass?: string;
-    style?: string;
-    border?: boolean;
-    shaded?: boolean;
-    title?: string;
-    variant?: "danger" | "attention" | "success";
-    onClick?: () => void;
-}> = (props) => {
+export const BoxProps = object({
+    class: optional(string()),
+    contentClass: optional(string()),
+    style: optional(string()),
+    border: optional(boolean()),
+    shaded: optional(boolean()),
+    title: optional(string()),
+    variant: optional(variant("danger", "attention", "success")),
+    onClick: optional(special<() => void>()),
+});
+
+export type BoxProps = Infer<typeof BoxProps>;
+
+export const Box: ParentComponent<BoxProps> = (props) => {
     return (
         <div
             class={cls("box", props.class, {

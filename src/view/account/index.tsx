@@ -1,5 +1,4 @@
 import { Component, Show, createSignal } from "solid-js";
-import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { Browser } from "~/kit/browser";
 import { createForm } from "~/kit/form";
@@ -14,6 +13,7 @@ import {
     updatePassword,
     useAccount,
 } from "~/lib/api/account";
+import { object, string } from "~/lib/schema";
 import { Email } from "./email";
 
 export const Account: Component = () => {
@@ -24,13 +24,19 @@ export const Account: Component = () => {
             domain: string(),
             name: string(),
             password: string([
-                custom(
-                    (value) => value.length === 0 || value.length >= 8,
-                    "Minium 8 characters",
-                ),
+                (value: string) => {
+                    if (value.length !== 0 && value.length >= 8) {
+                        return "Minium 8 characters";
+                    }
+                },
             ]),
         }),
-        initialValueEffect: () => {
+        prototype: {
+            domain: "",
+            name: "",
+            password: "",
+        },
+        prototypeEffect: () => {
             return {
                 domain: account.latest?.Domain.ASCII || "(none)",
                 name: account.latest?.FullName,
@@ -39,12 +45,12 @@ export const Account: Component = () => {
         onSubmit: async ({ success }) => {
             if (success) {
                 const message = [];
-                if (form.value.name !== form.initialValue.name) {
-                    await updateFullName(form.value.name);
+                if (form.value.name !== form.prototype.name) {
+                    await updateFullName(form.value.name!);
                     message.push("Full name updated");
                 }
-                if (form.value.password.length > 0) {
-                    await updatePassword(form.value.password);
+                if (form.value.password!.length > 0) {
+                    await updatePassword(form.value.password!);
                     message.push("Password updated");
                     form.value.password = "";
                 }

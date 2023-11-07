@@ -1,17 +1,24 @@
 import { Component } from "solid-js";
-import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { deleteDomain, reloadDomains } from "~/lib/api/admin";
+import { object, string } from "~/lib/schema";
 
 export const Delete: Component<{ domain: string }> = (props) => {
     const form = createForm({
         schema: object({
             domain: string([
-                custom((value) => value === props.domain, "incorrect"),
+                (value) => {
+                    if (value !== props.domain) {
+                        return "incorrect";
+                    }
+                },
             ]),
         }),
+        initialValue: {
+            domain: "",
+        },
         onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await deleteDomain(form.value.domain);

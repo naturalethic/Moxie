@@ -22,8 +22,8 @@ An experimental UI for administration of [mox](https://github.com/mjl-/mox).
 
 ```
 dist/index.html    0.32 kB │ gzip:  0.23 kB
-dist/index.css    24.60 kB │ gzip:  5.74 kB
-dist/index.js    144.97 kB │ gzip: 30.36 kB
+dist/index.css    25.19 kB │ gzip:  5.87 kB
+dist/index.js    141.49 kB │ gzip: 30.21 kB
 ```
 
 ### Deployment
@@ -32,7 +32,7 @@ Specific deployment instructions to a production setup TBD.  It may be as easy a
 
 ### Foundation
 
-This app provides it's own UI kit, developed against a [solid](https://github.com/solidjs/solid) runtime.  It leverages [valibot](https://github.com/fabian-hiller/valibot) for form validation. These are the only runtime dependencies.
+This app provides it's own UI kit, developed against [solid](https://github.com/solidjs/solid), which is the only runtime dependency.
 
 Build dependencies include [vite](https://github.com/vitejs/vite), [tailwind](https://github.com/tailwindlabs/tailwindcss), and a few others (see package.json).
 

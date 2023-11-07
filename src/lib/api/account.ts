@@ -12,14 +12,14 @@ const { apiResource, safeApi, reload } = apiFunctions(
 );
 
 export function useAccount() {
-    return apiResource<Account, [string, Domain, Record<string, Email>]>(
-        "Account",
-        ([FullName, Domain, Emails]) => ({
+    return apiResource<Account, [string, Domain, Record<string, Email>]>({
+        resource: "Account",
+        transform: ([FullName, Domain, Emails]) => ({
             FullName,
             Domain,
             Emails,
         }),
-    )[0];
+    })[0];
 }
 
 export function reloadAccount() {

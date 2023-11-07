@@ -1,10 +1,11 @@
 import { Component, Show, createSignal, onMount } from "solid-js";
-import { minLength, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
 import { createAccount, reloadAccounts, useDomains } from "~/lib/api/admin";
+import { object, string } from "~/lib/schema";
+import { required } from "~/lib/validation";
 
 export const New: Component = () => {
     const domains = useDomains();
@@ -13,11 +14,11 @@ export const New: Component = () => {
 
     const form = createForm({
         schema: object({
-            username: string([minLength(1, "required")]),
-            localpart: string([minLength(1, "required")]),
+            username: string([required()]),
+            localpart: string([required()]),
             domain: string(),
         }),
-        initialValue: {
+        prototype: {
             username: "",
             localpart: "",
             domain: "",

@@ -1,15 +1,4 @@
 import { Component, Show } from "solid-js";
-import {
-    Input,
-    boolean,
-    discriminatedUnion,
-    literal,
-    minLength,
-    number,
-    object,
-    record,
-    string,
-} from "valibot";
 import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { Checkbox } from "~/kit/checkbox";
@@ -26,11 +15,22 @@ import {
     useDomains,
     useWebServerConfig,
 } from "~/lib/api/admin";
+import {
+    Infer,
+    boolean,
+    discriminated,
+    literal,
+    number,
+    object,
+    record,
+    string,
+} from "~/lib/schema";
+import { required } from "~/lib/validation";
 
 const StaticDetail = object({
     type: literal("static"),
     strip: string(),
-    root: string([minLength(1, "required")]),
+    root: string([required()]),
     list: boolean(),
     continue: boolean(),
     headers: record(string()),
@@ -59,7 +59,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
             ? undefined
             : useWebServerConfig()?.latest?.WebHandlers?.[props.index]!;
 
-    const staticDetail: Input<typeof StaticDetail> = handler?.WebStatic
+    const staticDetail: Infer<typeof StaticDetail> = handler?.WebStatic
         ? {
               type: "static",
               strip: handler.WebStatic.StripPrefix,
@@ -77,7 +77,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
               headers: {},
           };
 
-    const redirectDetail: Input<typeof RedirectDetail> = handler?.WebRedirect
+    const redirectDetail: Infer<typeof RedirectDetail> = handler?.WebRedirect
         ? {
               type: "redirect",
               target: handler.WebRedirect.BaseURL,
@@ -93,7 +93,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
               status: 308,
           };
 
-    const forwardDetail: Input<typeof ForwardDetail> = handler?.WebForward
+    const forwardDetail: Infer<typeof ForwardDetail> = handler?.WebForward
         ? {
               type: "forward",
               strip: handler.WebForward.StripPath,
@@ -114,7 +114,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
             path: string(),
             secure: boolean(),
             compress: boolean(),
-            detail: discriminatedUnion("type", [
+            detail: discriminated("type", [
                 StaticDetail,
                 RedirectDetail,
                 ForwardDetail,
@@ -123,7 +123,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
         initialValue: {
             log: handler?.LogName ?? "",
             domain: handler?.Domain ?? "",
-            path: handler?.PathRegexp.substring(1),
+            path: handler?.PathRegexp.substring(1) ?? "",
             secure: !handler?.DontRedirectPlainHTTP ?? true,
             compress: handler?.Compress ?? false,
             detail:

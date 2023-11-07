@@ -1,9 +1,10 @@
 import { Component, onMount } from "solid-js";
-import { minLength, object, string } from "valibot";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
 import { createDomain, reloadDomains, useAccounts } from "~/lib/api/admin";
+import { object, string } from "~/lib/schema";
+import { required } from "~/lib/validation";
 
 export const New: Component = () => {
     const accounts = useAccounts();
@@ -12,7 +13,7 @@ export const New: Component = () => {
 
     const form = createForm({
         schema: object({
-            domain: string([minLength(1, "required")]),
+            domain: string([required()]),
             username: string(),
         }),
         initialValue: {
@@ -21,8 +22,8 @@ export const New: Component = () => {
         onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await createDomain(
-                    form.value.domain,
-                    form.value.username,
+                    form.value.domain!,
+                    form.value.username!,
                 );
                 if (error) {
                     form.error.username = error.split(":")[1];

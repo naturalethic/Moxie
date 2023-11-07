@@ -15,6 +15,10 @@ export const Header: Component = () => {
             link: "/admin",
             label: "Admin",
         },
+        {
+            link: "/kit",
+            label: "Kit",
+        },
     ];
     return (
         <header>

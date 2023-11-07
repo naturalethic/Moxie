@@ -24,7 +24,6 @@
         "baseUrl": ".",
         "paths": {
             "~/*": ["src/*"],
-            "valibot": ["node_modules/valibot/library/src/index"],
         }
     },
     "include": ["src", "test"],

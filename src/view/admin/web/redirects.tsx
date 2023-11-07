@@ -1,10 +1,10 @@
 import { Component, Show, createEffect } from "solid-js";
-import { object, record, string } from "valibot";
 import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { useToast } from "~/kit/toast";
 import { saveRedirects, useWebServerConfig } from "~/lib/api/admin";
+import { object, record, string } from "~/lib/schema";
 
 export const Redirects: Component = () => {
     const webServerConfig = useWebServerConfig();
@@ -12,6 +12,9 @@ export const Redirects: Component = () => {
 
     const form = createForm({
         schema: object({ redirects: record(string()) }),
+        initialValue: {
+            redirects: {} as Record<string, string>, // XXX: <--- that typecast should not be needed
+        },
         onSubmit: async () => {
             const { error } = await saveRedirects(form.value.redirects);
             if (error) {
