@@ -5,6 +5,7 @@ import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
 import { createAccount, reloadAccounts, useDomains } from "~/lib/api/admin";
 import { object, string } from "~/lib/schema";
+import { required } from "~/lib/validation";
 
 export const New: Component = () => {
     const domains = useDomains();
@@ -13,8 +14,8 @@ export const New: Component = () => {
 
     const form = createForm({
         schema: object({
-            username: string({ required: true }),
-            localpart: string({ required: true }),
+            username: string([required()]),
+            localpart: string([required()]),
             domain: string(),
         }),
         initialValue: {

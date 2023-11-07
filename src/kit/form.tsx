@@ -5,13 +5,8 @@ import {
     createSignal,
 } from "solid-js";
 import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
-import {
-    Infer,
-    ObjectEntries,
-    ObjectSchema,
-    ValidationError,
-    validate,
-} from "~/lib/schema";
+import { Infer, ObjectEntries, ObjectSchema } from "~/lib/schema";
+import { ValidationError, validate } from "~/lib/validation";
 // import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
 // import { setPath } from "~/lib/util";
 
@@ -120,7 +115,7 @@ export function createForm<
         return (
             <FormContext.Provider
                 value={{
-                    value,
+                    value: value as FormData,
                     error,
                 }}
             >

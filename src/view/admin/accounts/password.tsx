@@ -1,25 +1,31 @@
 import { Component } from "solid-js";
-import { minLength, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
+import { useToast } from "~/kit/toast";
 import { setPassword } from "~/lib/api/admin";
+import { object, string } from "~/lib/schema";
+import { min } from "~/lib/validation";
 
 export const Password: Component<{ username: string }> = (props) => {
+    const toast = useToast();
     const form = createForm({
         schema: object({
-            password: string([minLength(8, "8 chars minimum")]),
+            password: string([min(8, "8 chars minimum")]),
         }),
         initialValue: { password: "" },
-        onSubmit: async () => {
-            const { error } = await setPassword(
-                props.username,
-                form.value.password,
-            );
-            if (error) {
-                form.error.password = error.split(":")[1];
-            } else {
-                form.reset();
+        onSubmit: async ({ success }) => {
+            if (success) {
+                const { error } = await setPassword(
+                    props.username,
+                    form.value.password!,
+                );
+                if (error) {
+                    form.error.password = error;
+                } else {
+                    toast("success", "Password updated");
+                    form.reset();
+                }
             }
         },
     });
