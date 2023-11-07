@@ -1,20 +1,22 @@
 import { Component } from "solid-js";
-import { custom, object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { deleteAccount, reloadAccounts } from "~/lib/api/admin";
+import { object, string } from "~/lib/schema";
 
 export const Delete: Component<{ username: string }> = (props) => {
     const form = createForm({
         schema: object({
             username: string([
-                custom((value) => value === props.username, "incorrect"),
+                (value: string) => {
+                    if (value !== props.username) return "Incorrect";
+                },
             ]),
         }),
         onSubmit: async ({ success }) => {
             if (success) {
-                const { error } = await deleteAccount(form.value.username);
+                const { error } = await deleteAccount(form.value.username!);
                 if (error) {
                     form.error.username = error.split(":")[1];
                 } else {

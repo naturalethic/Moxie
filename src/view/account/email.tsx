@@ -1,11 +1,11 @@
 import { Component } from "solid-js";
-import { array, boolean, object, record, string } from "valibot";
 import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { Label } from "~/kit/label";
 import { Ruleset } from "~/lib/api/account";
+import { array, boolean, object, record, string } from "~/lib/schema";
 
 export const Email: Component<{
     address: string;

@@ -38,8 +38,8 @@ type CreateForm<
     V extends Infer<S>,
 > = {
     Form: Form;
-    value: Partial<V>;
-    initialValue: Partial<V>;
+    value: V;
+    initialValue: V;
     error: ValidationError;
     reset: () => void;
     set message(message: string);
@@ -52,13 +52,12 @@ export function createForm<
     V extends Infer<S>,
 >(options: {
     schema: S;
-    initialValue?: Partial<V>;
+    initialValue: V;
     initialValueEffect?: () => V;
     onSubmit?: (result: { success: boolean }) => void;
 }): CreateForm<E, S, V> {
     const { schema, onSubmit } = options;
-    const initialValue = options.initialValue ?? ({} as Partial<V>);
-
+    const initialValue = options.initialValue;
     const value = createMutable(structuredClone(unwrap(initialValue)));
     const error = createMutable<ValidationError>({});
     const [message, setMessage] = createSignal("");
@@ -79,12 +78,12 @@ export function createForm<
     }
 
     function reset() {
-        if (Object.keys(initialValue).length === 0) {
-            console.warn(
-                "Called form.reset() when no initial data was provided",
-            );
-            return;
-        }
+        // if (Object.keys(initialValue).length === 0) {
+        //     console.warn(
+        //         "Called form.reset() when no initial data was provided",
+        //     );
+        //     return;
+        // }
         modifyMutable(
             value,
             produce((value) => {

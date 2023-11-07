@@ -1,6 +1,7 @@
 import { ConditionalExcept, ConditionalPick, Simplify } from "type-fest";
 
-type Validations = ((value: unknown) => string | undefined)[];
+// biome-ignore lint/suspicious/noExplicitAny: XXX: Type this properly later
+type Validations = ((value: any) => string | undefined)[];
 
 export class Schema {
     public readonly schema = true as true & { readonly brand: unique symbol };
@@ -25,6 +26,16 @@ export class StringSchema extends Schema {
 
 export function string(validations: Validations = []) {
     return new StringSchema(validations);
+}
+
+export class NumberSchema extends Schema {
+    public readonly type = "number" as "number" & {
+        readonly brand: unique symbol;
+    };
+}
+
+export function number(validations: Validations = []) {
+    return new NumberSchema(validations);
 }
 
 export type ObjectEntries = Record<string, AnySchema>;
@@ -74,12 +85,80 @@ export function special<T>() {
     return new SpecialSchema({} as T);
 }
 
+export class ArraySchema<T extends AnySchema> extends Schema {
+    public readonly type = "array" as "array" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public entry: T) {
+        super([]);
+    }
+}
+
+export function array<T extends AnySchema>(entry: T) {
+    return new ArraySchema(entry);
+}
+
+export class RecordSchema<T extends AnySchema> extends Schema {
+    public readonly type = "record" as "record" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public entry: T) {
+        super([]);
+    }
+}
+
+export function record<T extends AnySchema>(entry: T) {
+    return new RecordSchema(entry);
+}
+
+export class LiteralSchema<T extends string> extends Schema {
+    public readonly type = "literal" as "literal" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public value: T) {
+        super([]);
+    }
+}
+
+export function literal<T extends string>(value: T) {
+    return new LiteralSchema(value);
+}
+
+export class DiscriminatedSchema<
+    T extends string,
+    V extends ObjectSchema<Record<T, LiteralSchema<string>> & ObjectEntries>,
+> extends Schema {
+    public readonly type = "discriminate" as "discriminate" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public discriminant: T, public variants: V[]) {
+        super([]);
+    }
+}
+
+export function discriminated<
+    T extends string,
+    V extends ObjectSchema<Record<T, LiteralSchema<string>> & ObjectEntries>,
+>(discriminant: T, variants: V[]) {
+    return new DiscriminatedSchema(discriminant, variants);
+}
+
 type NonOptionalSchema =
     | { type: BooleanSchema["type"] }
     | { type: StringSchema["type"] }
+    | { type: NumberSchema["type"] }
     | { type: ObjectSchema<ObjectEntries>["type"] }
     | { type: VariantSchema<string>["type"] }
-    | { type: SpecialSchema<string>["type"] };
+    | { type: SpecialSchema<string>["type"] }
+    | { type: ArraySchema<AnySchema>["type"] }
+    | { type: RecordSchema<AnySchema>["type"] }
+    | { type: LiteralSchema<"x">["type"] }
+    | {
+          type: DiscriminatedSchema<
+              "x",
+              ObjectSchema<Record<"x", LiteralSchema<"x">>>
+          >["type"];
+      };
 
 export type AnySchema =
     | NonOptionalSchema
@@ -100,16 +179,26 @@ export function optional<T extends NonOptionalSchema>(entry: T) {
 
 export type Infer<S extends AnySchema> = S extends ObjectSchema<infer T>
     ? InferEntries<T>
-    : S extends StringSchema
-    ? string
     : S extends BooleanSchema
     ? boolean
+    : S extends StringSchema
+    ? string
+    : S extends NumberSchema
+    ? number
     : S extends VariantSchema<infer T>
     ? T
     : S extends SpecialSchema<infer T>
     ? T
     : S extends OptionalSchema<infer T>
     ? Infer<T>
+    : S extends ArraySchema<infer T>
+    ? T[]
+    : S extends RecordSchema<infer T>
+    ? Record<string, Infer<T>>
+    : S extends LiteralSchema<infer T>
+    ? T
+    : S extends DiscriminatedSchema<infer _T, infer _V>
+    ? Infer<S["variants"][number]>
     : never;
 
 type InferEntries<T extends ObjectEntries> = Simplify<
@@ -123,3 +212,32 @@ type InferOptionalEntries<T extends ObjectEntries> = Partial<{
 type InferRequiredEntries<T extends ObjectEntries> = {
     [key in keyof ConditionalExcept<T, { type: "optional" }>]: Infer<T[key]>;
 };
+
+// const a = object({
+//     b: discriminated("type", [
+//         object({
+//             type: literal("a"),
+//             q: string(),
+//         }),
+//         object({
+//             type: literal("b"),
+//             z: string(),
+//             // q: optional(string()),
+//             // q: string(),
+//         }),
+//     ]),
+// });
+
+// type A = Infer<typeof a>;
+
+// const c: A = {
+//     b: {
+//         type: "b",
+//         // q: "string",
+//         z: "string",
+//         // x: "string",
+//     },
+// };
+
+// const l = literal("a");
+// type T = Infer<typeof l>;

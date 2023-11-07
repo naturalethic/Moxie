@@ -1,5 +1,4 @@
 import { Component, Show, onMount } from "solid-js";
-import { object, string } from "valibot";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
@@ -12,6 +11,7 @@ import {
     useAccount,
     useDomains,
 } from "~/lib/api/admin";
+import { object, string } from "~/lib/schema";
 
 export const Emails: Component<{ username: string }> = (props) => {
     const domains = useDomains();
