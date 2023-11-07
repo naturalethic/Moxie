@@ -18,7 +18,7 @@ export const New: Component = () => {
             localpart: string([required()]),
             domain: string(),
         }),
-        initialValue: {
+        prototype: {
             username: "",
             localpart: "",
             domain: "",
@@ -26,7 +26,7 @@ export const New: Component = () => {
         onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await createAccount(
-                    form.value.username!,
+                    form.value.username,
                     `${form.value.localpart}@${form.value.domain}`,
                 );
                 if (error) {

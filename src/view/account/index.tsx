@@ -31,7 +31,12 @@ export const Account: Component = () => {
                 },
             ]),
         }),
-        initialValueEffect: () => {
+        prototype: {
+            domain: "",
+            name: "",
+            password: "",
+        },
+        prototypeEffect: () => {
             return {
                 domain: account.latest?.Domain.ASCII || "(none)",
                 name: account.latest?.FullName,
@@ -40,7 +45,7 @@ export const Account: Component = () => {
         onSubmit: async ({ success }) => {
             if (success) {
                 const message = [];
-                if (form.value.name !== form.initialValue.name) {
+                if (form.value.name !== form.prototype.name) {
                     await updateFullName(form.value.name!);
                     message.push("Full name updated");
                 }

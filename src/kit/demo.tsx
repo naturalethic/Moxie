@@ -1,5 +1,5 @@
 import { Component, ParentComponent } from "solid-js";
-import { BaseSchema, Input } from "valibot";
+
 import { AnySchema } from "~/lib/schema";
 
 type DemoProps<S extends BaseSchema,> = {

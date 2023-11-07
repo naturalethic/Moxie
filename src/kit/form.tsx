@@ -4,14 +4,11 @@ import {
     createEffect,
     createSignal,
 } from "solid-js";
-import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
+import { createMutable, modifyMutable, reconcile } from "solid-js/store";
 import { Infer, ObjectEntries, ObjectSchema } from "~/lib/schema";
 import { ValidationError, validate } from "~/lib/validation";
-// import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
-// import { setPath } from "~/lib/util";
 
 type Form = ParentComponent<{ class?: string }>;
-// type FormData = Record<string, unknown>;
 type FormData = { [key: string]: FormDataNode };
 type FormDataNode =
     | { [key: string]: FormDataNode }
@@ -19,9 +16,6 @@ type FormDataNode =
     | boolean
     | number
     | undefined;
-
-// type FormError = Record<string, FormError | string | undefined>;
-// type FormError = { [key: string]: FormError | string | undefined };
 
 type FormContext =
     | {
@@ -39,7 +33,7 @@ type CreateForm<
 > = {
     Form: Form;
     value: V;
-    initialValue: V;
+    prototype: V;
     error: ValidationError;
     reset: () => void;
     set message(message: string);
@@ -52,28 +46,22 @@ export function createForm<
     V extends Infer<S>,
 >(options: {
     schema: S;
-    initialValue: V;
-    initialValueEffect?: () => V;
+    prototype: V;
+    prototypeEffect?: () => Partial<V>;
     onSubmit?: (result: { success: boolean }) => void;
 }): CreateForm<E, S, V> {
     const { schema, onSubmit } = options;
-    const initialValue = options.initialValue;
-    const value = createMutable(structuredClone(unwrap(initialValue)));
+    const prototype = options.prototype;
+    const value = createMutable(Object.create(prototype));
     const error = createMutable<ValidationError>({});
     const [message, setMessage] = createSignal("");
 
-    if (options.initialValueEffect) {
+    if (options.prototypeEffect) {
         createEffect(() => {
-            const effectValue = options.initialValueEffect!();
-            modifyMutable(
-                value,
-                produce((value) => {
-                    for (const key in effectValue) {
-                        initialValue[key] = effectValue[key]!;
-                        value[key] = effectValue[key]!;
-                    }
-                }),
-            );
+            const effectValue = options.prototypeEffect!();
+            for (const key in effectValue) {
+                prototype[key] = effectValue[key]!;
+            }
         });
     }
 
@@ -84,14 +72,14 @@ export function createForm<
         //     );
         //     return;
         // }
-        modifyMutable(
-            value,
-            produce((value) => {
-                for (const key in initialValue) {
-                    value[key] = initialValue[key]!;
-                }
-            }),
-        );
+        modifyMutable(value, reconcile({}));
+        //     value,
+        //     produce((value) => {
+        //         for (const key in initialValue) {
+        //             value[key] = initialValue[key]!;
+        //         }
+        //     }),
+        // );
     }
 
     const Form: Form = (props) => {
@@ -128,7 +116,7 @@ export function createForm<
     return {
         Form,
         value,
-        initialValue,
+        prototype,
         error,
         reset,
         set message(value: string) {
