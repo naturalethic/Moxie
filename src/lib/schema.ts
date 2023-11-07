@@ -1,121 +1,134 @@
 import { ConditionalExcept, ConditionalPick, Simplify } from "type-fest";
 
-type SchemaType =
-    | "boolean"
-    | "string"
-    | "object"
-    | "variant"
-    | "special"
-    | "optional";
+class BaseSchema {
+    // XXX: Figure this out
+    // public readonly schema = true as true & { readonly brand: unique symbol };
+}
 
-export type Schema<T extends SchemaType> = {
-    type: T;
-};
-
-export type AnySchema = Schema<SchemaType>;
-
-export function boolean(): Schema<"boolean"> {
-    return {
-        type: "boolean",
+class BooleanSchema extends BaseSchema {
+    public readonly type = "boolean" as "boolean" & {
+        readonly brand: unique symbol;
     };
+}
+
+export function boolean() {
+    return new BooleanSchema();
 }
 
 type StringOptions = {
     required?: boolean;
 };
 
-type StringSchema = Schema<"string"> & {
-    options: StringOptions;
-};
-
-export function string({ required = false }: StringOptions = {}): StringSchema {
-    return {
-        type: "string",
-        options: {
-            required,
-        },
+class StringSchema extends BaseSchema {
+    public readonly type = "string" as "string" & {
+        readonly brand: unique symbol;
     };
+    constructor(public options: StringOptions) {
+        super();
+    }
 }
 
-type ObjectEntries = Record<string, AnySchema>;
-
-type ObjectSchema<E extends ObjectEntries> = Schema<"object"> & {
-    entries: E;
-};
-
-export function object<E extends ObjectEntries>(entries: E): ObjectSchema<E> {
-    return {
-        type: "object",
-        entries,
-    };
+export function string({ required = false }: StringOptions = {}) {
+    return new StringSchema({
+        required,
+    });
 }
 
-type VariantSchema<T extends string> = Schema<"variant"> & {
-    variant: Record<T, T>;
-};
+export type ObjectEntries = Record<string, AnySchema>;
 
-export function variant<T extends string>(...items: T[]): VariantSchema<T> {
+export class ObjectSchema<T extends ObjectEntries> extends BaseSchema {
+    public readonly type = "object" as "object" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public entries: T) {
+        super();
+    }
+}
+
+export type AnyObjectSchema = ObjectSchema<ObjectEntries>;
+
+export function object<T extends ObjectEntries>(entries: T) {
+    return new ObjectSchema(entries);
+}
+
+class VariantSchema<T extends string> extends BaseSchema {
+    public readonly type = "variant" as "variant" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public variant: Record<T, T>) {
+        super();
+    }
+}
+
+export function variant<T extends string>(...items: T[]) {
     const map: { [key: string]: string } = {};
     for (const item of items) {
         map[item] = item;
     }
-    return {
-        type: "variant",
-        variant: Object.freeze(map) as Record<T, T>,
-    };
+    return new VariantSchema(Object.freeze(map) as Record<T, T>);
 }
 
-type SpecialSchema<T> = Schema<"special"> & {
-    _marker: T;
-};
-
-export function special<T>(): SpecialSchema<T> {
-    return {
-        type: "special",
-        _marker: {} as T,
+class SpecialSchema<T> extends BaseSchema {
+    public readonly type = "special" as "special" & {
+        readonly brand: unique symbol;
     };
+    constructor(public marker: T) {
+        super();
+    }
 }
 
-type OptionalSchema<E extends Exclude<AnySchema, { type: "optional" }>> = {
-    type: "optional";
-    entry: E;
-};
-
-export function optional<E extends Exclude<AnySchema, { type: "optional" }>>(
-    entry: E,
-): OptionalSchema<E> {
-    return {
-        type: "optional",
-        entry,
-    };
+export function special<T>() {
+    return new SpecialSchema({} as T);
 }
 
-export type Infer<S extends AnySchema> = S["type"] extends "string"
+type NonOptionalSchema =
+    | { type: BooleanSchema["type"] }
+    | { type: StringSchema["type"] }
+    | { type: ObjectSchema<ObjectEntries>["type"] }
+    | { type: VariantSchema<string>["type"] }
+    | { type: SpecialSchema<string>["type"] };
+
+type AnySchema =
+    | NonOptionalSchema
+    | { type: OptionalSchema<StringSchema>["type"] };
+
+class OptionalSchema<T extends NonOptionalSchema> extends BaseSchema {
+    public readonly type = "optional" as "optional" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public entry: T) {
+        super();
+    }
+}
+
+export function optional<T extends NonOptionalSchema>(entry: T) {
+    return new OptionalSchema(entry);
+}
+
+export type Infer<S extends AnySchema> = S extends StringSchema
     ? string
-    : S["type"] extends "boolean"
+    : S extends BooleanSchema
     ? boolean
-    : S extends ObjectSchema<infer _>
-    ? InferObject<S>
-    : S extends VariantSchema<infer V>
-    ? V
+    : S extends ObjectSchema<infer T>
+    ? InferEntries<T>
+    : S extends VariantSchema<infer T>
+    ? T
     : S extends SpecialSchema<infer T>
     ? T
-    : S extends OptionalSchema<infer _>
-    ? Infer<S["entry"]>
+    : S extends OptionalSchema<infer T>
+    ? Infer<T>
     : never;
 
-type InferObject<S extends ObjectSchema<ObjectEntries>> = Simplify<
-    InferRequired<S["entries"]> & InferOptional<S["entries"]>
+type InferEntries<T extends ObjectEntries> = Simplify<
+    InferOptionalEntries<T> & InferRequiredEntries<T>
 >;
 
-type InferOptional<E extends ObjectEntries> = Partial<{
-    [key in keyof ConditionalPick<E, OptionalSchema<AnySchema>>]: Infer<E[key]>;
+type InferOptionalEntries<T extends ObjectEntries> = Partial<{
+    [key in keyof ConditionalPick<T, { type: "optional" }>]: Infer<T[key]>;
 }>;
 
-type InferRequired<E extends ObjectEntries> = {
-    [key in keyof ConditionalExcept<E, OptionalSchema<AnySchema>>]: Infer<
-        E[key]
-    >;
+type InferRequiredEntries<T extends ObjectEntries> = {
+    [key in keyof ConditionalExcept<T, { type: "optional" }>]: Infer<T[key]>;
 };
 
 export type ValidationError = {
@@ -123,13 +136,13 @@ export type ValidationError = {
 };
 
 export function validate<S extends AnySchema, V extends Infer<S>>(
-    schema: AnySchema,
-    value: V,
+    schema: S,
+    value: Partial<V>,
 ): ValidationError {
     const error: ValidationError = {};
     if (schema.type === "object") {
-        const objectSchema = schema as ObjectSchema<ObjectEntries>;
-        const objectValue = value as Infer<typeof schema>;
+        const objectSchema = schema as AnyObjectSchema;
+        const objectValue = value as Infer<AnyObjectSchema>;
         for (const [key, entrySchema] of Object.entries(objectSchema.entries)) {
             if (Object.hasOwn(objectValue, key)) {
                 error[key] = validate(entrySchema, objectValue[key]);

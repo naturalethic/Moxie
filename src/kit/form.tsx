@@ -5,12 +5,20 @@ import {
     createSignal,
 } from "solid-js";
 import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
-import { Infer, Schema, validate } from "~/lib/schema";
+import { Infer, ObjectEntries, ObjectSchema, validate } from "~/lib/schema";
 // import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
 // import { setPath } from "~/lib/util";
 
 type Form = ParentComponent<{ class?: string }>;
-type FormData = Record<string, unknown>;
+// type FormData = Record<string, unknown>;
+type FormData = { [key: string]: FormDataNode };
+type FormDataNode =
+    | { [key: string]: FormDataNode }
+    | string
+    | boolean
+    | number
+    | undefined;
+
 // type FormError = Record<string, FormError | string | undefined>;
 type FormError = { [key: string]: FormError | string | undefined };
 
@@ -23,10 +31,14 @@ type FormContext =
 
 export const FormContext = createContext<FormContext>();
 
-type CreateForm<S extends Schema<"object">, V extends Partial<Infer<S>>> = {
+type CreateForm<
+    E extends ObjectEntries,
+    S extends ObjectSchema<E>,
+    V extends Infer<S>,
+> = {
     Form: Form;
-    value: V;
-    initialValue: V;
+    value: Partial<V>;
+    initialValue: Partial<V>;
     error: FormError;
     reset: () => void;
     set message(message: string);
@@ -34,18 +46,19 @@ type CreateForm<S extends Schema<"object">, V extends Partial<Infer<S>>> = {
 };
 
 export function createForm<
-    S extends Schema<"object">,
-    V extends Partial<Infer<S>>,
+    E extends ObjectEntries,
+    S extends ObjectSchema<E>,
+    V extends Infer<S>,
 >(options: {
     schema: S;
-    initialValue?: V;
+    initialValue?: Partial<V>;
     initialValueEffect?: () => V;
     onSubmit?: (result: { success: boolean; errors?: FormError }) => void;
-}): CreateForm<S, V> {
+}): CreateForm<E, S, V> {
     const { schema, onSubmit } = options;
-    const initialValue = options.initialValue ?? ({} as V);
+    const initialValue = options.initialValue ?? ({} as Partial<V>);
 
-    const value = createMutable<V>(structuredClone(unwrap(initialValue)));
+    const value = createMutable(structuredClone(unwrap(initialValue)));
     const error = createMutable<FormError>({});
     const [message, setMessage] = createSignal("");
 
