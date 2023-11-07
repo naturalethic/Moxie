@@ -5,13 +5,14 @@ import {
     createSignal,
 } from "solid-js";
 import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
-import { Infer, Schema } from "~/lib/schema";
+import { Infer, Schema, validate } from "~/lib/schema";
 // import { BaseSchema, Input, SafeParseResult, safeParse } from "valibot";
 // import { setPath } from "~/lib/util";
 
 type Form = ParentComponent<{ class?: string }>;
 type FormData = Record<string, unknown>;
-type FormError = Record<string, string | undefined>;
+// type FormError = Record<string, FormError | string | undefined>;
+type FormError = { [key: string]: FormError | string | undefined };
 
 type FormContext =
     | {
@@ -39,9 +40,9 @@ export function createForm<
     schema: S;
     initialValue?: V;
     initialValueEffect?: () => V;
-    onSubmit?: (result: { success: boolean }) => void;
+    onSubmit?: (result: { success: boolean; errors?: FormError }) => void;
 }): CreateForm<S, V> {
-    const { /* schema , */ onSubmit } = options;
+    const { schema, onSubmit } = options;
     const initialValue = options.initialValue ?? ({} as V);
 
     const value = createMutable<V>(structuredClone(unwrap(initialValue)));
@@ -83,7 +84,7 @@ export function createForm<
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
-            onSubmit?.({ success: true });
+            onSubmit?.({ success: true, errors: validate(schema, value) });
             // onSubmit?.({ success: true, value });
             // const result = safeParse(schema, value);
             // if (!result.success) {

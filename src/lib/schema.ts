@@ -1,3 +1,5 @@
+import { ConditionalExcept, ConditionalPick, Simplify } from "type-fest";
+
 type SchemaType =
     | "boolean"
     | "string"
@@ -5,7 +7,6 @@ type SchemaType =
     | "variant"
     | "special"
     | "optional";
-import { ConditionalExcept, ConditionalPick, Simplify } from "type-fest";
 
 export type Schema<T extends SchemaType> = {
     type: T;
@@ -117,58 +118,23 @@ type InferRequired<E extends ObjectEntries> = {
     >;
 };
 
-// const a = object({
-//     b: optional(string()),
-//     c: optional(object({ d: string(), e: optional(string()) })),
-//     v: variant("a", "b"),
-//     s: special<string>(),
-// });
-// type A = Infer<typeof a>;
+export type ValidationError = {
+    [key: string]: ValidationError | string | undefined;
+};
 
-// const v: A = {
-//     v: "d",
-//     b: "hello",
-//     c: {
-//         d: "hello",
-//         e: "hello",
-//     },
-// };
-
-// function foo<V extends ReadonlyArray<string>, R extends V[number]>(
-//     a: V,
-// ): VariantSchema<R> {
-//     return {
-//         type: "variant",
-//         variant: {} as R,
-//     };
-// }
-
-// import {enum_, Input} from 'valibot'
-
-// const x = enum_(['a', 'b', 'c'])
-
-// type vv = "foo" | "bar" | "baz"
-
-// type ev = enum
-
-// function makeEnumString<T extends string>(...items: T[]): EnumMap<T> {
-//     const enumMap: { [key: string]: string } = {};
-//     for (const item of items) {
-//         enumMap[item] = item;
-//     }
-//     return Object.freeze(enumMap) as EnumMap<T>;
-// }
-
-// const roles = makeEnumString("user", "admin", "owner");
-// const vv = variant("foo", "bar", "baz");
-
-// function foo(...items: string[]) {
-//     return variant(...items);
-// }
-
-// const vvv = foo("foo", "bar", "baz");
-
-// type RR = Enum<typeof roles>;
-
-// const aa = roles.owner;
-// // const ff = Object.keys(Roles);
+export function validate<S extends AnySchema, V extends Infer<S>>(
+    schema: AnySchema,
+    value: V,
+): ValidationError {
+    const error: ValidationError = {};
+    if (schema.type === "object") {
+        const objectSchema = schema as ObjectSchema<ObjectEntries>;
+        const objectValue = value as Infer<typeof schema>;
+        for (const [key, entrySchema] of Object.entries(objectSchema.entries)) {
+            if (Object.hasOwn(objectValue, key)) {
+                error[key] = validate(entrySchema, objectValue[key]);
+            }
+        }
+    }
+    return error;
+}
