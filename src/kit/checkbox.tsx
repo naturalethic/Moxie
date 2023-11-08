@@ -1,14 +1,24 @@
 import { Component, Show, splitProps, useContext } from "solid-js";
+import { Infer, object, optional, special, string } from "~/lib/schema";
 import { getPath, setPath } from "~/lib/util";
 import { FormContext } from "./form";
 
-export const Checkbox: Component<{
-    name?: string;
-    label: string;
-    tip?: string;
-    error?: string;
-    onChange?: (checked: boolean) => void;
-}> = (props) => {
+export const CheckboxDemo = {
+    // demoContainerClass: "float-left",
+    label: "Checkbox",
+};
+
+export const CheckboxProps = object({
+    name: optional(string()),
+    label: optional(string()),
+    tip: optional(string()),
+    error: optional(string()),
+    onChange: optional(special<(checked: boolean) => void>()),
+});
+
+type CheckboxProps = Infer<typeof CheckboxProps>;
+
+export const Checkbox: Component<CheckboxProps> = (props) => {
     const [, inputProps] = splitProps(props, [
         "label",
         "error",
@@ -19,8 +29,9 @@ export const Checkbox: Component<{
     const form = useContext(FormContext);
 
     return (
-        <label class="flex gap-[5px] tooltip-host select-none">
+        <label class="flex tooltip-host select-none gap-[5px]">
             <input
+                class="w-fit"
                 type="checkbox"
                 {...inputProps}
                 checked={

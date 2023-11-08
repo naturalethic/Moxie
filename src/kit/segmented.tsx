@@ -1,22 +1,36 @@
-import { For, createSignal } from "solid-js";
-import { cls } from "~/lib/util";
+import { Component, For, createSignal, useContext } from "solid-js";
+import { cls, setPath } from "~/lib/util";
+import { FormContext } from "./form";
 import { Option, optionLabel, optionValue } from "./option";
 
-type SegementedProps<T extends string> = {
+type SegementedProps = {
     name: string;
     value?: string;
-    options: Option<T>[];
-    onChange?: (value: T) => void;
+    options: Option<string>[];
+    allowNone?: boolean;
+    onChange?: (value: string | undefined) => void;
 };
 
-export const Segmented = <T extends string,>(props: SegementedProps<T>) => {
-    const [value, setValue] = createSignal<string>(
-        optionValue(props.value ?? props.options[0]),
+export const Segmented: Component<SegementedProps> = (props) => {
+    const form = useContext(FormContext);
+
+    const [value, setValue] = createSignal<string | undefined>(
+        (props.value ?? (!props.allowNone && optionValue(props.options[0]))) ||
+            undefined,
     );
-    function handleClick(option: Option<T>) {
-        setValue(optionValue(option) as string);
-        props.onChange?.(optionValue(option));
+
+    function handleClick(option: Option<string>) {
+        let newValue: string | undefined = optionValue(option);
+        if (props.allowNone && newValue === value()) {
+            newValue = undefined;
+        }
+        setValue(newValue);
+        props.onChange?.(newValue);
+        if (props.name && form) {
+            setPath(form.value, props.name, newValue);
+        }
     }
+
     return (
         <div class="segmented">
             <input type="hidden" name={props.name} value={value()} />

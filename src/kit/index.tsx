@@ -1,13 +1,16 @@
-import { Component, JSX } from "solid-js";
+import { Component, For, ParentComponent } from "solid-js";
+import { AnyObjectSchema } from "~/lib/schema";
+import { Box, BoxDemo, BoxProps } from "./box";
+import { Checkbox, CheckboxDemo, CheckboxProps } from "./checkbox";
 import { Deck } from "./deck";
 import { Demo } from "./demo";
-// import { Divider, DividerProps } from "./divider";
-import { Box, BoxProps } from "./box";
 import { Link, Routable } from "./history";
 
 type KitItem = Routable & {
     label: string;
-    view: () => JSX.Element;
+    component: Component | ParentComponent;
+    schema: AnyObjectSchema;
+    defaults?: Record<string, unknown>;
 };
 
 export const Kit: Component = () => {
@@ -15,22 +18,39 @@ export const Kit: Component = () => {
         {
             label: "Box",
             route: "/kit/box",
-            view: () => <Demo component={Box} schema={BoxProps} />,
+            component: Box,
+            schema: BoxProps,
+            defaults: BoxDemo,
         },
-        // {
-        //     label: "Divider",
-        //     route: "/kit/divider",
-        //     view: () => <Demo component={Divider} schema={DividerProps} />,
-        // },
+        {
+            label: "Checkbox",
+            route: "/kit/checkbox",
+            component: Checkbox,
+            schema: CheckboxProps,
+            defaults: CheckboxDemo,
+        },
     ];
 
     return (
         <div class="bg-neutral-emphasis border-t border-t-neutral-subtle flex flex-grow">
-            <div class="text-white text-xl p-8 h-full">
-                <Link route="/kit/box">Box</Link>
+            <div class="text-white text-xl p-8 h-full flex flex-col gap-2">
+                <For each={items}>
+                    {(item) => <Link route={item.route}>{item.label}</Link>}
+                </For>
             </div>
             <div class="m-2 bg-neutral-100 flex-grow rounded">
-                <Deck items={items} />
+                <Deck
+                    items={items.map((item) => ({
+                        route: item.route,
+                        view: () => (
+                            <Demo
+                                component={item.component}
+                                schema={item.schema}
+                                defaults={item.defaults}
+                            />
+                        ),
+                    }))}
+                />
             </div>
         </div>
     );

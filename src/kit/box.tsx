@@ -11,6 +11,10 @@ import {
 import { cls } from "~/lib/util";
 import { Icon } from "./icon";
 
+export const BoxDemo = {
+    children: "Demo",
+};
+
 export const BoxProps = object({
     class: optional(string()),
     contentClass: optional(string()),
