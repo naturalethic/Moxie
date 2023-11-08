@@ -60,6 +60,14 @@ Please don't use this configuration for production.
 
 Configure `.env.dev` with the proper values.  `VITE_SERVER_PROXY` is the endpoint to your mox web server.
 
+### Component testing
+
+This app includes a built in storyboard-like component lab at `/kit` during development.  If you want tailwind classes available to you while using the kit, set the tailwind url in your `.env.dev`:
+
+```
+VITE_TAILWIND_CDN=https://cdn.tailwindcss.com
+```
+
 ### Bundle analysis
 
 To get a nice visual breakdown of bundle composition, run:

@@ -1,4 +1,5 @@
 import {
+    Accessor,
     ParentComponent,
     createContext,
     createSignal,
@@ -13,7 +14,7 @@ export type Routable = {
 };
 
 type History = {
-    route: string;
+    route: Accessor<string>;
     matchRoute<R extends Routable>(routables: R[]): () => R | undefined;
     push(route: string): void;
 };

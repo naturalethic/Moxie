@@ -1,4 +1,13 @@
-import { Component, For, ParentComponent } from "solid-js";
+import { trackStore } from "@solid-primitives/deep";
+import prettierHtml from "prettier/plugins/html";
+import prettier from "prettier/standalone";
+import {
+    Component,
+    For,
+    ParentComponent,
+    createEffect,
+    createSignal,
+} from "solid-js";
 import {
     AnyObjectSchema,
     Infer,
@@ -21,9 +30,18 @@ type DemoProps<
 > = {
     schema: S;
     component: C;
-    // class?: string;
     defaults?: Record<string, unknown>;
 };
+
+async function format(html: string) {
+    return await prettier.format(html, {
+        parser: "html",
+        plugins: [prettierHtml],
+        tabWidth: 2,
+        printWidth: 20,
+        htmlWhitespaceSensitivity: "ignore",
+    });
+}
 
 export const Demo = <
     S extends AnyObjectSchema,
@@ -32,31 +50,21 @@ export const Demo = <
 >(
     props: DemoProps<S, P, C>,
 ) => {
-    // console.log(props.defaults);
-    // const componentProps = createMutable(props.defaults as P);
     if (props.defaults?.children) {
         props.schema.entries.children = string();
     }
+
     const form = createForm({
         schema: props.schema,
         prototype: (props.defaults ?? {}) as P,
     });
 
-    // function update(key: string, reset?: string) {
-    //     console.log(key, reset);
-    //     return function (value: unknown) {
-    //         if (value === reset) {
-    //             // delete componentProps[key];
-    //         } else {
-    //             // componentProps[key] = value;
-    //         }
-    //     };
-    // }
+    const [code, setCode] = createSignal("");
 
-    function code() {
+    createEffect(async () => {
         const name = props.component.name.replace(/\[solid-refresh\]/g, "");
-        const lines = [];
-        lines.push(`<${name}`);
+        const code = [];
+        code.push(`<${name}`);
         for (const key of Object.keys(props.schema.entries)) {
             if (key in form.value && key !== "children") {
                 let schema = props.schema.entries[key];
@@ -67,30 +75,39 @@ export const Demo = <
                 }
                 if (schema.type === "boolean") {
                     if (form.value[key]) {
-                        lines.push(`    ${key}`);
+                        code.push(` ${key}`);
                     }
                 }
                 if (
                     (schema.type === "string" || schema.type === "variant") &&
                     form.value[key]
                 ) {
-                    lines.push(`    ${key}="${form.value[key]}"`);
+                    code.push(` ${key}="${form.value[key]}"`);
                 }
             }
         }
         if (form.value.children) {
-            if (lines.length > 1) {
-                lines.push(">");
+            if (code.length > 1) {
+                code.push(">");
             } else {
-                lines[0] += ">";
+                code[0] += ">";
             }
-            lines.push(`    ${form.value.children}`);
-            lines.push(`</${name}>`);
+            code.push(`  ${form.value.children}`);
+            code.push(`</${name}>`);
         } else {
-            lines.push("/>");
+            code.push("/>");
         }
-        return lines.join("\n");
-    }
+        setCode(await format(code.join("")));
+    });
+
+    let componentDiv: HTMLDivElement;
+
+    const [markup, setMarkup] = createSignal("");
+
+    createEffect(async () => {
+        trackStore(form.value);
+        setMarkup(await format(componentDiv.innerHTML));
+    });
 
     return (
         <div class="flex h-full">
@@ -126,9 +143,6 @@ export const Demo = <
                                             options={Object.keys(
                                                 variant.variant,
                                             )}
-                                            // options={["X"].concat(
-                                            //     Object.keys(variant.variant),
-                                            // )}
                                         />{" "}
                                     </div>
                                 );
@@ -152,10 +166,21 @@ export const Demo = <
                 </div>
             </div>
             <div class="flex-grow m-8">
-                <div
-                    class={(props.defaults?.demoContainerClass as string) ?? ""}
-                >
-                    <props.component {...form.value} />
+                <div>
+                    <div
+                        ref={componentDiv!}
+                        class={
+                            (props.defaults?.demoContainerClass as string) ?? ""
+                        }
+                    >
+                        <props.component {...form.value} />
+                    </div>
+                </div>
+                <div class="pt-3 space-y-5 relative">
+                    <Divider />
+                    <div class="w-full absolute overflow-auto rounded bg-gray-600 text-gray-100 p-3">
+                        <pre class="text-xs">{markup()}</pre>
+                    </div>
                 </div>
             </div>
         </div>

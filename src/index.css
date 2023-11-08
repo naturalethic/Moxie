@@ -46,22 +46,30 @@ body {
     color: var(--color-danger);
 }
 
-/* .border {
-    border: var(--border);
-} */
-
 .box {
-    @apply relative;
+    @apply relative rounded;
+
+    /* &:has(.box-title) {
+        & .box-titled-content {
+
+        }
+        @apply pt-8;
+    } */
 }
 
 .box-shaded {
-    @apply rounded;
-    border: 1px solid var(--color-border);
+    & :has(:not(.box-title)) {
+        @apply py-1 px-2;
+    }
+
     background-color: var(--color-neutral-subtle);
 }
 
 .box-border {
-    @apply rounded;
+    & :has(:not(.box-title)) {
+        @apply py-1 px-2;
+    }
+
     border: 1px solid var(--color-border);
 }
 
@@ -74,7 +82,7 @@ body {
 }
 
 .box-titled-content {
-    @apply pt-6;
+    @apply pt-12;
 }
 
 .box-variant {

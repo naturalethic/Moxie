@@ -1,4 +1,4 @@
-import { Kit } from "~/kit";
+import { lazy } from "solid-js";
 import { Deck } from "~/kit/deck";
 import { History } from "~/kit/history";
 import { Toast } from "~/kit/toast";
@@ -7,36 +7,40 @@ import { Admin } from "./admin";
 import { Header } from "./header";
 import { Mail } from "./mail/mail";
 
+const Kit = lazy(() => import("~/kit"));
+
 export const Main = () => {
+    const items = [
+        {
+            route: "/",
+            view: () => <div>Home</div>,
+        },
+        {
+            route: "/admin",
+            view: () => <Admin />,
+        },
+        {
+            route: "/mail",
+            view: () => <Mail />,
+        },
+        {
+            route: "/account",
+            view: () => <Account />,
+        },
+    ];
+    if (process.env.NODE_ENV !== "production") {
+        items.push({
+            route: "/kit",
+            view: () => <Kit />,
+        });
+    }
+
     return (
         <Toast>
             <History>
                 <div class="flex flex-col h-screen">
                     <Header />
-                    <Deck
-                        items={[
-                            {
-                                route: "/",
-                                view: () => <div>Home</div>,
-                            },
-                            {
-                                route: "/kit",
-                                view: () => <Kit />,
-                            },
-                            {
-                                route: "/admin",
-                                view: () => <Admin />,
-                            },
-                            {
-                                route: "/mail",
-                                view: () => <Mail />,
-                            },
-                            {
-                                route: "/account",
-                                view: () => <Account />,
-                            },
-                        ]}
-                    />
+                    <Deck items={items} />
                 </div>
             </History>
         </Toast>

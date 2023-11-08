@@ -2,7 +2,6 @@
 export default {
     content: ["./src/**/*.{ts,tsx}"],
     plugins: [],
-    // blocklist: ["border"],
     theme: {
         extend: {
             colors: {

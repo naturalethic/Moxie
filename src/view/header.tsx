@@ -15,11 +15,13 @@ export const Header: Component = () => {
             link: "/admin",
             label: "Admin",
         },
-        {
+    ];
+    if (process.env.NODE_ENV !== "production") {
+        items.push({
             link: "/kit",
             label: "Kit",
-        },
-    ];
+        });
+    }
     return (
         <header>
             <Link route="/" class="header-logo">
