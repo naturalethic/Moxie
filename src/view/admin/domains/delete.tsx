@@ -16,7 +16,7 @@ export const Delete: Component<{ domain: string }> = (props) => {
                 },
             ]),
         }),
-        initialValue: {
+        prototype: {
             domain: "",
         },
         onSubmit: async ({ success }) => {

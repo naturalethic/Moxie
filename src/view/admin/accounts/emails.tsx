@@ -22,6 +22,10 @@ export const Emails: Component<{ username: string }> = (props) => {
             localpart: string(),
             domain: string(),
         }),
+        prototype: {
+            localpart: "",
+            domain: "",
+        },
         onSubmit: async () => {
             const { error } = await createEmail(
                 props.username,

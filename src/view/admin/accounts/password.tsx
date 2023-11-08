@@ -13,7 +13,7 @@ export const Password: Component<{ username: string }> = (props) => {
         schema: object({
             password: string([min(8, "8 chars minimum")]),
         }),
-        initialValue: { password: "" },
+        prototype: { password: "" },
         onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await setPassword(

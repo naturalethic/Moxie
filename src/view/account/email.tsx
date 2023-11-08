@@ -1,10 +1,8 @@
 import { Component } from "solid-js";
-import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/input";
 import { Label } from "~/kit/label";
-import { Ruleset } from "~/lib/api/account";
 import { array, boolean, object, record, string } from "~/lib/schema";
 
 export const Email: Component<{
@@ -29,6 +27,11 @@ export const Email: Component<{
                 }),
             ),
         }),
+        prototype: {
+            FullName: "",
+            Mailbox: "",
+            Rulesets: [],
+        },
     });
     return (
         <Box shaded class="p-4 w-full h-full">
@@ -58,10 +61,10 @@ export const Email: Component<{
     );
 };
 
-const EmailRuleset: Component<{ ruleset: Ruleset }> = (props) => {
-    return (
-        <Box shaded class="p-4 w-full h-full">
-            <Associative />
-        </Box>
-    );
-};
+// const EmailRuleset: Component<{ ruleset: Ruleset }> = (props) => {
+//     return (
+//         <Box shaded class="p-4 w-full h-full">
+//             <Associative />
+//         </Box>
+//     );
+// };

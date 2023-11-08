@@ -10,5 +10,5 @@ export const Deck: Component<{
 }> = (props) => {
     const history = useHistory();
     const item = history.matchRoute(props.items);
-    return <>{item().view()}</>;
+    return <>{item()?.view()}</>;
 };

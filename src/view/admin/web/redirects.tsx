@@ -12,7 +12,7 @@ export const Redirects: Component = () => {
 
     const form = createForm({
         schema: object({ redirects: record(string()) }),
-        initialValue: {
+        prototype: {
             redirects: {} as Record<string, string>, // XXX: <--- that typecast should not be needed
         },
         onSubmit: async () => {

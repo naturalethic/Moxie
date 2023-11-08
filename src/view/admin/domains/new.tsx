@@ -16,8 +16,9 @@ export const New: Component = () => {
             domain: string([required()]),
             username: string(),
         }),
-        initialValue: {
+        prototype: {
             domain: "",
+            username: "",
         },
         onSubmit: async ({ success }) => {
             if (success) {

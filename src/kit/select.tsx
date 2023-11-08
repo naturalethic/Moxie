@@ -1,10 +1,4 @@
-import {
-    ComponentProps,
-    For,
-    createEffect,
-    splitProps,
-    useContext,
-} from "solid-js";
+import { For, createEffect, splitProps, useContext } from "solid-js";
 import { cls, getPath, setPath } from "~/lib/util";
 import { FormContext } from "./form";
 import { Label } from "./label";
@@ -19,18 +13,8 @@ type SelectProps<T extends string | number> = {
     size?: "small" | "normal";
     tip?: string;
     onChange?: (value: T) => void;
-} & ComponentProps<"select">;
+};
 
-// export const Select: Component<{
-//     name?: string;
-//     label?: string;
-//     options?: Option[];
-//     error?: string;
-//     value?: string;
-//     size?: "small" | "normal";
-//     tip?: string;
-//     onChange?: (value: string) => void;
-// }> = (props) => {
 export const Select = <T extends string | number,>(props: SelectProps<T>) => {
     const [, selectProps] = splitProps(props, [
         "label",
@@ -38,6 +22,7 @@ export const Select = <T extends string | number,>(props: SelectProps<T>) => {
         "value",
         "size",
         "tip",
+        "onChange",
     ]);
     const form = useContext(FormContext);
 

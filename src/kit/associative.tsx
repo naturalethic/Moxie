@@ -14,7 +14,7 @@ export const Associative: Component<{
     items?: Items;
     keyPlaceholder?: string;
     valuePlaceholder?: string;
-    valueOptions?: Option[];
+    valueOptions?: Option<string>[];
     submitLabel?: string;
     onSubmit?: (key: string, value: string) => void;
     onDelete?: (key: string) => void;
@@ -140,7 +140,7 @@ export const Associative: Component<{
                                     options={props.valueOptions}
                                     size="small"
                                     value={item().value}
-                                    onChange={(value: string) =>
+                                    onChange={(value) =>
                                         props.onChange?.(item().key, value)
                                     }
                                 />

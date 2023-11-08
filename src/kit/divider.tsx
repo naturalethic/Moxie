@@ -1,10 +1,9 @@
 import { Component } from "solid-js";
-import { Infer, object, string } from "~/lib/schema";
-// import { Input, object, optional, string } from "valibot";
+import { Infer, object, optional, string } from "~/lib/schema";
 import { cls } from "~/lib/util";
 
 export const DividerProps = object({
-    class: string(),
+    class: optional(string()),
 });
 
 type DividerProps = Infer<typeof DividerProps>;

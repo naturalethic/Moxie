@@ -120,7 +120,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
                 ForwardDetail,
             ]),
         }),
-        initialValue: {
+        prototype: {
             log: handler?.LogName ?? "",
             domain: handler?.Domain ?? "",
             path: handler?.PathRegexp.substring(1) ?? "",

@@ -14,6 +14,9 @@ export const Delete: Component<{ username: string }> = (props) => {
                 },
             ]),
         }),
+        prototype: {
+            username: "",
+        },
         onSubmit: async ({ success }) => {
             if (success) {
                 const { error } = await deleteAccount(form.value.username!);
