@@ -7,8 +7,14 @@ export const Checkbox: Component<{
     label: string;
     tip?: string;
     error?: string;
+    onChange?: (checked: boolean) => void;
 }> = (props) => {
-    const [, inputProps] = splitProps(props, ["label", "error", "tip"]);
+    const [, inputProps] = splitProps(props, [
+        "label",
+        "error",
+        "tip",
+        "onChange",
+    ]);
 
     const form = useContext(FormContext);
 
@@ -27,6 +33,7 @@ export const Checkbox: Component<{
                     if (props.name && form) {
                         setPath(form.value, props.name, input.checked);
                     }
+                    props.onChange?.(input.checked);
                 }}
             />
             <div

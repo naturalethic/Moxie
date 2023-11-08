@@ -143,7 +143,7 @@ export function discriminated<
     return new DiscriminatedSchema(discriminant, variants);
 }
 
-type NonOptionalSchema =
+export type NonOptionalSchema =
     | { type: BooleanSchema["type"] }
     | { type: StringSchema["type"] }
     | { type: NumberSchema["type"] }
@@ -152,11 +152,11 @@ type NonOptionalSchema =
     | { type: SpecialSchema<string>["type"] }
     | { type: ArraySchema<AnySchema>["type"] }
     | { type: RecordSchema<AnySchema>["type"] }
-    | { type: LiteralSchema<"x">["type"] }
+    | { type: LiteralSchema<"z">["type"] }
     | {
           type: DiscriminatedSchema<
-              "x",
-              ObjectSchema<Record<"x", LiteralSchema<"x">>>
+              "z",
+              ObjectSchema<Record<"z", LiteralSchema<"z">>>
           >["type"];
       };
 
@@ -164,7 +164,7 @@ export type AnySchema =
     | NonOptionalSchema
     | { type: OptionalSchema<StringSchema>["type"] };
 
-class OptionalSchema<T extends NonOptionalSchema> extends Schema {
+export class OptionalSchema<T extends NonOptionalSchema> extends Schema {
     public readonly type = "optional" as "optional" & {
         readonly brand: unique symbol;
     };

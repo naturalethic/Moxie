@@ -36,7 +36,7 @@ export function Entries<
 >(props: {
     for: T | undefined | null | false;
     fallback?: JSX.Element;
-    children: (item: [string, string], index: Accessor<number>) => U;
+    children: (item: [string, unknown], index: Accessor<number>) => U;
 }) {
     return (
         <For each={Object.entries(props.for ?? {})} fallback={props.fallback}>
