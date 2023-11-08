@@ -16,8 +16,8 @@ import {
     VariantSchema,
     string,
 } from "~/lib/schema";
+import { Box } from "./box";
 import { Checkbox } from "./checkbox";
-import { Divider } from "./divider";
 import { createForm } from "./form";
 import { TextInput } from "./input";
 import { Label } from "./label";
@@ -110,8 +110,8 @@ export const Demo = <
     });
 
     return (
-        <div class="flex h-full">
-            <div class="w-64 m-8 space-y-1">
+        <div class="grid grid-cols-[300px_auto] grid-rows-[auto_1fr] p-4 gap-4 h-full">
+            <Box shaded border class="py-1 px-2">
                 <form.Form>
                     <TextInput label="content" name="children" value="Demo" />
                     <For each={Object.keys(props.schema.entries)}>
@@ -158,29 +158,23 @@ export const Demo = <
                         }}
                     </For>
                 </form.Form>
-                <div class="pt-3 text-gray-600 space-y-5">
-                    <Divider />
-                    <pre class="text-xs p-3 border rounded bg-gray-600 text-gray-100">
-                        {code()}
-                    </pre>
+            </Box>
+            <div class="border border-border bg-white rounded bg-gray-white p-4">
+                <div
+                    ref={componentDiv!}
+                    class={(props.defaults?.demoContainerClass as string) ?? ""}
+                >
+                    <props.component {...form.value} />
                 </div>
             </div>
-            <div class="flex-grow m-8">
-                <div>
-                    <div
-                        ref={componentDiv!}
-                        class={
-                            (props.defaults?.demoContainerClass as string) ?? ""
-                        }
-                    >
-                        <props.component {...form.value} />
-                    </div>
-                </div>
-                <div class="pt-3 space-y-5 relative">
-                    <Divider />
-                    <div class="w-full absolute overflow-auto rounded bg-gray-600 text-gray-100 p-3">
-                        <pre class="text-xs">{markup()}</pre>
-                    </div>
+            <div class="text-gray-600">
+                <pre class="text-xs p-3 border rounded bg-slate-600 text-slate-100">
+                    {code()}
+                </pre>
+            </div>
+            <div class="relative">
+                <div class="w-full h-full absolute overflow-auto rounded bg-slate-500 text-slate-200 p-3">
+                    <pre class="text-xs">{markup()}</pre>
                 </div>
             </div>
         </div>

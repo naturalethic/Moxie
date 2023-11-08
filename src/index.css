@@ -58,17 +58,17 @@ body {
 }
 
 .box-shaded {
-    & :has(:not(.box-title)) {
+    /* & :has(:not(.box-title)) {
         @apply py-1 px-2;
-    }
+    } */
 
     background-color: var(--color-neutral-subtle);
 }
 
 .box-border {
-    & :has(:not(.box-title)) {
+    /* & :has(:not(.box-title)) {
         @apply py-1 px-2;
-    }
+    } */
 
     border: 1px solid var(--color-border);
 }
