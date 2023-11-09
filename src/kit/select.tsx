@@ -1,26 +1,44 @@
-import { For, createEffect, splitProps } from "solid-js";
+import { Component, For, splitProps } from "solid-js";
+import {
+    Infer,
+    boolean,
+    object,
+    optional,
+    record,
+    special,
+    string,
+    unknown,
+} from "~/lib/schema";
 import { cls, getPath, setPath } from "~/lib/util";
 import { useForm } from "../lib/form";
-import { Option, optionLabel, optionValue } from "../lib/option";
 import { Label } from "./label";
 
-type SelectProps<T extends string | number> = {
-    name?: string;
-    label?: string;
-    options?: Option<T>[];
-    error?: string;
-    value?: T;
-    size?: "small" | "normal";
-    tip?: string;
-    onChange?: (value: T) => void;
+export const SelectLab: SelectProps = {
+    items: {
+        Screwtape: "screwtape",
+        Wormwood: "wormwood",
+        Toadpipe: "toadpipe",
+    },
 };
 
-export const Select = <T extends string | number,>(props: SelectProps<T>) => {
+export const SelectProps = object({
+    name: optional(string()),
+    label: optional(string()),
+    items: record(unknown()),
+    error: optional(string()),
+    small: optional(boolean()),
+    tip: optional(string()),
+    onChange: optional(special<(value: unknown) => void>()),
+});
+
+type SelectProps = Infer<typeof SelectProps>;
+
+export const Select: Component<SelectProps> = (props) => {
     const [, selectProps] = splitProps(props, [
         "label",
+        "items",
         "error",
-        "value",
-        "size",
+        "small",
         "tip",
         "onChange",
     ]);
@@ -28,25 +46,12 @@ export const Select = <T extends string | number,>(props: SelectProps<T>) => {
 
     function handleChange(event: Event) {
         const select = event.target as HTMLSelectElement;
-        const value = optionValue(props.options![select.selectedIndex]);
+        const value = props.items[select.selectedOptions[0].label];
         if (props.name && form) {
             setPath(form.value, props.name, value);
         }
         props.onChange?.(value);
     }
-
-    createEffect(() => {
-        // Initialize the form data value for this select to the first item, if it is not yet defined.
-        if (
-            form &&
-            props.name &&
-            props.options &&
-            props.options.length > 0 &&
-            !getPath(form.value, props.name)
-        ) {
-            setPath(form.value, props.name, optionValue(props.options[0]));
-        }
-    });
 
     return (
         <Label label={props.label} error={props.error} tip={props.tip}>
@@ -54,23 +59,22 @@ export const Select = <T extends string | number,>(props: SelectProps<T>) => {
                 {...selectProps}
                 onChange={handleChange}
                 class={cls({
-                    "text-sm": !props.size || props.size === "normal",
-                    "text-xs": props.size === "small",
+                    "text-xs": props.small,
+                    "text-sm": !props.small,
                 })}
             >
-                <For each={props.options}>
-                    {(option) => (
+                <For each={Object.keys(props.items)}>
+                    {(key) => (
                         <option
-                            value={optionValue(option)}
+                            value={key}
                             selected={
-                                optionValue(option) ===
-                                (props.value ??
-                                    (props.name &&
-                                        form &&
-                                        getPath(form.value, props.name)))
+                                props.items[key] ===
+                                (form &&
+                                    props.name &&
+                                    getPath(form.value, props.name))
                             }
                         >
-                            {optionLabel(option)}
+                            {key}
                         </option>
                     )}
                 </For>

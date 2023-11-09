@@ -8,6 +8,7 @@ import {
 import { createMutable, modifyMutable, reconcile } from "solid-js/store";
 import { Infer, ObjectEntries, ObjectSchema } from "~/lib/schema";
 import { ValidationError, validate } from "~/lib/validation";
+import { getPath, setPath } from "./util";
 
 type Form = ParentComponent<{ class?: string }>;
 type FormData = { [key: string]: FormDataNode };
@@ -71,37 +72,13 @@ export function createForm<
     }
 
     function reset() {
-        // if (Object.keys(initialValue).length === 0) {
-        //     console.warn(
-        //         "Called form.reset() when no initial data was provided",
-        //     );
-        //     return;
-        // }
         modifyMutable(value, reconcile({}));
-        //     value,
-        //     produce((value) => {
-        //         for (const key in initialValue) {
-        //             value[key] = initialValue[key]!;
-        //         }
-        //     }),
-        // );
     }
 
     const Form: Form = (props) => {
         function handleSubmit(event: SubmitEvent) {
             event.preventDefault();
             onSubmit?.({ success: validate(schema, value, error) });
-            // onSubmit?.({ success: true, value });
-            // const result = safeParse(schema, value);
-            // if (!result.success) {
-            //     for (const issue of result.issues) {
-            //         if (issue.path) {
-            //             const path = issue.path.map((p) => p.key);
-            //             setPath(error, path, issue.message);
-            //         }
-            //     }
-            // }
-            // onSubmit?.(result);
         }
 
         return (
@@ -131,4 +108,27 @@ export function createForm<
             return message();
         },
     };
+}
+
+// XXX: Not a very good name for this function.
+//      This function is meant to provide a deep mutable from a form to a component, or
+//      a non-form local mutable.
+export function formDefault<T extends object>(
+    form: FormContext | undefined,
+    name: string | undefined,
+    value: T | undefined,
+    fallback: T,
+) {
+    const mutable =
+        form && name
+            ? getPath<T>(form.value, name) ?? fallback
+            : createMutable<T>(value ?? fallback);
+
+    if (name && form) {
+        if (!getPath(form.value, name)) {
+            setPath(form.value, name, mutable);
+        }
+    }
+
+    return mutable;
 }

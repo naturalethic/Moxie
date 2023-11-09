@@ -3,7 +3,7 @@ import { Infer, object, optional, special, string } from "~/lib/schema";
 import { getPath, setPath } from "~/lib/util";
 import { useForm } from "../lib/form";
 
-export const CheckboxDemo = {
+export const CheckboxLab = {
     label: "Checkbox",
 };
 

@@ -1,15 +1,13 @@
 import { Component, Index, Show } from "solid-js";
-import { createMutable } from "solid-js/store";
 import { Infer, object, optional, record, special, string } from "~/lib/schema";
-import { getPath, setPath } from "~/lib/util";
-import { useForm } from "../lib/form";
+import { formDefault, useForm } from "../lib/form";
 import { Option } from "../lib/option";
 import { Box } from "./box";
 import { Button } from "./button";
 import { Select } from "./select";
 import { TextInput } from "./text-input";
 
-export const AssociativeDemo: Partial<AssociativeProps> = {
+export const AssociativeLab: Partial<AssociativeProps> = {
     name: "headers",
     keyPlaceholder: "Key",
     valuePlaceholder: "Value",
@@ -35,21 +33,10 @@ export const AssociativeProps = object({
 });
 
 type AssociativeProps = Infer<typeof AssociativeProps>;
-type Items = Record<string, string>;
 
 export const Associative: Component<AssociativeProps> = (props) => {
     const form = useForm();
-
-    const items =
-        props.name && form
-            ? getPath<Items>(form.value, props.name) ?? {}
-            : createMutable<Items>(props.items ?? {});
-
-    if (props.name && form) {
-        if (!getPath(form.value, props.name)) {
-            setPath(form.value, props.name, items);
-        }
-    }
+    const items = formDefault(form, props.name, props.items, {});
 
     let keyInput: HTMLInputElement;
     let valueInput: HTMLInputElement | HTMLSelectElement;

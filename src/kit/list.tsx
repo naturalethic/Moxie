@@ -1,6 +1,5 @@
 import { Component, For } from "solid-js";
-import { createMutable } from "solid-js/store";
-import { useForm } from "~/lib/form";
+import { formDefault, useForm } from "~/lib/form";
 import {
     Infer,
     array,
@@ -10,7 +9,6 @@ import {
     special,
     string,
 } from "~/lib/schema";
-import { getPath, setPath } from "~/lib/util";
 import { TextInput } from "./text-input";
 
 export const ListLab: ListProps = {
@@ -28,17 +26,8 @@ type ListProps = Infer<typeof ListProps>;
 
 export const List: Component<ListProps> = (props) => {
     const form = useForm();
-
-    const items =
-        props.name && form
-            ? getPath<string[]>(form.value, props.name) ?? []
-            : createMutable<string[]>(props.items ?? []);
-
-    if (props.name && form) {
-        if (!getPath(form.value, props.name)) {
-            setPath(form.value, props.name, items);
-        }
-    }
+    const items = formDefault(form, props.name, props.items, []);
+    console.log("List", JSON.stringify(items));
 
     function handleDelete(index: number) {
         items.splice(index, 1);

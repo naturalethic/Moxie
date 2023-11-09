@@ -85,6 +85,10 @@ export function special<T>() {
     return new SpecialSchema({} as T);
 }
 
+export function unknown() {
+    return special<unknown>();
+}
+
 export class ArraySchema<T extends AnySchema> extends Schema {
     public readonly type = "array" as "array" & {
         readonly brand: unique symbol;
