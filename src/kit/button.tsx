@@ -1,15 +1,31 @@
-import { ParentComponent, Show } from "solid-js";
+import { Component, ParentProps, Show } from "solid-js";
+import {
+    Infer,
+    boolean,
+    object,
+    optional,
+    special,
+    string,
+} from "~/lib/schema";
 import { cls } from "~/lib/util";
 import { Icon } from "./icon";
 
-export const Button: ParentComponent<{
-    leadingIcon?: string;
-    small?: boolean;
-    stretch?: boolean;
-    onClick?: () => void;
-    submit?: boolean;
-    class?: string;
-}> = (props) => {
+export const ButtonLab: ButtonProps = {
+    children: "Button",
+};
+
+export const ButtonProps = object({
+    leadingIcon: optional(string()),
+    small: optional(boolean()),
+    stretch: optional(boolean()),
+    onClick: optional(special<() => void>()),
+    submit: optional(boolean()),
+    class: optional(string()),
+});
+
+type ButtonProps = Infer<typeof ButtonProps> & ParentProps;
+
+export const Button: Component<ButtonProps> = (props) => {
     const size = props.small ? "small" : "normal";
     const submit = props.submit ?? true;
     return (

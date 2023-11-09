@@ -1,9 +1,9 @@
 import { Component } from "solid-js";
 import { Box } from "~/kit/box";
-import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/text-input";
 import { useToast } from "~/kit/toast";
 import { setPassword } from "~/lib/api/admin";
+import { createForm } from "~/lib/form";
 import { object, string } from "~/lib/schema";
 import { min } from "~/lib/validation";
 

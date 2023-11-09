@@ -1,9 +1,9 @@
 import { Component, Show, createEffect } from "solid-js";
 import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
-import { createForm } from "~/kit/form";
 import { useToast } from "~/kit/toast";
 import { saveRedirects, useWebServerConfig } from "~/lib/api/admin";
+import { createForm } from "~/lib/form";
 import { object, record, string } from "~/lib/schema";
 
 export const Redirects: Component = () => {

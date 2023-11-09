@@ -1,8 +1,8 @@
 import { For, createEffect, splitProps, useContext } from "solid-js";
 import { cls, getPath, setPath } from "~/lib/util";
-import { FormContext } from "./form";
+import { FormContext } from "../lib/form";
+import { Option, optionLabel, optionValue } from "../lib/option";
 import { Label } from "./label";
-import { Option, optionLabel, optionValue } from "./option";
 
 type SelectProps<T extends string | number> = {
     name?: string;

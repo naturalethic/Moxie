@@ -1,7 +1,7 @@
 import { Component, For, createSignal, useContext } from "solid-js";
 import { cls, setPath } from "~/lib/util";
-import { FormContext } from "./form";
-import { Option, optionLabel, optionValue } from "./option";
+import { FormContext } from "../lib/form";
+import { Option, optionLabel, optionValue } from "../lib/option";
 
 type SegementedProps = {
     name: string;

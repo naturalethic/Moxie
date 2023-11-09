@@ -11,8 +11,12 @@ import {
 import { cls } from "~/lib/util";
 import { Icon } from "./icon";
 
-export const BoxDemo = {
-    children: "Demo",
+export const BoxLab = {
+    children: `My dear Wormwood,
+    I note what you say about guiding your patient's reading and taking care that he
+    sees a good deal of his materialist friend. But are you not being a trifle naive? It
+    sounds as if you suppose that argument was the way to keep him out of the enemy's
+    clutches. That might have been so if he had lived a few centuries earlier.`,
 };
 
 export const BoxProps = object({

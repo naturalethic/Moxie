@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import { Box } from "~/kit/box";
-import { createForm } from "~/kit/form";
 import { Label } from "~/kit/label";
 import { TextInput } from "~/kit/text-input";
+import { createForm } from "~/lib/form";
 import { array, boolean, object, record, string } from "~/lib/schema";
 
 export const Email: Component<{

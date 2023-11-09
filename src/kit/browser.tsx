@@ -1,7 +1,7 @@
 import { Component, For, JSX, Show } from "solid-js";
 import { cls } from "~/lib/util";
+import { Routable, useHistory } from "../lib/history";
 import { Divider } from "./divider";
-import { Routable, useHistory } from "./history";
 import { Icon } from "./icon";
 
 type BrowserItem = Routable & {

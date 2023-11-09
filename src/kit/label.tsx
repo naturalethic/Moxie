@@ -2,7 +2,7 @@ import { ParentComponent, Show } from "solid-js";
 import { Infer, object, optional, string } from "~/lib/schema";
 import { cls } from "~/lib/util";
 
-export const LabelDemo: LabelProps = {
+export const LabelLab: LabelProps = {
     label: "Favorite book",
     error: "Some error",
     tip: "Some tip",

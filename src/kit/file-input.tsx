@@ -5,20 +5,32 @@ import {
     splitProps,
     useContext,
 } from "solid-js";
+import {
+    Infer,
+    boolean,
+    object,
+    optional,
+    special,
+    string,
+} from "~/lib/schema";
 import { cls, getPath } from "~/lib/util";
-import { FormContext } from "./form";
+import { FormContext } from "../lib/form";
 import { Label } from "./label";
 
-export const FileInput: Component<{
-    name?: string;
-    label?: string;
-    disabled?: boolean;
-    tip?: string;
-    error?: string;
-    size?: "small" | "normal";
-    accept?: string;
-    onChange?: (file: File) => void;
-}> = (props) => {
+export const FileInputProps = object({
+    name: optional(string()),
+    label: optional(string()),
+    disabled: optional(boolean()),
+    tip: optional(string()),
+    error: optional(string()),
+    size: optional(special<"small" | "normal">()),
+    accept: optional(string()),
+    onChange: optional(special<(file: File) => void>()),
+});
+
+type FileInputProps = Infer<typeof FileInputProps>;
+
+export const FileInput: Component<FileInputProps> = (props) => {
     const [, inputProps] = splitProps(props, [
         "label",
         "tip",

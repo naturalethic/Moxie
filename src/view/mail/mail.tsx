@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { Box } from "~/kit/box";
 import { Deck } from "~/kit/deck";
-import { Link } from "~/kit/history";
+import { Link } from "~/lib/history";
 
 export const Mail: Component = () => {
     return (

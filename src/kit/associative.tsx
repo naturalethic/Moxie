@@ -2,10 +2,10 @@ import { Component, Index, Show, useContext } from "solid-js";
 import { createMutable } from "solid-js/store";
 import { Infer, object, optional, record, special, string } from "~/lib/schema";
 import { getPath, setPath } from "~/lib/util";
+import { FormContext } from "../lib/form";
+import { Option } from "../lib/option";
 import { Box } from "./box";
 import { Button } from "./button";
-import { FormContext } from "./form";
-import { Option } from "./option";
 import { Select } from "./select";
 import { TextInput } from "./text-input";
 

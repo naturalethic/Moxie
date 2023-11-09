@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import { Box } from "~/kit/box";
-import { createForm } from "~/kit/form";
 import { TextInput } from "~/kit/text-input";
 import { deleteDomain, reloadDomains } from "~/lib/api/admin";
+import { createForm } from "~/lib/form";
 import { object, string } from "~/lib/schema";
 
 export const Delete: Component<{ domain: string }> = (props) => {

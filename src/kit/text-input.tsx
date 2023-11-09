@@ -15,10 +15,10 @@ import {
     string,
 } from "~/lib/schema";
 import { cls, getPath, setPath } from "~/lib/util";
-import { FormContext } from "./form";
+import { FormContext } from "../lib/form";
 import { Label } from "./label";
 
-export const TextInputDemo: TextInputProps = {
+export const TextInputLab: TextInputProps = {
     placeholder: "Enter some text...",
     label: "Favorite book",
     trailingIcon: "circle-plus",

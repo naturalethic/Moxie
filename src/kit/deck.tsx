@@ -1,5 +1,5 @@
 import { Component, JSX } from "solid-js";
-import { Routable, useHistory } from "./history";
+import { Routable, useHistory } from "../lib/history";
 
 type DeckItem = Routable & {
     view: () => JSX.Element;

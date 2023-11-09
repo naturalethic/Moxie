@@ -2,7 +2,6 @@ import { Component, Show } from "solid-js";
 import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { Checkbox } from "~/kit/checkbox";
-import { createForm } from "~/kit/form";
 import { Label } from "~/kit/label";
 import { Segmented } from "~/kit/segmented";
 import { Select } from "~/kit/select";
@@ -15,6 +14,7 @@ import {
     useDomains,
     useWebServerConfig,
 } from "~/lib/api/admin";
+import { createForm } from "~/lib/form";
 import {
     Infer,
     boolean,

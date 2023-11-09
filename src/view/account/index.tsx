@@ -2,7 +2,6 @@ import { Component, Show, createSignal } from "solid-js";
 import { Box } from "~/kit/box";
 import { Browser } from "~/kit/browser";
 import { FileInput } from "~/kit/file-input";
-import { createForm } from "~/kit/form";
 import { Progress } from "~/kit/progress";
 import { Select } from "~/kit/select";
 import { TextInput } from "~/kit/text-input";
@@ -14,6 +13,7 @@ import {
     updatePassword,
     useAccount,
 } from "~/lib/api/account";
+import { createForm } from "~/lib/form";
 import { object, string } from "~/lib/schema";
 import { Email } from "./email";
 
