@@ -3,10 +3,10 @@ import { Associative } from "~/kit/associative";
 import { Box } from "~/kit/box";
 import { Checkbox } from "~/kit/checkbox";
 import { createForm } from "~/kit/form";
-import { TextInput } from "~/kit/input";
 import { Label } from "~/kit/label";
 import { Segmented } from "~/kit/segmented";
 import { Select } from "~/kit/select";
+import { TextInput } from "~/kit/text-input";
 import { useToast } from "~/kit/toast";
 import {
     WebHandler,

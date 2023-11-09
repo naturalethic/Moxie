@@ -1,9 +1,9 @@
 import { Component, Show, onMount } from "solid-js";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
-import { TextInput } from "~/kit/input";
 import { List } from "~/kit/list";
 import { Select } from "~/kit/select";
+import { TextInput } from "~/kit/text-input";
 import {
     createEmail,
     deleteEmail,

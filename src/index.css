@@ -142,8 +142,8 @@ body {
     transition: transform 0.5s;
 }
 
-button {
-    @apply rounded px-2 py-1 text-sm font-medium;
+.button {
+    @apply rounded px-2 py-1;
     color: #24292f;
     background-color: #f6f8fa;
     border: 1px solid var(--color-border);
@@ -225,6 +225,8 @@ input:disabled {
 }
 
 .input-container {
+    @apply relative;
+
     &:has(.input-leading-icon-normal) {
         & input {
             @apply px-9;

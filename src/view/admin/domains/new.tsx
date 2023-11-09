@@ -1,7 +1,7 @@
 import { Component, onMount } from "solid-js";
 import { createForm } from "~/kit/form";
-import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
+import { TextInput } from "~/kit/text-input";
 import { createDomain, reloadDomains, useAccounts } from "~/lib/api/admin";
 import { object, string } from "~/lib/schema";
 import { required } from "~/lib/validation";

@@ -1,11 +1,13 @@
 import { Component, For, ParentComponent } from "solid-js";
 import { AnyObjectSchema } from "~/lib/schema";
 import { cls } from "~/lib/util";
+import { Associative, AssociativeDemo, AssociativeProps } from "./associative";
 import { Box, BoxDemo, BoxProps } from "./box";
 import { Checkbox, CheckboxDemo, CheckboxProps } from "./checkbox";
 import { Deck } from "./deck";
 import { Demo } from "./demo";
 import { Link, Routable, useHistory } from "./history";
+import { TextInput, TextInputDemo, TextInputProps } from "./text-input";
 
 type KitItem = Routable & {
     label: string;
@@ -17,6 +19,13 @@ type KitItem = Routable & {
 const Kit: Component = () => {
     const history = useHistory();
     const items: KitItem[] = [
+        {
+            label: "Associative",
+            route: "/kit/associative",
+            component: Associative,
+            schema: AssociativeProps,
+            defaults: AssociativeDemo,
+        },
         {
             label: "Box",
             route: "/kit/box",
@@ -30,6 +39,13 @@ const Kit: Component = () => {
             component: Checkbox,
             schema: CheckboxProps,
             defaults: CheckboxDemo,
+        },
+        {
+            label: "TextInput",
+            route: "/kit/text-input",
+            component: TextInput,
+            schema: TextInputProps,
+            defaults: TextInputDemo,
         },
     ];
 

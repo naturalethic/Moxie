@@ -1,8 +1,8 @@
 import { Component, Show, createSignal, onMount } from "solid-js";
 import { Box } from "~/kit/box";
 import { createForm } from "~/kit/form";
-import { TextInput } from "~/kit/input";
 import { Select } from "~/kit/select";
+import { TextInput } from "~/kit/text-input";
 import { createAccount, reloadAccounts, useDomains } from "~/lib/api/admin";
 import { object, string } from "~/lib/schema";
 import { required } from "~/lib/validation";

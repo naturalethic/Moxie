@@ -4,7 +4,6 @@ import { getPath, setPath } from "~/lib/util";
 import { FormContext } from "./form";
 
 export const CheckboxDemo = {
-    // demoContainerClass: "float-left",
     label: "Checkbox",
 };
 

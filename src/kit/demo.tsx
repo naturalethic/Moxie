@@ -1,10 +1,13 @@
 import { trackStore } from "@solid-primitives/deep";
+import prettierEstree from "prettier/plugins/estree";
 import prettierHtml from "prettier/plugins/html";
+import prettierTypescript from "prettier/plugins/typescript";
 import prettier from "prettier/standalone";
 import {
     Component,
     For,
     ParentComponent,
+    Show,
     createEffect,
     createSignal,
 } from "solid-js";
@@ -16,12 +19,13 @@ import {
     VariantSchema,
     string,
 } from "~/lib/schema";
+import { Associative } from "./associative";
 import { Box } from "./box";
 import { Checkbox } from "./checkbox";
 import { createForm } from "./form";
-import { TextInput } from "./input";
 import { Label } from "./label";
 import { Segmented } from "./segmented";
+import { TextInput } from "./text-input";
 
 type DemoProps<
     S extends AnyObjectSchema,
@@ -33,12 +37,12 @@ type DemoProps<
     defaults?: Record<string, unknown>;
 };
 
-async function format(html: string) {
-    return await prettier.format(html, {
-        parser: "html",
-        plugins: [prettierHtml],
+async function format(parser: "html" | "typescript", source: string) {
+    return await prettier.format(source, {
+        parser,
+        plugins: [prettierHtml, prettierTypescript, prettierEstree],
         tabWidth: 2,
-        printWidth: 20,
+        printWidth: 80,
         htmlWhitespaceSensitivity: "ignore",
     });
 }
@@ -84,6 +88,13 @@ export const Demo = <
                 ) {
                     code.push(` ${key}="${form.value[key]}"`);
                 }
+                if (schema.type === "record") {
+                    if (form.value[key]) {
+                        code.push(
+                            ` ${key}={${JSON.stringify(form.value[key])}}`,
+                        );
+                    }
+                }
             }
         }
         if (form.value.children) {
@@ -97,7 +108,7 @@ export const Demo = <
         } else {
             code.push("/>");
         }
-        setCode(await format(code.join("")));
+        setCode(await format("typescript", code.join("")));
     });
 
     let componentDiv: HTMLDivElement;
@@ -106,14 +117,20 @@ export const Demo = <
 
     createEffect(async () => {
         trackStore(form.value);
-        setMarkup(await format(componentDiv.innerHTML));
+        setMarkup(await format("html", componentDiv.innerHTML));
     });
 
     return (
         <div class="grid grid-cols-[300px_auto] grid-rows-[auto_1fr] p-4 gap-4 h-full">
             <Box shaded border class="py-1 px-2">
                 <form.Form>
-                    <TextInput label="content" name="children" value="Demo" />
+                    <Show when={props.defaults?.children}>
+                        <TextInput
+                            label="content"
+                            name="children"
+                            value="Demo"
+                        />
+                    </Show>
                     <For each={Object.keys(props.schema.entries)}>
                         {(key) => {
                             if (key === "children") {
@@ -147,6 +164,14 @@ export const Demo = <
                                     </div>
                                 );
                             }
+                            if (schema.type === "record") {
+                                return (
+                                    <div>
+                                        <Label label={key} />
+                                        <Associative name={key} />
+                                    </div>
+                                );
+                            }
                             if (schema.type === "special") {
                                 return <></>;
                             }
@@ -167,14 +192,14 @@ export const Demo = <
                     <props.component {...form.value} />
                 </div>
             </div>
-            <div class="text-gray-600">
-                <pre class="text-xs p-3 border rounded bg-slate-600 text-slate-100">
-                    {code()}
-                </pre>
+            <div class="relative">
+                <div class="w-full h-full absolute overflow-auto rounded bg-slate-600 text-slate-100 p-3 text-xs">
+                    <pre>{code()}</pre>
+                </div>
             </div>
             <div class="relative">
-                <div class="w-full h-full absolute overflow-auto rounded bg-slate-500 text-slate-200 p-3">
-                    <pre class="text-xs">{markup()}</pre>
+                <div class="w-full h-full absolute overflow-auto rounded bg-slate-100 text-slate-400 p-3 text-xs">
+                    <pre>{markup()}</pre>
                 </div>
             </div>
         </div>
