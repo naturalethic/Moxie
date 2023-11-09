@@ -1,4 +1,5 @@
 import { trackStore } from "@solid-primitives/deep";
+import components from "kit:components";
 import prettierEstree from "prettier/plugins/estree";
 import prettierHtml from "prettier/plugins/html";
 import prettierTypescript from "prettier/plugins/typescript";
@@ -33,6 +34,7 @@ import { Label } from "./label";
 import { List } from "./list";
 import { Segmented } from "./segmented";
 import { TextInput } from "./text-input";
+console.log("components", components);
 
 // Kit is only included in dev mode, So load up the tailwind css via cdn
 // to make tailwind classes available on the client.
@@ -90,8 +92,7 @@ function item(name: string): KitItem {
 
 export const Kit: Component = () => {
     const history = useHistory();
-
-    const items: KitItem[] = JSON.parse(import.meta.env.VITE_KIT).map(item);
+    const items: KitItem[] = components.map(item);
 
     return (
         <div class="bg-neutral-emphasis border-t border-t-neutral-subtle flex flex-grow">
