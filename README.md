@@ -62,11 +62,7 @@ Configure `.env.dev` with the proper values.  `VITE_SERVER_PROXY` is the endpoin
 
 ### Component testing
 
-This app includes a built in storyboard-like component lab at `/kit` during development.  If you want tailwind classes available to you while using the kit, set the tailwind url in your `.env.dev`:
-
-```
-VITE_TAILWIND_CDN=https://cdn.tailwindcss.com
-```
+This app includes a built in storyboard-like component lab at `/kit` during development.
 
 ### Bundle analysis
 

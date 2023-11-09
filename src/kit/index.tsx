@@ -9,6 +9,24 @@ import { Demo } from "./demo";
 import { Link, Routable, useHistory } from "./history";
 import { TextInput, TextInputDemo, TextInputProps } from "./text-input";
 
+// Kit is only included in dev mode, So load up the tailwind css via cdn
+// to make tailwind classes available on the client.
+if (!document.querySelector("#tailwind-cdn")) {
+    const script = document.createElement("script");
+    script.id = "tailwind-cdn";
+    script.src = "https://cdn.tailwindcss.com";
+    script.addEventListener("load", () => {
+        // Disable tailwind reset so it doesn't clobber our existing styles.
+        // @ts-ignore
+        tailwind.config = {
+            corePlugins: {
+                preflight: false,
+            },
+        };
+    });
+    document.head.appendChild(script);
+}
+
 type KitItem = Routable & {
     label: string;
     component: Component | ParentComponent;
