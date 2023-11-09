@@ -1,11 +1,23 @@
 import { ParentComponent, Show } from "solid-js";
+import { Infer, object, optional, string } from "~/lib/schema";
+import { cls } from "~/lib/util";
 
-export const Label: ParentComponent<{
-    label?: string;
-    error?: string;
-    tip?: string;
-    class?: string;
-}> = (props) => {
+export const LabelDemo: LabelProps = {
+    label: "Favorite book",
+    error: "Some error",
+    tip: "Some tip",
+};
+
+export const LabelProps = object({
+    label: optional(string()),
+    error: optional(string()),
+    tip: optional(string()),
+    class: optional(string()),
+});
+
+type LabelProps = Infer<typeof LabelProps>;
+
+export const Label: ParentComponent<LabelProps> = (props) => {
     return (
         <label class={`flex flex-col gap-[2px] select-none ${props.class}`}>
             <Show when={props.label}>
@@ -14,7 +26,7 @@ export const Label: ParentComponent<{
                     data-tip={props.tip}
                 >
                     <div class="flex gap-1">
-                        <div class="text-sm">{props.label}</div>
+                        <div class={cls("text-sm")}>{props.label}</div>
                         <Show when={props.tip}>
                             <div class="tooltip" data-tip={props.tip}>
                                 ?

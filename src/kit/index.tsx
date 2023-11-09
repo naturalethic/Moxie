@@ -7,6 +7,7 @@ import { Checkbox, CheckboxDemo, CheckboxProps } from "./checkbox";
 import { Deck } from "./deck";
 import { Demo } from "./demo";
 import { Link, Routable, useHistory } from "./history";
+import { Label, LabelDemo, LabelProps } from "./label";
 import { TextInput, TextInputDemo, TextInputProps } from "./text-input";
 
 // Kit is only included in dev mode, So load up the tailwind css via cdn
@@ -57,6 +58,13 @@ const Kit: Component = () => {
             component: Checkbox,
             schema: CheckboxProps,
             defaults: CheckboxDemo,
+        },
+        {
+            label: "Label",
+            route: "/kit/label",
+            component: Label,
+            schema: LabelProps,
+            defaults: LabelDemo,
         },
         {
             label: "TextInput",

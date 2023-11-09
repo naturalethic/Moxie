@@ -1,4 +1,5 @@
 import { trackStore } from "@solid-primitives/deep";
+import { capitalize, titleize, underscore } from "inflection";
 import prettierEstree from "prettier/plugins/estree";
 import prettierHtml from "prettier/plugins/html";
 import prettierTypescript from "prettier/plugins/typescript";
@@ -37,14 +38,19 @@ type DemoProps<
     defaults?: Record<string, unknown>;
 };
 
-async function format(parser: "html" | "typescript", source: string) {
-    return await prettier.format(source, {
+async function format(
+    parser: "html" | "typescript",
+    printWidth: number,
+    source: string,
+) {
+    const formatted = await prettier.format(source, {
         parser,
         plugins: [prettierHtml, prettierTypescript, prettierEstree],
         tabWidth: 2,
-        printWidth: 80,
+        printWidth,
         htmlWhitespaceSensitivity: "ignore",
     });
+    return formatted.replace(/;\s*$/, "");
 }
 
 export const Demo = <
@@ -103,12 +109,12 @@ export const Demo = <
             } else {
                 code[0] += ">";
             }
-            code.push(`  ${form.value.children}`);
+            code.push(`${form.value.children}`);
             code.push(`</${name}>`);
         } else {
             code.push("/>");
         }
-        setCode(await format("typescript", code.join("")));
+        setCode(await format("typescript", 40, code.join("")));
     });
 
     let componentDiv: HTMLDivElement;
@@ -117,12 +123,12 @@ export const Demo = <
 
     createEffect(async () => {
         trackStore(form.value);
-        setMarkup(await format("html", componentDiv.innerHTML));
+        setMarkup(await format("html", 80, componentDiv.innerHTML));
     });
 
     return (
         <div class="grid grid-cols-[300px_auto] grid-rows-[auto_1fr] p-4 gap-4 h-full">
-            <Box shaded border class="py-1 px-2">
+            <Box shaded border class="p-2">
                 <form.Form>
                     <Show when={props.defaults?.children}>
                         <TextInput
@@ -144,16 +150,35 @@ export const Demo = <
                                 schema = optional.entry;
                             }
                             if (schema.type === "string") {
-                                return <TextInput label={key} name={key} />;
+                                return (
+                                    <TextInput
+                                        label={capitalize(
+                                            titleize(underscore(key)),
+                                        )}
+                                        name={key}
+                                        small
+                                    />
+                                );
                             }
                             if (schema.type === "boolean") {
-                                return <Checkbox label={key} name={key} />;
+                                return (
+                                    <Checkbox
+                                        label={capitalize(
+                                            titleize(underscore(key)),
+                                        )}
+                                        name={key}
+                                    />
+                                );
                             }
                             if (schema.type === "variant") {
                                 const variant = schema as VariantSchema<string>;
                                 return (
                                     <div>
-                                        <Label label={key} />
+                                        <Label
+                                            label={capitalize(
+                                                titleize(underscore(key)),
+                                            )}
+                                        />
                                         <Segmented
                                             name={key}
                                             allowNone
@@ -167,7 +192,11 @@ export const Demo = <
                             if (schema.type === "record") {
                                 return (
                                     <div>
-                                        <Label label={key} />
+                                        <Label
+                                            label={capitalize(
+                                                titleize(underscore(key)),
+                                            )}
+                                        />
                                         <Associative name={key} />
                                     </div>
                                 );
@@ -198,7 +227,7 @@ export const Demo = <
                 </div>
             </div>
             <div class="relative">
-                <div class="w-full h-full absolute overflow-auto rounded bg-slate-100 text-slate-400 p-3 text-xs">
+                <div class="w-full h-full absolute overflow-auto rounded text-slate-400 p-3 text-xs">
                     <pre>{markup()}</pre>
                 </div>
             </div>
