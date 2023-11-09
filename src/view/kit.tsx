@@ -24,16 +24,16 @@ import {
     string,
 } from "~/lib/schema";
 import { cls } from "~/lib/util";
+import { Associative } from "../kit/associative";
+import { Box } from "../kit/box";
+import { Checkbox } from "../kit/checkbox";
+import { Deck } from "../kit/deck";
+import { Label } from "../kit/label";
+import { List } from "../kit/list";
+import { Segmented } from "../kit/segmented";
+import { TextInput } from "../kit/text-input";
 import { createForm } from "../lib/form";
 import { Link, Routable, useHistory } from "../lib/history";
-import { Associative } from "./associative";
-import { Box } from "./box";
-import { Checkbox } from "./checkbox";
-import { Deck } from "./deck";
-import { Label } from "./label";
-import { List } from "./list";
-import { Segmented } from "./segmented";
-import { TextInput } from "./text-input";
 console.log("components", components);
 
 // Kit is only included in dev mode, So load up the tailwind css via cdn
@@ -73,7 +73,8 @@ function item(name: string): KitItem {
         label: cname,
         route: `/kit/${name}`,
         view: lazy(async () => {
-            const module = await import(/* @vite-ignore */ `./${name}`);
+            // const module = await import(/* @vite-ignore */ `./${name}`);
+            const module = await import(`../kit/${name}.tsx`);
             const component = module[cname] as Component;
             const schema = module[`${cname}Props`] as AnyObjectSchema;
             const defaults = module[`${cname}Lab`] ?? {};

@@ -16,17 +16,15 @@ export default function kit(): Plugin {
 
         load(id) {
             if (id === resolvedVirtualModuleId) {
-                console.log("LOADING VIRTUAL MODULE");
                 return `export default ${JSON.stringify(validComponents())}`;
             }
         },
 
         handleHotUpdate({ file, server, modules }) {
             if (/src\/kit\/.*\.tsx$/.test(file)) {
-                return [
-                    ...modules,
+                modules.push(
                     server.moduleGraph.getModuleById(resolvedVirtualModuleId)!,
-                ];
+                );
             }
         },
     };
