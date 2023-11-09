@@ -1,10 +1,4 @@
-import {
-    Component,
-    Show,
-    createSignal,
-    splitProps,
-    useContext,
-} from "solid-js";
+import { Component, Show, createSignal, splitProps } from "solid-js";
 import {
     Infer,
     boolean,
@@ -14,7 +8,7 @@ import {
     string,
 } from "~/lib/schema";
 import { cls, getPath } from "~/lib/util";
-import { FormContext } from "../lib/form";
+import { useForm } from "../lib/form";
 import { Label } from "./label";
 
 export const FileInputProps = object({
@@ -39,7 +33,7 @@ export const FileInput: Component<FileInputProps> = (props) => {
         "onChange",
     ]);
     const size = props.size ?? "normal";
-    const form = useContext(FormContext);
+    const form = useForm();
 
     let fileInput: HTMLInputElement;
     let fileButton: HTMLButtonElement;

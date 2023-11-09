@@ -17,10 +17,10 @@ type State = {
 };
 
 type ContextData = [Accessor<State>, Setter<State>];
-const Context = createContext<ContextData>([] as unknown as ContextData);
+const ToastContext = createContext<ContextData>([] as unknown as ContextData);
 
 export function useToast() {
-    const [state, setState] = useContext(Context);
+    const [state, setState] = useContext(ToastContext);
     return function (
         variant: "danger" | "attention" | "success",
         message: string | string[],
@@ -42,7 +42,7 @@ export const Toast: ParentComponent = (props) => {
     });
     const value = [state, setState] as ContextData;
     return (
-        <Context.Provider value={value}>
+        <ToastContext.Provider value={value}>
             {props.children}
             <Box
                 class={cls("toast", { active: state().active })}
@@ -61,6 +61,6 @@ export const Toast: ParentComponent = (props) => {
                     {(message) => <p>{message}</p>}
                 </For>
             </Box>
-        </Context.Provider>
+        </ToastContext.Provider>
     );
 };

@@ -1,7 +1,7 @@
-import { Component, Show, splitProps, useContext } from "solid-js";
+import { Component, Show, splitProps } from "solid-js";
 import { Infer, object, optional, special, string } from "~/lib/schema";
 import { getPath, setPath } from "~/lib/util";
-import { FormContext } from "../lib/form";
+import { useForm } from "../lib/form";
 
 export const CheckboxDemo = {
     label: "Checkbox",
@@ -25,7 +25,7 @@ export const Checkbox: Component<CheckboxProps> = (props) => {
         "onChange",
     ]);
 
-    const form = useContext(FormContext);
+    const form = useForm();
 
     return (
         <label class="flex tooltip-host select-none gap-[5px]">

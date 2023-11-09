@@ -192,7 +192,7 @@ export type Infer<S extends AnySchema> = S extends ObjectSchema<infer T>
     : S extends OptionalSchema<infer T>
     ? Infer<T>
     : S extends ArraySchema<infer T>
-    ? T[]
+    ? Infer<T>[]
     : S extends RecordSchema<infer T>
     ? Record<string, Infer<T>>
     : S extends LiteralSchema<infer T>
@@ -212,32 +212,3 @@ type InferOptionalEntries<T extends ObjectEntries> = Partial<{
 type InferRequiredEntries<T extends ObjectEntries> = {
     [key in keyof ConditionalExcept<T, { type: "optional" }>]: Infer<T[key]>;
 };
-
-// const a = object({
-//     b: discriminated("type", [
-//         object({
-//             type: literal("a"),
-//             q: string(),
-//         }),
-//         object({
-//             type: literal("b"),
-//             z: string(),
-//             // q: optional(string()),
-//             // q: string(),
-//         }),
-//     ]),
-// });
-
-// type A = Infer<typeof a>;
-
-// const c: A = {
-//     b: {
-//         type: "b",
-//         // q: "string",
-//         z: "string",
-//         // x: "string",
-//     },
-// };
-
-// const l = literal("a");
-// type T = Infer<typeof l>;

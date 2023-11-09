@@ -1,6 +1,6 @@
-import { Component, For, createSignal, useContext } from "solid-js";
+import { Component, For, createSignal } from "solid-js";
 import { cls, setPath } from "~/lib/util";
-import { FormContext } from "../lib/form";
+import { useForm } from "../lib/form";
 import { Option, optionLabel, optionValue } from "../lib/option";
 
 type SegementedProps = {
@@ -12,7 +12,7 @@ type SegementedProps = {
 };
 
 export const Segmented: Component<SegementedProps> = (props) => {
-    const form = useContext(FormContext);
+    const form = useForm();
 
     const [value, setValue] = createSignal<string | undefined>(
         (props.value ?? (!props.allowNone && optionValue(props.options[0]))) ||

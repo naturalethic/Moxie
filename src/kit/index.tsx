@@ -30,6 +30,7 @@ import { Box } from "./box";
 import { Checkbox } from "./checkbox";
 import { Deck } from "./deck";
 import { Label } from "./label";
+import { List } from "./list";
 import { Segmented } from "./segmented";
 import { TextInput } from "./text-input";
 
@@ -59,8 +60,6 @@ if (!document.querySelector("#tailwind-cdn")) {
     document.head.appendChild(script);
 }
 
-console.log(import.meta.env.VITE_KIT);
-
 type KitItem = Routable & {
     label: string;
     view: () => JSX.Element;
@@ -89,7 +88,7 @@ function item(name: string): KitItem {
     };
 }
 
-const Kit: Component = () => {
+export const Kit: Component = () => {
     const history = useHistory();
 
     const items: KitItem[] = JSON.parse(import.meta.env.VITE_KIT).map(item);
@@ -121,8 +120,6 @@ const Kit: Component = () => {
         </div>
     );
 };
-
-export default Kit;
 
 type LabProps<
     S extends AnyObjectSchema,
@@ -191,6 +188,13 @@ const Lab = <
                     code.push(` ${key}="${form.value[key]}"`);
                 }
                 if (schema.type === "record") {
+                    if (form.value[key]) {
+                        code.push(
+                            ` ${key}={${JSON.stringify(form.value[key])}}`,
+                        );
+                    }
+                }
+                if (schema.type === "array") {
                     if (form.value[key]) {
                         code.push(
                             ` ${key}={${JSON.stringify(form.value[key])}}`,
@@ -274,6 +278,14 @@ const Lab = <
                                     <div>
                                         <Label label={label} />
                                         <Associative name={key} />
+                                    </div>
+                                );
+                            }
+                            if (schema.type === "array") {
+                                return (
+                                    <div>
+                                        <Label label={label} />
+                                        <List items={form.value[key]} />
                                     </div>
                                 );
                             }

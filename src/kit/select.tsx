@@ -1,6 +1,6 @@
-import { For, createEffect, splitProps, useContext } from "solid-js";
+import { For, createEffect, splitProps } from "solid-js";
 import { cls, getPath, setPath } from "~/lib/util";
-import { FormContext } from "../lib/form";
+import { useForm } from "../lib/form";
 import { Option, optionLabel, optionValue } from "../lib/option";
 import { Label } from "./label";
 
@@ -24,7 +24,7 @@ export const Select = <T extends string | number,>(props: SelectProps<T>) => {
         "tip",
         "onChange",
     ]);
-    const form = useContext(FormContext);
+    const form = useForm();
 
     function handleChange(event: Event) {
         const select = event.target as HTMLSelectElement;

@@ -3,6 +3,7 @@ import {
     createContext,
     createEffect,
     createSignal,
+    useContext,
 } from "solid-js";
 import { createMutable, modifyMutable, reconcile } from "solid-js/store";
 import { Infer, ObjectEntries, ObjectSchema } from "~/lib/schema";
@@ -25,6 +26,10 @@ type FormContext =
     | undefined;
 
 export const FormContext = createContext<FormContext>();
+
+export function useForm() {
+    return useContext(FormContext);
+}
 
 type CreateForm<
     E extends ObjectEntries,

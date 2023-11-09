@@ -7,7 +7,9 @@ import { Admin } from "./admin";
 import { Header } from "./header";
 import { Mail } from "./mail/mail";
 
-const Kit = lazy(() => import("~/kit"));
+const Kit = lazy(async () => {
+    return { default: (await import("~/kit")).Kit };
+});
 
 export const Main = () => {
     const items = [

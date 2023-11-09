@@ -1,8 +1,8 @@
-import { Component, Index, Show, useContext } from "solid-js";
+import { Component, Index, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
 import { Infer, object, optional, record, special, string } from "~/lib/schema";
 import { getPath, setPath } from "~/lib/util";
-import { FormContext } from "../lib/form";
+import { useForm } from "../lib/form";
 import { Option } from "../lib/option";
 import { Box } from "./box";
 import { Button } from "./button";
@@ -38,7 +38,7 @@ type AssociativeProps = Infer<typeof AssociativeProps>;
 type Items = Record<string, string>;
 
 export const Associative: Component<AssociativeProps> = (props) => {
-    const form = useContext(FormContext);
+    const form = useForm();
 
     const items =
         props.name && form

@@ -1,10 +1,4 @@
-import {
-    Component,
-    Show,
-    createEffect,
-    splitProps,
-    useContext,
-} from "solid-js";
+import { Component, Show, createEffect, splitProps } from "solid-js";
 import { Icon } from "~/kit/icon";
 import {
     Infer,
@@ -15,7 +9,7 @@ import {
     string,
 } from "~/lib/schema";
 import { cls, getPath, setPath } from "~/lib/util";
-import { FormContext } from "../lib/form";
+import { useForm } from "../lib/form";
 import { Label } from "./label";
 
 export const TextInputLab: TextInputProps = {
@@ -54,7 +48,7 @@ export const TextInput: Component<TextInputProps> = (props) => {
         "onEnter",
         "onChange",
     ]);
-    const form = useContext(FormContext);
+    const form = useForm();
 
     function size() {
         return props.small ? "small" : "normal";
