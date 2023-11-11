@@ -10,6 +10,8 @@ import {
 import { cls } from "~/lib/util";
 import { Box } from "./box";
 
+export const ToastLab = null;
+
 type State = {
     active: boolean;
     variant: "danger" | "attention" | "success";

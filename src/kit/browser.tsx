@@ -1,4 +1,5 @@
 import { Component, For, JSX, Show } from "solid-js";
+import { Infer, object, optional, special, string } from "~/lib/schema";
 import { cls } from "~/lib/util";
 import { Routable, useHistory } from "../lib/history";
 import { Divider } from "./divider";
@@ -13,12 +14,38 @@ type BrowserItem = Routable & {
     moveable?: boolean;
 };
 
-export const Browser: Component<{
-    items: BrowserItem[];
-    onMove?: (from: number, to: number) => void;
-    class?: string;
-    contentClass?: string;
-}> = (props) => {
+export const BrowserLab: BrowserProps = {
+    items: [
+        {
+            label: "Alpha",
+            route: "/kit/browser/alpha",
+            view: () => <div>Alpha</div>,
+            divider: true,
+            icon: "circle-plus",
+        },
+        {
+            label: "Beta",
+            route: "/kit/browser/beta",
+            view: () => <div>Beta</div>,
+        },
+        {
+            label: "Gamma",
+            route: "/kit/browser/gamma",
+            view: () => <div>Gamma</div>,
+        },
+    ],
+};
+
+export const BrowserProps = object({
+    items: special<BrowserItem[]>(),
+    class: optional(string()),
+    contentClass: optional(string()),
+    onMove: optional(special<(from: number, to: number) => void>()),
+});
+
+type BrowserProps = Infer<typeof BrowserProps>;
+
+export const Browser: Component<BrowserProps> = (props) => {
     const history = useHistory();
     const selectedItem = history.matchRoute(props.items);
 

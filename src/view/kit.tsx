@@ -15,6 +15,7 @@ import {
     createSignal,
     lazy,
 } from "solid-js";
+import { TextArea } from "~/kit/text-area";
 import {
     AnyObjectSchema,
     Infer,
@@ -34,7 +35,6 @@ import { Segmented } from "../kit/segmented";
 import { TextInput } from "../kit/text-input";
 import { createForm } from "../lib/form";
 import { Link, Routable, useHistory } from "../lib/history";
-console.log("components", components);
 
 // Kit is only included in dev mode, So load up the tailwind css via cdn
 // to make tailwind classes available on the client.
@@ -97,7 +97,7 @@ export const Kit: Component = () => {
 
     return (
         <div class="bg-neutral-emphasis border-t border-t-neutral-subtle flex flex-grow">
-            <div class="text-white text-xl py-8 px-2 h-full flex flex-col gap-2">
+            <div class="text-white text-lg py-8 px-2 h-full flex flex-col gap-2">
                 <For each={items}>
                     {(item) => (
                         <Link
@@ -189,14 +189,11 @@ const Lab = <
                 ) {
                     code.push(` ${key}="${form.value[key]}"`);
                 }
-                if (schema.type === "record") {
-                    if (form.value[key]) {
-                        code.push(
-                            ` ${key}={${JSON.stringify(form.value[key])}}`,
-                        );
-                    }
-                }
-                if (schema.type === "array") {
+                if (
+                    schema.type === "record" ||
+                    schema.type === "array" ||
+                    schema.type === "number"
+                ) {
                     if (form.value[key]) {
                         code.push(
                             ` ${key}={${JSON.stringify(form.value[key])}}`,
@@ -233,7 +230,9 @@ const Lab = <
             <Box shaded border class="p-2">
                 <form.Form>
                     <Show when={props.defaults.children}>
-                        <TextInput
+                        <TextArea
+                            lines={3}
+                            resizable
                             label="content"
                             name="children"
                             value={(props.defaults.children as string) ?? ""}
@@ -257,6 +256,16 @@ const Lab = <
                                     <TextInput label={label} name={key} small />
                                 );
                             }
+                            if (schema.type === "number") {
+                                return (
+                                    <TextInput
+                                        type="number"
+                                        label={label}
+                                        name={key}
+                                        small
+                                    />
+                                );
+                            }
                             if (schema.type === "boolean") {
                                 return <Checkbox label={label} name={key} />;
                             }
@@ -268,9 +277,7 @@ const Lab = <
                                         <Segmented
                                             name={key}
                                             allowNone
-                                            options={Object.keys(
-                                                variant.variant,
-                                            )}
+                                            items={variant.variant}
                                         />{" "}
                                     </div>
                                 );
@@ -306,7 +313,7 @@ const Lab = <
             <div class="border border-border bg-white rounded bg-gray-white p-4">
                 <div
                     ref={componentDiv!}
-                    class={(props.defaults.labContainerClass as string) ?? ""}
+                    class={cls(props.defaults.labContainerClass)}
                 >
                     <props.component {...form.value} />
                 </div>

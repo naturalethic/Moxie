@@ -3,6 +3,10 @@
 import { Component, Show } from "solid-js";
 import { cls } from "~/lib/util";
 
+// XXX: Would be nice to have a lab page that showed all the icons.
+
+export const IconLab = null;
+
 export const Icon: Component<{
     name: string;
     class?: string;

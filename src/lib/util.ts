@@ -13,7 +13,12 @@
  * ```
  */
 export function cls(
-    ...classes: (string | boolean | undefined | Record<string, unknown>)[]
+    ...classes: unknown[]
+    // | string
+    // | boolean
+    // | undefined
+    // | Record<string, unknown>
+    // | unknown
 ) {
     return classes
         .filter((x) => x)

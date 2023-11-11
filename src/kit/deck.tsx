@@ -1,6 +1,8 @@
 import { Component, JSX } from "solid-js";
 import { Routable, useHistory } from "../lib/history";
 
+export const DeckLab = null;
+
 type DeckItem = Routable & {
     view: () => JSX.Element;
 };

@@ -1,8 +1,8 @@
-import { Component, Show, splitProps } from "solid-js";
-import { Icon } from "~/kit/icon";
+import { Component, splitProps } from "solid-js";
 import {
     Infer,
     boolean,
+    number,
     object,
     optional,
     special,
@@ -12,39 +12,35 @@ import { cls, getPath, setPath } from "~/lib/util";
 import { useForm } from "../lib/form";
 import { Label } from "./label";
 
-export const TextInputLab: TextInputProps = {
+export const TextAreaLab: TextAreaProps = {
     placeholder: "Enter some text...",
-    label: "Favorite book",
-    trailingIcon: "circle-plus",
+    lines: 10,
 };
 
-export const TextInputProps = object({
-    type: optional(string()),
+export const TextAreaProps = object({
     name: optional(string()),
     placeholder: optional(string()),
     label: optional(string()),
+    lines: optional(number()),
+    resizable: optional(boolean()),
     disabled: optional(boolean()),
     tip: optional(string()),
     error: optional(string()),
-    leadingIcon: optional(string()),
-    trailingIcon: optional(string()),
-    onClickTrailingIcon: optional(special<() => void>()),
     small: optional(boolean()),
     value: optional(string()),
     onEnter: optional(special<() => void>()),
-    onChange: optional(special<(value: string | number) => void>()),
+    onChange: optional(special<(value: string) => void>()),
 });
 
-type TextInputProps = Infer<typeof TextInputProps>;
+type TextAreaProps = Infer<typeof TextAreaProps>;
 
-export const TextInput: Component<TextInputProps> = (props) => {
+export const TextArea: Component<TextAreaProps> = (props) => {
     const [, inputProps] = splitProps(props, [
         "label",
+        "lines",
+        "resizable",
         "tip",
         "error",
-        "leadingIcon",
-        "trailingIcon",
-        "onClickTrailingIcon",
         "small",
         "value",
         "onEnter",
@@ -65,13 +61,11 @@ export const TextInput: Component<TextInputProps> = (props) => {
 
     function handleInput(event: InputEvent) {
         const input = event.target as HTMLInputElement;
-        const value =
-            props.type === "number" ? parseInt(input.value) : input.value;
         if (props.name && form) {
-            setPath(form.value, props.name, value);
+            setPath(form.value, props.name, input.value);
             setPath(form.error, props.name, undefined);
         }
-        props.onChange?.(value);
+        props.onChange?.(input.value);
     }
 
     return (
@@ -86,15 +80,11 @@ export const TextInput: Component<TextInputProps> = (props) => {
             tip={props.tip}
         >
             <div class="input-container">
-                <input
+                <textarea
                     {...inputProps}
-                    value={
-                        props.value ??
-                        (props.name &&
-                            form &&
-                            (getPath(form.value, props.name) as string))
-                    }
+                    rows={props.lines}
                     class={cls({
+                        "resize-none": !props.resizable,
                         "border-danger":
                             props.error ??
                             (props.name &&
@@ -106,21 +96,12 @@ export const TextInput: Component<TextInputProps> = (props) => {
                     placeholder={props.placeholder}
                     onKeyPress={handleKeyPress}
                     onInput={handleInput}
-                    // onFocus={handleFocus}
-                />
-                <Show when={props.leadingIcon}>
-                    <Icon
-                        name={props.leadingIcon!}
-                        class={`input-icon input-leading-icon input-leading-icon-${size()}`}
-                    />
-                </Show>
-                <Show when={props.trailingIcon}>
-                    <Icon
-                        name={props.trailingIcon!}
-                        class={`input-icon input-trailing-icon input-trailing-icon-${size()}`}
-                        onClick={props.onClickTrailingIcon}
-                    />
-                </Show>
+                >
+                    {props.value ??
+                        (props.name &&
+                            form &&
+                            (getPath(form.value, props.name) as string))}
+                </textarea>
             </div>
         </Label>
     );
