@@ -1,0 +1,9 @@
+.file-input-container {
+    @apply flex flex-col rounded p-1;
+    border: 1px dashed var(--color-border);
+
+    & div {
+        @apply text-xs break-all p-1;
+        color: var(--color-accent-semimuted);
+    }
+}

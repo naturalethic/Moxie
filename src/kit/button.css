@@ -1,0 +1,18 @@
+.button {
+    @apply rounded px-2 py-1;
+    color: #24292f;
+    background-color: #f6f8fa;
+    border: 1px solid var(--color-border);
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &:active {
+        background-color: hsla(220, 14%, 93%, 1);
+    }
+
+    &.selected {
+        background-color: hsla(220, 14%, 94%, 1);
+    }
+}

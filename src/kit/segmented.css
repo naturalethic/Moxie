@@ -1,0 +1,14 @@
+.segmented {
+    @apply rounded flex;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-neutral-subtle);
+}
+
+.segmented-button {
+    @apply rounded box-content m-px border-0 flex-1;
+}
+
+.segmented-button.selected {
+    background-color: var(--color-accent);
+    color: white;
+}

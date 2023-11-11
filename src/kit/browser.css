@@ -1,0 +1,62 @@
+.browser-label {
+    @apply text-sm select-none cursor-pointer rounded-md px-2 py-1 relative;
+    border: 1px solid transparent;
+    min-width: 10rem;
+    margin: 0 .5rem;
+
+    &:hover {
+        background-color: rgba(208, 215, 222, 0.32);
+    }
+
+    &:active {
+        background-color: rgba(208, 215, 222, 0.48);
+    }
+
+    &.selected {
+        background-color: rgba(208, 215, 222, 0.24);
+
+        &::after {
+            @apply absolute;
+            top: calc(50% - 12px);
+            left: -8px;
+            width: 4px;
+            height: 24px;
+            content: "";
+            background-color: rgb(9, 105, 218);
+            border-radius: 6px;
+        }
+    }
+
+    & .icon-trash {
+        @apply w-4;
+        color: var(--color-neutral);
+    }
+
+    & .drag-marker.insert-above {
+        &::after {
+            @apply absolute;
+            top: -6px;
+            left: -10px;
+            content: "";
+            /* background-color: var(--color-neutral-subtle); */
+            border: 5px solid black;
+            border-color: transparent transparent transparent var(--color-neutral);
+        }
+    }
+
+    & .drag-marker.insert-below {
+        &::after {
+            @apply absolute;
+            top: calc(100% + -4px);
+            left: -10px;
+            content: "";
+            background-color: var(--color-neutral-subtle);
+            border: 5px solid black;
+            border-color: transparent transparent transparent var(--color-neutral);
+        }
+    }
+}
+
+.browser-content {
+    min-width: 18rem;
+}

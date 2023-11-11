@@ -1,5 +1,5 @@
-import { Plugin } from "vite";
 import { readFileSync } from "fs";
+import { Plugin } from "vite";
 
 /**
  * This plugin forces all css files to be module css, except src/index.css
@@ -8,7 +8,7 @@ export default function css(): Plugin {
     return {
         name: "moxie:css",
         enforce: "pre",
-        async resolveId(id: string, importer: string, options: object) {
+        async resolveId(id, importer, options: object) {
             if (id.endsWith(".css")) {
                 if (id.includes("node_modules")) {
                     return;
@@ -17,6 +17,9 @@ export default function css(): Plugin {
                     skipSelf: true,
                     ...options,
                 });
+                if (!resolved) {
+                    return;
+                }
                 if (resolved.id.endsWith("src/index.css")) {
                     return;
                 }

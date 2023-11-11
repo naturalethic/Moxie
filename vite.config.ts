@@ -5,15 +5,13 @@ import { defineConfig } from "vitest/config";
 import kit from "./src/plugin/kit";
 
 export default defineConfig({
-    plugins: [
-        tsconfigPaths(),
-        solid(),
-        doctest(),
-        kit(),
-        // restart({
-        //     restart: ["src/kit/*.tsx"],
-        // }),
-    ],
+    plugins: [tsconfigPaths(), solid(), doctest(), kit()],
+    css: {
+        modules: {
+            scopeBehaviour: "local",
+            localsConvention: "camelCaseOnly",
+        },
+    },
     test: {
         root: "src",
         includeSource: ["**/*.{ts,tsx}"],

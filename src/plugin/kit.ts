@@ -7,7 +7,7 @@ export default function kit(): Plugin {
     const resolvedVirtualModuleId = `\0${virtualModuleId}`;
 
     return {
-        name: "kit",
+        name: "moxie:kit",
         resolveId(id) {
             if (id === virtualModuleId) {
                 return resolvedVirtualModuleId;
@@ -32,6 +32,7 @@ export default function kit(): Plugin {
 
 function validComponents() {
     return readdirSync("src/kit")
+        .filter((it) => it.endsWith(".tsx"))
         .map((it) => it.replace(".tsx", ""))
         .filter((it) => !["index"].includes(it))
         .filter((it) => {

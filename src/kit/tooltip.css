@@ -1,0 +1,38 @@
+/* https://blog.logrocket.com/creating-beautiful-tooltips-with-only-css/ */
+.tooltip-host {
+    position: relative;
+
+    &:hover .tooltip:before {
+        display: block;
+    }
+
+    &:hover .tooltip:after {
+        display: block;
+    }
+}
+
+.tooltip {
+    z-index: 9999;
+    font-size: 8px;
+    text-decoration: underline;
+
+    &:before {
+        @apply absolute text-xs px-2 py-1 rounded;
+        content: attr(data-tip);
+        background-color: #24292F;
+        color: white;
+        top: 100%;
+        left: 0;
+        display: none;
+    }
+
+    &:after {
+        @apply absolute;
+        content: "";
+        top: 50%;
+        margin-left: -2px;
+        border: 5px solid black;
+        border-color: transparent transparent black transparent;
+        display: none;
+    }
+}

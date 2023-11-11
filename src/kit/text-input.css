@@ -1,0 +1,75 @@
+input {
+    @apply rounded px-2 py-1 w-full;
+    border: 1px solid var(--color-border);
+}
+
+input:disabled {
+    color: var(--color-neutral-emphasis);
+}
+
+.input-container {
+    @apply relative;
+
+    &:has(.input-leading-icon-normal) {
+        & input {
+            @apply px-9;
+        }
+    }
+
+    &:has(.input-leading-icon-small) {
+        & input {
+            @apply px-9;
+        }
+    }
+}
+
+.input-icon {
+    @apply absolute rounded;
+    top: 1px;
+    padding: 4px;
+    background-color: rgba(175, 184, 193, 0.3);
+    color: var(--color-neutral-emphasis);
+}
+
+.input-icon.clickable {
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(175, 184, 193, 0.4);
+    }
+
+    &:active {
+        background-color: rgba(175, 184, 193, 0.5);
+    }
+}
+
+.input-leading-icon {
+    @apply rounded-r-none;
+    left: 1px;
+}
+
+.input-leading-icon-small {
+    height: 24px;
+    width: 24px;
+}
+
+.input-leading-icon-normal {
+    height: 28px;
+    width: 28px;
+}
+
+.input-trailing-icon {
+    @apply rounded-l-none;
+    right: 1px;
+    padding: 4px;
+}
+
+.input-trailing-icon-small {
+    height: 24px;
+    width: 24px;
+}
+
+.input-trailing-icon-normal {
+    height: 28px;
+    width: 28px;
+}

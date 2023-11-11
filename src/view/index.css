@@ -1,0 +1,17 @@
+header {
+    @apply h-20 flex items-center px-4;
+    background-color: var(--color-neutral-emphasis);
+    color: white;
+
+    & .header-logo {
+        @apply text-2xl;
+    }
+
+    & ul {
+        @apply ml-auto flex gap-4;
+    }
+}
+
+a {
+    @apply cursor-pointer;
+}

@@ -1,0 +1,12 @@
+.toast {
+    @apply absolute pr-2 mt-1;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%) translateY(-120%);
+    transition: transform 0.5s;
+}
+
+.toast.active {
+    transform: translateX(-50%);
+    transition: transform 0.5s;
+}
