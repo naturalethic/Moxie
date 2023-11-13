@@ -20,9 +20,11 @@ import {
     AnyObject,
     AnyObjectSchema,
     AnySchema,
+    ArraySchema,
     Infer,
     NonOptionalSchema,
     OptionalSchema,
+    UnionSchema,
     VariantSchema,
     string,
 } from "~/lib/schema";
@@ -281,6 +283,12 @@ function attributeForSchema(
             return ` ${key}={${JSON.stringify(value[key])}}`;
         }
     }
+    if (schema.type === "union") {
+        // XXX: Need to discriminate here on actual type, i.e. strings should not be JSONified.
+        if (value[key]) {
+            return ` ${key}={${JSON.stringify(value[key])}}`;
+        }
+    }
     return "";
 }
 
@@ -322,6 +330,20 @@ function fieldForSchema(schema: AnySchema, key: string, value: AnyObject) {
     }
     if (schema.type === "special") {
         return <></>;
+    }
+    if (schema.type === "union") {
+        // XXX: This can be improved, we do a minimal guess at a renderable schema
+        const union = schema as UnionSchema<AnySchema[]>;
+        for (const variant of union.variants) {
+            if (variant.type === "record" || variant.type === "array") {
+                const entry = (variant as ArraySchema<AnySchema>).entry;
+                if (entry.type !== "special") {
+                    return fieldForSchema(variant, key, value);
+                }
+            } else {
+                return fieldForSchema(variant, key, value);
+            }
+        }
     }
     return (
         <div>

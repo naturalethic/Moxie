@@ -1,6 +1,7 @@
 import {
     Component,
     For,
+    createEffect,
     createRenderEffect,
     createSignal,
     splitProps,
@@ -32,7 +33,13 @@ export const SelectLab: SelectProps = {
 export const SelectProps = object({
     name: optional(string()),
     label: optional(string()),
-    items: union(array(unknown()), record(unknown())),
+    items: union(
+        array(unknown()),
+        record(unknown()),
+        record(string()), // provides a type the lab understands
+    ),
+    value: optional(unknown()),
+    allowNone: optional(boolean()),
     error: optional(string()),
     small: optional(boolean()),
     tip: optional(string()),
@@ -45,6 +52,8 @@ export const Select: Component<SelectProps> = (props) => {
     const [, selectProps] = splitProps(props, [
         "label",
         "items",
+        "value",
+        "allowNone",
         "error",
         "small",
         "tip",
@@ -55,20 +64,34 @@ export const Select: Component<SelectProps> = (props) => {
     const [items, setItems] = createSignal<Record<string, unknown>>({});
 
     createRenderEffect(() => {
-        if (typeof props.items === "object") {
-            setItems(props.items as Record<string, unknown>);
-        } else {
+        if (Array.isArray(props.items)) {
             const items: Record<string, unknown> = {};
             for (const item of props.items as unknown[]) {
                 items[(item as object).toString()] = item;
             }
             setItems(items);
+        } else {
+            setItems(props.items as Record<string, unknown>);
         }
+    });
+
+    const [value, setValue] = createSignal<unknown>();
+
+    createEffect(() => {
+        setValue(
+            (form && props.name
+                ? getPath(form.value, props.name)
+                : undefined) ||
+                (props.value ??
+                    (!props.allowNone && Object.values(items())[0])) ||
+                undefined,
+        );
     });
 
     function handleChange(event: Event) {
         const select = event.target as HTMLSelectElement;
         const value = items()[select.selectedOptions[0].label];
+        setValue(value);
         if (props.name && form) {
             setPath(form.value, props.name, value);
         }
@@ -87,15 +110,7 @@ export const Select: Component<SelectProps> = (props) => {
             >
                 <For each={Object.keys(items())}>
                     {(key) => (
-                        <option
-                            value={key}
-                            selected={
-                                items()[key] ===
-                                (form &&
-                                    props.name &&
-                                    getPath(form.value, props.name))
-                            }
-                        >
+                        <option value={key} selected={items()[key] === value()}>
                             {key}
                         </option>
                     )}

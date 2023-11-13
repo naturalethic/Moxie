@@ -199,12 +199,12 @@ export const Account: Component = () => {
                         <div class="grid grid-cols-2 gap-1">
                             <Select
                                 ref={exportFormatSelect!}
-                                options={["mbox", "maildir"]}
+                                items={["mbox", "maildir"]}
                                 label="Format"
                             />
                             <Select
                                 ref={exportCompressionSelect!}
-                                options={["zip", "tgz"]}
+                                items={["zip", "tgz"]}
                                 label="Compression"
                             />
                         </div>

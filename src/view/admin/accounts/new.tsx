@@ -46,12 +46,12 @@ export const New: Component = () => {
 
     const [username, setUsername] = createSignal<string>("");
 
-    function handleUsernameChange(value: string) {
+    function handleUsernameChange(value: string | number) {
         if (username() === form.value.localpart) {
-            form.value.localpart = value;
+            form.value.localpart = value as string;
             form.error.localpart = undefined;
         }
-        setUsername(value);
+        setUsername(value as string);
     }
 
     return (
@@ -66,7 +66,7 @@ export const New: Component = () => {
             <Select
                 name="domain"
                 label="Domain"
-                options={domains.latest.map((d) => d.ASCII)}
+                items={domains.latest.map((d) => d.ASCII)}
             />
             <Show when={form.value.username && form.value.localpart}>
                 <Box variant="attention">

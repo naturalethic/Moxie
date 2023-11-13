@@ -55,9 +55,11 @@ export const Associative: Component<AssociativeProps> = (props) => {
         }
     }
 
-    function handleChange(key: string, value: string) {
-        items[key] = value;
-        props.onChange?.(key, value);
+    function handleChange(key: string, value: string | number) {
+        // XXX: Update this component to allow numbers here,
+        //      and use the items pattern from select/segmented.
+        items[key] = value as string;
+        props.onChange?.(key, value as string);
     }
 
     function handleDelete(key: string) {
@@ -90,8 +92,8 @@ export const Associative: Component<AssociativeProps> = (props) => {
                 </Show>
                 <Show when={props.valueOptions}>
                     <Select
-                        options={props.valueOptions}
-                        size="small"
+                        items={props.valueOptions!}
+                        small
                         ref={valueInput!}
                     />
                 </Show>
@@ -131,11 +133,14 @@ export const Associative: Component<AssociativeProps> = (props) => {
                             </Show>
                             <Show when={props.valueOptions}>
                                 <Select
-                                    options={props.valueOptions}
-                                    size="small"
+                                    items={props.valueOptions!}
+                                    small
                                     value={item().value}
                                     onChange={(value) =>
-                                        handleChange(item().key, value)
+                                        handleChange(
+                                            item().key,
+                                            value as string,
+                                        )
                                     }
                                 />
                             </Show>

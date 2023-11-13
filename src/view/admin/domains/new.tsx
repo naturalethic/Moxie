@@ -47,7 +47,7 @@ export const New: Component = () => {
             <Select
                 name="username"
                 label="Postmaster / reporting account"
-                options={accounts.latest}
+                items={accounts.latest}
             />
             <button>Add new domain</button>
         </form.Form>

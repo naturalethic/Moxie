@@ -207,7 +207,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
                 <Select
                     name="domain"
                     label="Domain"
-                    options={domains.latest.map((d) => d.ASCII)}
+                    items={domains.latest.map((d) => d.ASCII)}
                 />
                 <TextInput
                     name="path"
@@ -230,8 +230,8 @@ export const Handler: Component<{ index?: number }> = (props) => {
             <Segmented
                 name="type"
                 value={form.value.detail.type}
-                onChange={handleChangeType}
-                options={[
+                onChange={handleChangeType as (v: unknown) => void}
+                items={[
                     { value: "static", label: "Static" },
                     { value: "redirect", label: "Redirect" },
                     { value: "forward", label: "Forward" },
@@ -295,7 +295,7 @@ export const Handler: Component<{ index?: number }> = (props) => {
                         name="detail.status"
                         label="HTTP Status"
                         tip="Status code to use in redirect"
-                        options={[
+                        items={[
                             {
                                 value: 301,
                                 label: "301 - Moved Permanently",

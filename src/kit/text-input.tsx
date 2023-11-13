@@ -18,6 +18,8 @@ export const TextInputLab: TextInputProps = {
     trailingIcon: "circle-plus",
 };
 
+// XXX: Like segmented, select, we really should allow any value type.  In future inputs could represent
+//      any type, with some sort of parser.
 export const TextInputProps = object({
     type: optional(string()),
     name: optional(string()),

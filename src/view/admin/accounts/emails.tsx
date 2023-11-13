@@ -59,14 +59,14 @@ export const Emails: Component<{ username: string }> = (props) => {
                     <div class="flex gap-1">
                         <TextInput
                             ref={localpartInput!}
-                            size="small"
+                            small
                             name="localpart"
                             placeholder="localpart"
                         />
                         <Select
-                            size="small"
+                            small
                             name="domain"
-                            options={domains.latest.map((d) => d.ASCII)}
+                            items={domains.latest.map((d) => d.ASCII)}
                         />
                     </div>
                     <Show when={form.message}>
@@ -76,7 +76,7 @@ export const Emails: Component<{ username: string }> = (props) => {
                 </Box>
             </form.Form>
             <List
-                size="small"
+                small
                 items={Object.keys(account.latest?.Destinations ?? {})}
                 onDelete={handleDelete}
             />

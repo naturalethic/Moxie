@@ -1,12 +1,21 @@
-import { Component, For, createEffect, createSignal } from "solid-js";
+import {
+    Component,
+    For,
+    createEffect,
+    createRenderEffect,
+    createSignal,
+} from "solid-js";
 import {
     Infer,
+    array,
     boolean,
     object,
     optional,
     record,
     special,
     string,
+    union,
+    unknown,
 } from "~/lib/schema";
 import { cls, getPath, setPath } from "~/lib/util";
 import { useForm } from "../lib/form";
@@ -22,10 +31,14 @@ export const SegmentedLab: SegementedProps = {
 
 export const SegmentedProps = object({
     name: optional(string()),
-    value: optional(string()),
-    items: record(string()),
+    value: optional(unknown()),
+    items: union(
+        array(unknown()),
+        record(unknown()),
+        record(string()), // provides a type the lab understands
+    ),
     allowNone: optional(boolean()),
-    onChange: optional(special<(value: string | undefined) => void>()),
+    onChange: optional(special<(value: unknown) => void>()),
 });
 
 type SegementedProps = Infer<typeof SegmentedProps>;
@@ -33,7 +46,23 @@ type SegementedProps = Infer<typeof SegmentedProps>;
 export const Segmented: Component<SegementedProps> = (props) => {
     const form = useForm();
 
-    const [value, setValue] = createSignal<string | undefined>();
+    // XXX: This pattern with items of array or object type, is repeated in other components.
+    //      Abstract it.  (Same with value below)
+    const [items, setItems] = createSignal<Record<string, unknown>>({});
+
+    createRenderEffect(() => {
+        if (Array.isArray(props.items)) {
+            const items: Record<string, unknown> = {};
+            for (const item of props.items as unknown[]) {
+                items[(item as object).toString()] = item;
+            }
+            setItems(items);
+        } else {
+            setItems(props.items as Record<string, unknown>);
+        }
+    });
+
+    const [value, setValue] = createSignal<unknown>();
 
     createEffect(() => {
         setValue(
@@ -41,13 +70,13 @@ export const Segmented: Component<SegementedProps> = (props) => {
                 ? getPath(form.value, props.name)
                 : undefined) ||
                 (props.value ??
-                    (!props.allowNone && Object.values(props.items)[0])) ||
+                    (!props.allowNone && Object.values(items())[0])) ||
                 undefined,
         );
     });
 
-    function handleClick(itemValue: string) {
-        let newValue: string | undefined = itemValue;
+    function handleClick(itemValue: unknown) {
+        let newValue = itemValue;
         if (props.allowNone && newValue === value()) {
             newValue = undefined;
         }
@@ -60,16 +89,15 @@ export const Segmented: Component<SegementedProps> = (props) => {
 
     return (
         <div class="segmented">
-            <input type="hidden" name={props.name} value={value()} />
-            <For each={Object.keys(props.items)}>
+            <For each={Object.keys(items())}>
                 {(key) => {
                     return (
                         <button
                             type="button"
                             class={cls("segmented-button", {
-                                selected: props.items[key] === value(),
+                                selected: items()[key] === value(),
                             })}
-                            onClick={() => handleClick(props.items[key])}
+                            onClick={() => handleClick(items()[key])}
                         >
                             {key}
                         </button>

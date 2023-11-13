@@ -8,6 +8,7 @@
         "build": "vite build && uglifyjs dist/index.js -b --in-situ && biome check --apply-unsafe --max-diagnostics=0 dist/index.js",
         "analyze": "vite-bundle-visualizer",
         "preview": "vite preview",
+        "check": "tsc --noEmit && biome check src",
         "test": "vitest",
         "test:e2e": "cypress run",
         "test:e2e:gui": "cypress open",
