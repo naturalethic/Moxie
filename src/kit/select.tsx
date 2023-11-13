@@ -1,12 +1,20 @@
-import { Component, For, splitProps } from "solid-js";
+import {
+    Component,
+    For,
+    createRenderEffect,
+    createSignal,
+    splitProps,
+} from "solid-js";
 import {
     Infer,
+    array,
     boolean,
     object,
     optional,
     record,
     special,
     string,
+    union,
     unknown,
 } from "~/lib/schema";
 import { cls, getPath, setPath } from "~/lib/util";
@@ -24,7 +32,7 @@ export const SelectLab: SelectProps = {
 export const SelectProps = object({
     name: optional(string()),
     label: optional(string()),
-    items: record(unknown()),
+    items: union(array(unknown()), record(unknown())),
     error: optional(string()),
     small: optional(boolean()),
     tip: optional(string()),
@@ -44,9 +52,23 @@ export const Select: Component<SelectProps> = (props) => {
     ]);
     const form = useForm();
 
+    const [items, setItems] = createSignal<Record<string, unknown>>({});
+
+    createRenderEffect(() => {
+        if (typeof props.items === "object") {
+            setItems(props.items as Record<string, unknown>);
+        } else {
+            const items: Record<string, unknown> = {};
+            for (const item of props.items as unknown[]) {
+                items[(item as object).toString()] = item;
+            }
+            setItems(items);
+        }
+    });
+
     function handleChange(event: Event) {
         const select = event.target as HTMLSelectElement;
-        const value = props.items[select.selectedOptions[0].label];
+        const value = items()[select.selectedOptions[0].label];
         if (props.name && form) {
             setPath(form.value, props.name, value);
         }
@@ -63,12 +85,12 @@ export const Select: Component<SelectProps> = (props) => {
                     "text-sm": !props.small,
                 })}
             >
-                <For each={Object.keys(props.items)}>
+                <For each={Object.keys(items())}>
                     {(key) => (
                         <option
                             value={key}
                             selected={
-                                props.items[key] ===
+                                items()[key] ===
                                 (form &&
                                     props.name &&
                                     getPath(form.value, props.name))

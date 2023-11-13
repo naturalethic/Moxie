@@ -50,6 +50,7 @@ export class ObjectSchema<T extends ObjectEntries> extends Schema {
 }
 
 export type AnyObjectSchema = ObjectSchema<ObjectEntries>;
+export type AnyObject = Infer<AnyObjectSchema>;
 
 export function object<T extends ObjectEntries>(entries: T) {
     return new ObjectSchema(entries);
@@ -128,6 +129,19 @@ export function literal<T extends string>(value: T) {
     return new LiteralSchema(value);
 }
 
+export class UnionSchema<V extends Array<AnySchema>> extends Schema {
+    public readonly type = "union" as "union" & {
+        readonly brand: unique symbol;
+    };
+    constructor(public variants: V) {
+        super([]);
+    }
+}
+
+export function union<V extends Array<AnySchema>>(...variants: V) {
+    return new UnionSchema(variants);
+}
+
 export class DiscriminatedSchema<
     T extends string,
     V extends ObjectSchema<Record<T, LiteralSchema<string>> & ObjectEntries>,
@@ -162,7 +176,8 @@ export type NonOptionalSchema =
               "z",
               ObjectSchema<Record<"z", LiteralSchema<"z">>>
           >["type"];
-      };
+      }
+    | { type: UnionSchema<AnySchema[]>["type"] };
 
 export type AnySchema =
     | NonOptionalSchema
@@ -203,7 +218,12 @@ export type Infer<S extends AnySchema> = S extends ObjectSchema<infer T>
     ? T
     : S extends DiscriminatedSchema<infer _T, infer _V>
     ? Infer<S["variants"][number]>
-    : never;
+    : S extends UnionSchema<infer _T>
+    ? Infer<S["variants"][number]>
+    : //   UnionToUnionArrays<Infer<S["variants"][number]>>
+      never;
+
+// type UnionToUnionArrays<T> = T extends unknown ? T[] : never;
 
 type InferEntries<T extends ObjectEntries> = Simplify<
     InferOptionalEntries<T> & InferRequiredEntries<T>

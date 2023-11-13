@@ -10,6 +10,9 @@ export async function api<T>(
     path: string,
     params: unknown[] = [],
 ) {
+    console.log(
+        `api: ${username} ${password} ${path} ${JSON.stringify(params)}`,
+    );
     const endpoint = import.meta.env.VITE_MOX_ENDPOINT ?? "/mox";
     const url = `${endpoint}${path}`;
     const response = await fetch(url, {

@@ -17,7 +17,9 @@ import {
 } from "solid-js";
 import { TextArea } from "~/kit/text-area";
 import {
+    AnyObject,
     AnyObjectSchema,
+    AnySchema,
     Infer,
     NonOptionalSchema,
     OptionalSchema,
@@ -178,28 +180,8 @@ const Lab = <
                         schema as OptionalSchema<NonOptionalSchema>;
                     schema = optional.entry;
                 }
-                if (schema.type === "boolean") {
-                    if (form.value[key]) {
-                        code.push(` ${key}`);
-                    }
-                }
-                if (
-                    (schema.type === "string" || schema.type === "variant") &&
-                    form.value[key]
-                ) {
-                    code.push(` ${key}="${form.value[key]}"`);
-                }
-                if (
-                    schema.type === "record" ||
-                    schema.type === "array" ||
-                    schema.type === "number"
-                ) {
-                    if (form.value[key]) {
-                        code.push(
-                            ` ${key}={${JSON.stringify(form.value[key])}}`,
-                        );
-                    }
-                }
+                console.log(schema.type);
+                code.push(attributeForSchema(schema, key, form.value));
             }
         }
         if (form.value.children) {
@@ -240,7 +222,6 @@ const Lab = <
                     </Show>
                     <For each={Object.keys(props.schema.entries)}>
                         {(key) => {
-                            const label = capitalize(title(key).toLowerCase());
                             if (key === "children") {
                                 return <></>;
                             }
@@ -251,61 +232,7 @@ const Lab = <
                                     schema as OptionalSchema<NonOptionalSchema>;
                                 schema = optional.entry;
                             }
-                            if (schema.type === "string") {
-                                return (
-                                    <TextInput label={label} name={key} small />
-                                );
-                            }
-                            if (schema.type === "number") {
-                                return (
-                                    <TextInput
-                                        type="number"
-                                        label={label}
-                                        name={key}
-                                        small
-                                    />
-                                );
-                            }
-                            if (schema.type === "boolean") {
-                                return <Checkbox label={label} name={key} />;
-                            }
-                            if (schema.type === "variant") {
-                                const variant = schema as VariantSchema<string>;
-                                return (
-                                    <div>
-                                        <Label label={label} />
-                                        <Segmented
-                                            name={key}
-                                            allowNone
-                                            items={variant.variant}
-                                        />{" "}
-                                    </div>
-                                );
-                            }
-                            if (schema.type === "record") {
-                                return (
-                                    <div>
-                                        <Label label={label} />
-                                        <Associative name={key} />
-                                    </div>
-                                );
-                            }
-                            if (schema.type === "array") {
-                                return (
-                                    <div>
-                                        <Label label={label} />
-                                        <List items={form.value[key]} />
-                                    </div>
-                                );
-                            }
-                            if (schema.type === "special") {
-                                return <></>;
-                            }
-                            return (
-                                <div>
-                                    Unhandled: {key}: {schema.type}
-                                </div>
-                            );
+                            return fieldForSchema(schema, key, form.value);
                         }}
                     </For>
                 </form.Form>
@@ -331,3 +258,74 @@ const Lab = <
         </div>
     );
 };
+
+function attributeForSchema(
+    schema: AnySchema,
+    key: string,
+    value: AnyObject,
+): string {
+    if (schema.type === "boolean") {
+        if (value[key]) {
+            return ` ${key}`;
+        }
+    }
+    if ((schema.type === "string" || schema.type === "variant") && value[key]) {
+        return ` ${key}="${value[key]}"`;
+    }
+    if (
+        schema.type === "record" ||
+        schema.type === "array" ||
+        schema.type === "number"
+    ) {
+        if (value[key]) {
+            return ` ${key}={${JSON.stringify(value[key])}}`;
+        }
+    }
+    return "";
+}
+
+function fieldForSchema(schema: AnySchema, key: string, value: AnyObject) {
+    const label = capitalize(title(key).toLowerCase());
+    if (schema.type === "string") {
+        return <TextInput label={label} name={key} small />;
+    }
+    if (schema.type === "number") {
+        return <TextInput type="number" label={label} name={key} small />;
+    }
+    if (schema.type === "boolean") {
+        return <Checkbox label={label} name={key} />;
+    }
+    if (schema.type === "variant") {
+        const variant = schema as VariantSchema<string>;
+        return (
+            <div>
+                <Label label={label} />
+                <Segmented name={key} allowNone items={variant.variant} />{" "}
+            </div>
+        );
+    }
+    if (schema.type === "record") {
+        return (
+            <div>
+                <Label label={label} />
+                <Associative name={key} />
+            </div>
+        );
+    }
+    if (schema.type === "array") {
+        return (
+            <div>
+                <Label label={label} />
+                <List items={value[key]} />
+            </div>
+        );
+    }
+    if (schema.type === "special") {
+        return <></>;
+    }
+    return (
+        <div>
+            Unhandled: {key}: {schema.type}
+        </div>
+    );
+}
